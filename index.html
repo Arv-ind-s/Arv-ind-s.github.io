@@ -91,23 +91,28 @@
   /* neural canvas hero */
   #net{position:absolute;top:0;bottom:0;left:var(--rail);right:0;width:calc(100% - var(--rail));height:100%;z-index:0;display:block}
   .net-fade{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.86) 26%,rgba(8,26,35,.15) 62%,transparent 85%)}
-  .hero-inner{position:relative;z-index:2;pointer-events:none}
+    background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.82) 30%,rgba(8,26,35,.06) 52%,transparent 64%)}
+  .hero-inner{position:relative;z-index:2;pointer-events:none;max-width:530px}
   .hero-inner a,.hero-inner .mag{pointer-events:auto}
-  @media(max-width:760px){.net-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.72) 40%,rgba(8,26,35,.5) 100%)}}
+  @media(max-width:760px){
+    .net-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.74) 46%,rgba(8,26,35,.42) 100%)}
+    .hero-inner{max-width:100%}
+  }
 
   .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
   @media(max-width:560px){.hero-kick .sep{display:none}.hero-kick{font-size:.76rem}}
   .hero-kick .live{display:inline-flex;align-items:center;gap:7px;color:var(--gold)}
   .hero-kick .live .d{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:blink 2.2s var(--ease) infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  h1{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,7vw,5.6rem);line-height:1.03;letter-spacing:-.02em;margin-bottom:30px;max-width:16ch}
-  h1 .em{font-style:italic;color:var(--accent);font-weight:600}
-  h1 .gold{color:var(--gold);font-style:italic;font-weight:600}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(3.4rem,9.5vw,6.8rem);line-height:1;letter-spacing:-.02em;margin-bottom:20px}
+  h1 .accent{color:var(--accent)}
   .h1line{display:block;overflow:hidden}
   .h1line>span{display:block;transform:translateY(105%);animation:rise 1s var(--d,0s) var(--ease) both}
   @keyframes rise{to{transform:translateY(0)}}
-  .hero-sub{font-family:var(--mono);font-size:clamp(.9rem,1.8vw,1.05rem);color:var(--muted);margin-bottom:34px;letter-spacing:.02em}
+  .hero-tag{font-family:var(--serif);font-weight:400;font-size:clamp(1.15rem,2.5vw,1.55rem);line-height:1.4;color:var(--muted);max-width:44ch;margin-bottom:26px}
+  .hero-tag .em{font-style:italic;color:var(--accent);font-weight:600}
+  .hero-tag .gold{font-style:italic;color:var(--gold);font-weight:600}
+  .hero-sub{font-family:var(--mono);font-size:clamp(.85rem,1.6vw,.98rem);color:var(--muted);margin-bottom:34px;letter-spacing:.02em}
   .hero-sub .sep{color:var(--accent);padding:0 .5em}
   .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   .btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:9px;font-weight:600;font-size:.94rem;font-family:var(--body);transition:transform .18s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease);border:1px solid transparent;cursor:pointer;will-change:transform}
@@ -240,18 +245,17 @@
     <div class="net-fade" aria-hidden="true"></div>
     <div class="node"><span class="ring"></span><span class="core"></span></div>
     <div class="hero-inner">
-      <div class="hero-kick load" style="--d:.1s">Aravind&nbsp;S <span class="sep" style="color:var(--dim)">·</span> AI Engineer &amp; Builder <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
+      <div class="hero-kick load" style="--d:.1s">AI Engineer &amp; Builder <span class="sep" style="color:var(--dim)">·</span> Kochi, India <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
       <h1>
-        <span class="h1line"><span style="--d:.2s">I take models from</span></span>
-        <span class="h1line"><span class="em" style="--d:.32s">research</span></span>
-        <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production endpoint.</span></span></span>
+        <span class="h1line"><span style="--d:.2s">Aravind <span class="accent">S.</span></span></span>
       </h1>
-      <div class="hero-sub load" style="--d:.66s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
-      <div class="cta load" style="--d:.78s">
+      <p class="hero-tag load" style="--d:.38s">I take models from <span class="em">research</span> to a live <span class="gold">production endpoint.</span></p>
+      <div class="hero-sub load" style="--d:.5s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
+      <div class="cta load" style="--d:.62s">
         <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary mag">Explore Thought2Build <span class="arw">↗</span></a>
         <a href="#s-ship" class="btn ghost mag">Selected work</a>
       </div>
-      <div class="hint load" style="--d:.95s"><span class="m"></span> click the network · scroll to deploy</div>
+      <div class="hint load" style="--d:.78s"><span class="m"></span> click the network · scroll to deploy</div>
     </div>
   </section>
 
