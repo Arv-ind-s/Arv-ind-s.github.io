@@ -89,10 +89,11 @@
   .stag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.5}
 
   /* neural canvas hero */
-  #net{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:0;display:block}
+  #net{position:absolute;top:0;bottom:0;left:var(--rail);right:0;width:calc(100% - var(--rail));height:100%;z-index:0;display:block}
   .net-fade{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:1;pointer-events:none;
     background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.86) 26%,rgba(8,26,35,.15) 62%,transparent 85%)}
-  .hero-inner{position:relative;z-index:2}
+  .hero-inner{position:relative;z-index:2;pointer-events:none}
+  .hero-inner a,.hero-inner .mag{pointer-events:auto}
   @media(max-width:760px){.net-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.72) 40%,rgba(8,26,35,.5) 100%)}}
 
   .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
@@ -424,7 +425,7 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
 
   function size(){
     DPR = Math.min(2, devicePixelRatio||1);
-    W = cv.clientWidth; H = cv.clientHeight;
+    W = Math.max(1, cv.clientWidth); H = Math.max(1, cv.clientHeight);
     cv.width = W*DPR; cv.height = H*DPR;
     ctx.setTransform(DPR,0,0,DPR,0,0);
     build();
