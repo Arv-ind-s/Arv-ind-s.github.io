@@ -25,8 +25,7 @@
     --body:'Inter',system-ui,-apple-system,sans-serif;
     --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --ease:cubic-bezier(.22,1,.36,1);
-    --rail:96px;   /* desktop spine x + content offset */
-    --spx:40px;    /* spine x position */
+    --rail:96px; --spx:40px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -35,16 +34,13 @@
   ::selection{background:var(--accent);color:#081a23}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
 
-  /* ambient background: deep vignette + faint contour texture */
   .amb{position:fixed;inset:0;z-index:-2;background:
-    radial-gradient(1100px 620px at 88% -8%,rgba(255,122,77,.08),transparent 60%),
-    radial-gradient(760px 760px at -6% 106%,rgba(245,196,81,.05),transparent 62%),
-    var(--bg);}
+    radial-gradient(1100px 620px at 88% -8%,rgba(255,122,77,.07),transparent 60%),
+    radial-gradient(760px 760px at -6% 106%,rgba(245,196,81,.05),transparent 62%),var(--bg);}
   .amb::after{content:'';position:absolute;inset:0;opacity:.5;
-    background-image:radial-gradient(rgba(241,233,217,.045) 1px,transparent 1.3px);background-size:30px 30px;
+    background-image:radial-gradient(rgba(241,233,217,.04) 1px,transparent 1.3px);background-size:30px 30px;
     -webkit-mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);}
 
-  /* ---------- top bar ---------- */
   header.bar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
     padding:18px clamp(20px,5vw,56px);transition:.35s var(--ease);border-bottom:1px solid transparent}
   header.bar.scrolled{background:rgba(8,26,35,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:12px;padding-bottom:12px}
@@ -59,7 +55,6 @@
   .ghn:hover{border-color:var(--accent);color:var(--accent)!important}
   @media(max-width:760px){.navlinks a:not(.ghn){display:none}}
 
-  /* deploy progress readout (fixed) */
   .deploy{position:fixed;bottom:22px;right:22px;z-index:60;font-family:var(--mono);font-size:.72rem;color:var(--muted);
     display:flex;align-items:center;gap:9px;background:rgba(8,26,35,.7);backdrop-filter:blur(8px);border:1px solid var(--line);padding:8px 12px;border-radius:9px}
   .deploy .track{width:70px;height:4px;border-radius:3px;background:var(--spine);overflow:hidden}
@@ -67,23 +62,17 @@
   .deploy b{color:var(--ink);font-weight:500;min-width:34px;text-align:right}
   @media(max-width:560px){.deploy{display:none}}
 
-  /* ---------- pipeline scaffold ---------- */
   .pipeline{position:relative;max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
-  .spine{position:absolute;top:0;bottom:0;left:calc(clamp(20px,5vw,56px) + var(--spx));width:2px;background:var(--spine);z-index:0}
+  .spine{position:absolute;top:0;bottom:0;left:calc(clamp(20px,5vw,56px) + var(--spx));width:2px;background:var(--spine);z-index:1}
   .spine .fill{position:absolute;top:0;left:0;width:100%;height:0;background:linear-gradient(var(--accent),var(--accent) 82%,var(--gold));box-shadow:0 0 14px rgba(255,122,77,.5)}
   .tok{position:absolute;left:50%;width:5px;height:5px;border-radius:50%;background:var(--accent);transform:translateX(-50%);filter:drop-shadow(0 0 5px var(--accent));animation:flow 5.5s linear infinite;opacity:0}
   @keyframes flow{0%{top:-1%;opacity:0}8%{opacity:.9}92%{opacity:.9}100%{top:101%;opacity:0}}
 
-  /* ---------- stage ---------- */
   .stage{position:relative;padding:clamp(80px,12vh,150px) 0 clamp(80px,12vh,150px) var(--rail);min-height:60vh}
-  #s-hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:120px}
-  @media(max-width:640px){
-    :root{--rail:56px;--spx:20px}
-    .stage{padding-left:var(--rail)}
-  }
+  #s-hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:120px;overflow:hidden}
+  @media(max-width:640px){:root{--rail:56px;--spx:20px}}
 
-  /* node marker on spine */
-  .node{position:absolute;left:calc(var(--spx) - 11px);top:clamp(80px,12vh,150px);width:24px;height:24px;z-index:2}
+  .node{position:absolute;left:calc(var(--spx) - 11px);top:clamp(80px,12vh,150px);width:24px;height:24px;z-index:3}
   #s-hero .node{top:120px}
   .node .core{position:absolute;inset:7px;border-radius:50%;background:var(--bg);border:2px solid var(--dim);transition:.5s var(--ease)}
   .node .ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);opacity:0;transform:scale(.4)}
@@ -93,14 +82,19 @@
   .stage.ship.live .node .core{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 5px rgba(245,196,81,.15),0 0 18px rgba(245,196,81,.6)}
   .stage.ship.live .node .ring{border-color:var(--gold)}
 
-  /* stage tag (mono label beside node) */
   .stag{font-family:var(--mono);font-size:.76rem;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px;margin-bottom:22px;transition:color .5s var(--ease)}
   .stage.live .stag{color:var(--accent)}
   .stage.ship.live .stag{color:var(--gold)}
-  .stag .idx{color:var(--dim);opacity:.6}
+  .stag .idx{opacity:.6}
   .stag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.5}
 
-  /* ---------- hero ---------- */
+  /* neural canvas hero */
+  #net{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:0;display:block}
+  .net-fade{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.86) 26%,rgba(8,26,35,.15) 62%,transparent 85%)}
+  .hero-inner{position:relative;z-index:2}
+  @media(max-width:760px){.net-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.72) 40%,rgba(8,26,35,.5) 100%)}}
+
   .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
   @media(max-width:560px){.hero-kick .sep{display:none}.hero-kick{font-size:.76rem}}
   .hero-kick .live{display:inline-flex;align-items:center;gap:7px;color:var(--gold)}
@@ -115,24 +109,25 @@
   .hero-sub{font-family:var(--mono);font-size:clamp(.9rem,1.8vw,1.05rem);color:var(--muted);margin-bottom:34px;letter-spacing:.02em}
   .hero-sub .sep{color:var(--accent);padding:0 .5em}
   .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:9px;font-weight:600;font-size:.94rem;font-family:var(--body);transition:.3s var(--ease);border:1px solid transparent;cursor:pointer}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:9px;font-weight:600;font-size:.94rem;font-family:var(--body);transition:transform .18s var(--ease),box-shadow .3s var(--ease),background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease);border:1px solid transparent;cursor:pointer;will-change:transform}
   .btn .arw{transition:transform .3s var(--ease)}
   .btn:hover .arw{transform:translate(3px,-3px)}
   .btn.primary{background:var(--accent);color:#12100c}
-  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(255,122,77,.34)}
+  .btn.primary:hover{box-shadow:0 14px 34px rgba(255,122,77,.34)}
   .btn.ghost{border-color:var(--line2);color:var(--ink)}
-  .btn.ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+  .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
   .load{opacity:0;animation:fade .9s var(--d,0s) var(--ease) forwards}
   @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .hint{margin-top:60px;font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:10px}
+  .hint .m{width:19px;height:30px;border:1.5px solid var(--dim);border-radius:10px;position:relative}
+  .hint .m::before{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;border-radius:2px;background:var(--accent);animation:sc 1.8s var(--ease) infinite}
+  @keyframes sc{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,10px)}}
 
-  /* ---------- generic stage content ---------- */
   .stage h2{font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,4.4vw,3.1rem);letter-spacing:-.02em;line-height:1.08;margin-bottom:22px;max-width:20ch}
   .stage h2 .em{font-style:italic;color:var(--accent)}
   .lede{color:var(--muted);font-size:clamp(1rem,1.7vw,1.14rem);max-width:640px;margin-bottom:14px}
   .lede b{color:var(--ink);font-weight:600}
-  .lede .mono{font-family:var(--mono);font-size:.88em;color:var(--accent)}
 
-  /* research: two-column with artifact */
   .research-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start;margin-top:12px}
   @media(max-width:820px){.research-grid{grid-template-columns:1fr;gap:32px}}
   .about-p{color:var(--muted);margin-bottom:18px;font-size:1.02rem}
@@ -147,18 +142,15 @@
   .term .body{padding:20px;line-height:1.9;overflow-x:auto}
   .term .kw{color:#ff9e6b}.term .cls{color:var(--gold)}.term .self{color:#ef7d8f}.term .str{color:#8fce9b}.term .fn{color:#6fb6d6}.term .cm{color:var(--dim)}
 
-  /* train: layer stack */
-  .layers{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .layers{display:flex;flex-direction:column;gap:14px;margin-top:34px}
   .layer{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);transition:.32s var(--ease)}
   .layer:hover{border-color:var(--accent-line);transform:translateX(6px);background:var(--panel2)}
   @media(max-width:640px){.layer{grid-template-columns:1fr;gap:10px}}
   .layer .lname{font-family:var(--mono);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
   .layer .chips{display:flex;flex-wrap:wrap;gap:8px}
   .chip{font-family:var(--mono);font-size:.83rem;padding:6px 12px;border-radius:7px;border:1px solid var(--line2);color:var(--ink);transition:.22s var(--ease)}
-  .layer:hover .chip{border-color:var(--line2)}
   .chip:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
-  /* ship: deployment records */
   .flag{border:1px solid var(--line2);border-radius:14px;background:linear-gradient(165deg,var(--panel2),var(--bg2));padding:clamp(24px,4vw,40px);position:relative;overflow:hidden;margin:8px 0 22px}
   .flag::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
   .flag .badge{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
@@ -201,14 +193,12 @@
   .rec ul li b{color:var(--ink);font-weight:600}
   .more{margin-top:26px}
 
-  /* endpoint: contact */
   #s-contact h2{max-width:18ch}
   .endpoint{color:var(--muted);max-width:520px;margin-bottom:34px;font-size:1.06rem}
   .crow{display:flex;gap:13px;flex-wrap:wrap}
   .foot{margin-top:70px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--dim);font-family:var(--mono);font-size:.77rem}
   .foot a:hover{color:var(--accent)}
 
-  /* scroll reveals */
   .rv{opacity:0;transform:translateY(24px);transition:opacity .75s var(--ease),transform .75s var(--ease);transition-delay:var(--rd,0s)}
   .rv.in{opacity:1;transform:none}
 
@@ -218,7 +208,7 @@
     .tok{display:none}
   }
 </style>
-<noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}</style></noscript>
+<noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}#net{display:none}</style></noscript>
 </head>
 <body>
 <div class="amb"></div>
@@ -234,39 +224,40 @@
   </nav>
 </header>
 
-<div class="deploy" aria-hidden="true">
-  <span>deploy</span><span class="track"><span class="fill" id="dfill"></span></span><b id="dpct">0%</b>
-</div>
+<div class="deploy" aria-hidden="true"><span>deploy</span><span class="track"><span class="fill" id="dfill"></span></span><b id="dpct">0%</b></div>
 
 <main class="pipeline" id="top">
   <div class="spine" aria-hidden="true">
     <div class="fill" id="spineFill"></div>
-    <span class="tok" style="animation-delay:0s"></span>
-    <span class="tok" style="animation-delay:-1.4s"></span>
-    <span class="tok" style="animation-delay:-2.8s"></span>
-    <span class="tok" style="animation-delay:-4.1s"></span>
+    <span class="tok" style="animation-delay:0s"></span><span class="tok" style="animation-delay:-1.4s"></span>
+    <span class="tok" style="animation-delay:-2.8s"></span><span class="tok" style="animation-delay:-4.1s"></span>
   </div>
 
-  <!-- ============ HERO ============ -->
+  <!-- HERO -->
   <section class="stage" id="s-hero">
+    <canvas id="net" aria-hidden="true"></canvas>
+    <div class="net-fade" aria-hidden="true"></div>
     <div class="node"><span class="ring"></span><span class="core"></span></div>
-    <div class="hero-kick load" style="--d:.1s">Aravind&nbsp;S <span class="sep" style="color:var(--dim)">·</span> AI Engineer &amp; Builder <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
-    <h1>
-      <span class="h1line"><span style="--d:.2s">I take models from</span></span>
-      <span class="h1line"><span class="em" style="--d:.32s">research</span></span>
-      <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production endpoint.</span></span></span>
-    </h1>
-    <div class="hero-sub load" style="--d:.66s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
-    <div class="cta load" style="--d:.78s">
-      <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary">Explore Thought2Build <span class="arw">↗</span></a>
-      <a href="#s-ship" class="btn ghost">Selected work</a>
+    <div class="hero-inner">
+      <div class="hero-kick load" style="--d:.1s">Aravind&nbsp;S <span class="sep" style="color:var(--dim)">·</span> AI Engineer &amp; Builder <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
+      <h1>
+        <span class="h1line"><span style="--d:.2s">I take models from</span></span>
+        <span class="h1line"><span class="em" style="--d:.32s">research</span></span>
+        <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production endpoint.</span></span></span>
+      </h1>
+      <div class="hero-sub load" style="--d:.66s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
+      <div class="cta load" style="--d:.78s">
+        <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary mag">Explore Thought2Build <span class="arw">↗</span></a>
+        <a href="#s-ship" class="btn ghost mag">Selected work</a>
+      </div>
+      <div class="hint load" style="--d:.95s"><span class="m"></span> click the network · scroll to deploy</div>
     </div>
   </section>
 
-  <!-- ============ RESEARCH / about ============ -->
-  <section class="stage" id="s-research" data-tag="research" data-idx="01">
+  <!-- RESEARCH -->
+  <section class="stage" id="s-research">
     <div class="node"><span class="ring"></span><span class="core"></span></div>
-    <div class="stag rv"><span class="idx">01</span> Research</div>
+    <div class="stag rv"><span class="idx">01</span> <span class="lbl" data-scramble>Research</span></div>
     <h2 class="rv" style="--rd:.05s">I care about <span class="em">why a model fails</span> — then engineer around it.</h2>
     <div class="research-grid">
       <div>
@@ -293,13 +284,13 @@
     </div>
   </section>
 
-  <!-- ============ TRAIN / stack ============ -->
-  <section class="stage" id="s-train" data-tag="train" data-idx="02">
+  <!-- TRAIN -->
+  <section class="stage" id="s-train">
     <div class="node"><span class="ring"></span><span class="core"></span></div>
-    <div class="stag rv"><span class="idx">02</span> Train</div>
+    <div class="stag rv"><span class="idx">02</span> <span class="lbl" data-scramble>Train</span></div>
     <h2 class="rv" style="--rd:.05s">The <span class="em">layers</span> I build with.</h2>
     <p class="lede rv" style="--rd:.1s">From raw data up to a deployed endpoint — the working toolkit behind the projects.</p>
-    <div class="layers" style="margin-top:34px">
+    <div class="layers">
       <div class="layer rv"><div class="lname">Language</div><div class="chips"><span class="chip">Python</span></div></div>
       <div class="layer rv" style="--rd:.05s"><div class="lname">ML / DL</div><div class="chips"><span class="chip">PyTorch</span><span class="chip">scikit-learn</span><span class="chip">Hugging Face</span><span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">BERT</span></div></div>
       <div class="layer rv" style="--rd:.1s"><div class="lname">GenAI / LLM</div><div class="chips"><span class="chip">LangChain</span><span class="chip">RAG</span><span class="chip">ChromaDB</span><span class="chip">LlamaCloud</span><span class="chip">Tavily</span><span class="chip">GPT-4o-mini</span></div></div>
@@ -308,12 +299,11 @@
     </div>
   </section>
 
-  <!-- ============ SHIP / work ============ -->
-  <section class="stage ship" id="s-ship" data-tag="ship" data-idx="03">
+  <!-- SHIP -->
+  <section class="stage ship" id="s-ship">
     <div class="node"><span class="ring"></span><span class="core"></span></div>
-    <div class="stag rv"><span class="idx">03</span> Ship</div>
+    <div class="stag rv"><span class="idx">03</span> <span class="lbl" data-scramble>Ship</span></div>
     <h2 class="rv" style="--rd:.05s">Deployed to <span class="em">production.</span></h2>
-
     <div class="flag rv" style="--rd:.05s">
       <div class="badge"><span class="d"></span>Flagship · Live · thought2build.com</div>
       <h3>Thought2Build</h3>
@@ -331,89 +321,212 @@
           <h4>Built for</h4>
           <p>Founders, product teams, engineers &amp; AI-agent workflows that need real structure between <i>idea</i> and <i>execution</i>.</p>
           <div class="mtags"><span>GenAI</span><span>LLM Orchestration</span><span>Multi-provider</span><span>Full-stack</span></div>
-          <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary" style="margin-top:20px">Launch app <span class="arw">↗</span></a>
+          <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary mag" style="margin-top:20px">Launch app <span class="arw">↗</span></a>
         </div>
       </div>
     </div>
-
     <div class="deploys">
       <a class="rec rv" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">
         <div class="rk"><span class="s"></span>Open source · Python</div>
         <h3>Nexus Research Assistant <span class="arw">↗</span></h3>
         <p>Agentic LLM research assistant fusing a <b>private knowledge base</b> with <b>real-time web intelligence</b>.</p>
-        <ul>
-          <li><b>Hybrid retrieval</b> — intent classifier routes each query to ChromaDB, Tavily, or both</li>
-          <li><b>Multi-agent:</b> Classifier → Researcher → Synthesizer</li>
-          <li><b>Dual-source citations</b> + SQLite caching for cost &amp; latency</li>
-        </ul>
+        <ul><li><b>Hybrid retrieval</b> — intent classifier routes each query to ChromaDB, Tavily, or both</li><li><b>Multi-agent:</b> Classifier → Researcher → Synthesizer</li><li><b>Dual-source citations</b> + SQLite caching for cost &amp; latency</li></ul>
         <div class="mtags"><span>LangChain</span><span>GPT-4o-mini</span><span>ChromaDB</span><span>Tavily</span></div>
       </a>
       <a class="rec rv" style="--rd:.1s" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">
         <div class="rk"><span class="s"></span>Serverless · AWS</div>
         <h3>Content Moderation <span class="arw">↗</span></h3>
         <p>Real-time NLP toxicity detection, <b>serverless and sub-second at scale</b>.</p>
-        <ul>
-          <li>Fine-tuned <b>BERT</b> for 6-category toxicity classification</li>
-          <li><b>Serverless AWS</b> with async audit logging</li>
-          <li>Auto-scaling deployment targeting <b>99.9% uptime</b></li>
-        </ul>
+        <ul><li>Fine-tuned <b>BERT</b> for 6-category toxicity classification</li><li><b>Serverless AWS</b> with async audit logging</li><li>Auto-scaling deployment targeting <b>99.9% uptime</b></li></ul>
         <div class="mtags"><span>BERT</span><span>AWS Lambda</span><span>DynamoDB</span></div>
       </a>
     </div>
-    <div class="more rv"><a href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener" class="btn ghost">More on GitHub <span class="arw">↗</span></a></div>
+    <div class="more rv"><a href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener" class="btn ghost mag">More on GitHub <span class="arw">↗</span></a></div>
   </section>
 
-  <!-- ============ ENDPOINT / contact ============ -->
-  <section class="stage" id="s-contact" data-tag="endpoint" data-idx="04">
+  <!-- ENDPOINT -->
+  <section class="stage" id="s-contact">
     <div class="node"><span class="ring"></span><span class="core"></span></div>
-    <div class="stag rv"><span class="idx">04</span> Endpoint</div>
+    <div class="stag rv"><span class="idx">04</span> <span class="lbl" data-scramble>Endpoint</span></div>
     <h2 class="rv" style="--rd:.05s">Let's build something <span class="em">worth shipping.</span></h2>
     <p class="endpoint rv" style="--rd:.1s">Open to AI / ML Engineer roles and ambitious collaborative projects. Always happy to talk AI, cloud architecture, or a hard technical problem.</p>
     <div class="crow rv" style="--rd:.15s">
-      <a href="mailto:arvindsathyan@gmail.com" class="btn primary">arvindsathyan@gmail.com <span class="arw">↗</span></a>
-      <a href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener" class="btn ghost">LinkedIn <span class="arw">↗</span></a>
-      <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="btn ghost">GitHub <span class="arw">↗</span></a>
+      <a href="mailto:arvindsathyan@gmail.com" class="btn primary mag">arvindsathyan@gmail.com <span class="arw">↗</span></a>
+      <a href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener" class="btn ghost mag">LinkedIn <span class="arw">↗</span></a>
+      <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="btn ghost mag">GitHub <span class="arw">↗</span></a>
     </div>
-    <div class="foot">
-      <span>© <span id="yr"></span> Aravind S</span>
-      <span>Research today · Deploy tomorrow</span>
-    </div>
+    <div class="foot"><span>© <span id="yr"></span> Aravind S</span><span>Research today · Deploy tomorrow</span></div>
   </section>
 </main>
 
 <script>
-  document.getElementById('yr').textContent = new Date().getFullYear();
-  const bar = document.getElementById('bar');
-  const spineFill = document.getElementById('spineFill');
-  const dfill = document.getElementById('dfill');
-  const dpct = document.getElementById('dpct');
-  const pipeline = document.getElementById('top');
-  let ticking = false;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.getElementById('yr').textContent = new Date().getFullYear();
 
-  function onScroll(){
-    bar.classList.toggle('scrolled', scrollY > 40);
-    const rect = pipeline.getBoundingClientRect();
-    const total = pipeline.offsetHeight - innerHeight;
-    const prog = Math.min(1, Math.max(0, (-rect.top) / (total || 1)));
-    spineFill.style.height = (prog * 100).toFixed(2) + '%';
-    dfill.style.width = (prog * 100).toFixed(1) + '%';
-    dpct.textContent = Math.round(prog * 100) + '%';
-    ticking = false;
+/* ---------- scroll: bar + spine deploy progress ---------- */
+const bar = document.getElementById('bar');
+const spineFill = document.getElementById('spineFill');
+const dfill = document.getElementById('dfill');
+const dpct = document.getElementById('dpct');
+const pipeline = document.getElementById('top');
+let ticking = false;
+function onScroll(){
+  bar.classList.toggle('scrolled', scrollY > 40);
+  const total = pipeline.offsetHeight - innerHeight;
+  const prog = Math.min(1, Math.max(0, (-pipeline.getBoundingClientRect().top) / (total || 1)));
+  spineFill.style.height = (prog*100).toFixed(2) + '%';
+  dfill.style.width = (prog*100).toFixed(1) + '%';
+  dpct.textContent = Math.round(prog*100) + '%';
+  ticking = false;
+}
+addEventListener('scroll', () => { if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
+onScroll();
+
+/* ---------- node ignition + content reveals ---------- */
+const stageIO = new IntersectionObserver((es)=>es.forEach(e=>e.target.classList.toggle('live', e.isIntersecting)), { rootMargin:'-45% 0px -45% 0px' });
+document.querySelectorAll('.stage').forEach(s=>stageIO.observe(s));
+const rvIO = new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); rvIO.unobserve(e.target); } }),{ threshold:.16, rootMargin:'0px 0px -8% 0px' });
+document.querySelectorAll('.rv').forEach(n=>rvIO.observe(n));
+
+/* ---------- text scramble on stage labels ---------- */
+const GLY = 'ABCDEFGHKLMNPRSTUVXYZ0123456789/<>_{}';
+function scramble(el){
+  const final = el.textContent; el.dataset.done = '1';
+  if(reduce){ return; }
+  let i = 0;
+  const iv = setInterval(()=>{
+    el.textContent = final.split('').map((c,idx)=> idx < Math.floor(i) ? c : (c===' '?' ':GLY[Math.random()*GLY.length|0])).join('');
+    i += 0.5;
+    if(i >= final.length){ clearInterval(iv); el.textContent = final; }
+  }, 45);
+}
+const scIO = new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting && !e.target.dataset.done){ scramble(e.target); scIO.unobserve(e.target); } }),{ threshold:.6 });
+document.querySelectorAll('[data-scramble]').forEach(el=>scIO.observe(el));
+
+/* ---------- magnetic buttons ---------- */
+if(!reduce && matchMedia('(pointer:fine)').matches){
+  document.querySelectorAll('.mag').forEach(b=>{
+    b.addEventListener('pointermove', e=>{
+      const r = b.getBoundingClientRect();
+      b.style.transform = `translate(${(e.clientX-r.left-r.width/2)*0.28}px, ${(e.clientY-r.top-r.height/2)*0.42}px)`;
+    });
+    b.addEventListener('pointerleave', ()=> b.style.transform = '');
+  });
+}
+
+/* ---------- interactive neural-network canvas ---------- */
+(function(){
+  const cv = document.getElementById('net');
+  if(!cv) return;
+  const ctx = cv.getContext('2d');
+  const LAYERS = [4,6,6,5,2];
+  let W=0,H=0,DPR=1, nodes=[], edges=[], outs=[], pulses=[], layerStart=[], mouse={x:-9999,y:-9999}, running=false, injTimer=0;
+
+  function size(){
+    DPR = Math.min(2, devicePixelRatio||1);
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W*DPR; cv.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    build();
   }
-  addEventListener('scroll', () => { if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
-  onScroll();
+  function build(){
+    nodes=[]; edges=[]; outs=[]; layerStart=[];
+    const narrow = W < 640;
+    const padL = W*(narrow?0.18:0.34), padR = W*0.94;
+    const colW = (padR-padL)/(LAYERS.length-1);
+    let idx=0;
+    LAYERS.forEach((count,li)=>{
+      layerStart[li]=idx;
+      const gap = H/(count+1);
+      for(let i=0;i<count;i++){ const x=padL+colW*li, y=gap*(i+1); nodes.push({x,y,bx:x,by:y,ox:0,oy:0,glow:0,layer:li}); idx++; }
+    });
+    for(let n=0;n<nodes.length;n++) outs[n]=[];
+    for(let li=0; li<LAYERS.length-1; li++){
+      const a0=layerStart[li], a1=a0+LAYERS[li], b0=a1, b1=b0+LAYERS[li+1];
+      for(let a=a0;a<a1;a++) for(let b=b0;b<b1;b++){ edges.push([a,b]); outs[a].push(b); }
+    }
+    pulses=[];
+  }
+  function fire(nodeIdx){
+    const outsOf = outs[nodeIdx]; if(!outsOf.length) return;
+    // fan out to a random subset for organic waves
+    const k = Math.max(1, Math.round(outsOf.length*(0.5+Math.random()*0.5)));
+    const shuffled = outsOf.slice().sort(()=>Math.random()-0.5).slice(0,k);
+    shuffled.forEach(b=> pulses.push({a:nodeIdx,b, t:0, sp:0.014+Math.random()*0.012}));
+  }
+  function inject(){ for(let i=layerStart[0]; i<layerStart[0]+LAYERS[0]; i++){ if(Math.random()<0.75){ nodes[i].glow=1; fire(i); } } }
 
-  // node ignition per stage
-  const stageIO = new IntersectionObserver((es) => {
-    es.forEach(e => e.target.classList.toggle('live', e.isIntersecting));
-  }, { rootMargin: '-45% 0px -45% 0px' });
-  document.querySelectorAll('.stage').forEach(s => stageIO.observe(s));
+  function frame(ts){
+    if(!running) return;
+    ctx.clearRect(0,0,W,H);
+    // periodic forward pass
+    if(ts-injTimer > 2200){ inject(); injTimer=ts; }
+    // edges
+    ctx.lineWidth = 1;
+    for(const [a,b] of edges){
+      const na=nodes[a], nb=nodes[b];
+      const act = Math.max(na.glow, nb.glow);
+      ctx.strokeStyle = `rgba(241,233,217,${0.04+act*0.16})`;
+      ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y); ctx.stroke();
+    }
+    // pulses
+    for(let i=pulses.length-1;i>=0;i--){
+      const p=pulses[i], na=nodes[p.a], nb=nodes[p.b];
+      p.t += p.sp;
+      const x=na.x+(nb.x-na.x)*p.t, y=na.y+(nb.y-na.y)*p.t;
+      const isGold = nb.layer===LAYERS.length-1;
+      ctx.fillStyle = isGold ? 'rgba(245,196,81,.95)' : 'rgba(255,122,77,.95)';
+      ctx.shadowColor = isGold ? '#f5c451' : '#ff7a4d'; ctx.shadowBlur = 10;
+      ctx.beginPath(); ctx.arc(x,y,2.4,0,7); ctx.fill();
+      ctx.shadowBlur = 0;
+      if(p.t>=1){ nb.glow=1; fire(p.b); pulses.splice(i,1); }
+    }
+    // nodes + cursor spring
+    for(const n of nodes){
+      const dx=n.bx-mouse.x, dy=n.by-mouse.y, d=Math.hypot(dx,dy);
+      let tx=0,ty=0;
+      if(d<120){ const f=(1-d/120)*22; tx=dx/d*f; ty=dy/d*f; n.glow=Math.max(n.glow,(1-d/120)*0.6); }
+      n.ox += (tx-n.ox)*0.12; n.oy += (ty-n.oy)*0.12;
+      n.x = n.bx+n.ox; n.y = n.by+n.oy;
+      n.glow *= 0.955;
+      const r = 2.6 + n.glow*3.4;
+      if(n.glow>0.05){ ctx.shadowColor='#ff7a4d'; ctx.shadowBlur=8*n.glow; }
+      ctx.fillStyle = `rgba(255,122,77,${0.22+n.glow*0.78})`;
+      if(n.layer===LAYERS.length-1) ctx.fillStyle = `rgba(245,196,81,${0.3+n.glow*0.7})`;
+      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,7); ctx.fill(); ctx.shadowBlur=0;
+    }
+    requestAnimationFrame(frame);
+  }
+  function start(){ if(running||reduce) return; running=true; injTimer=performance.now(); requestAnimationFrame(frame); }
+  function stop(){ running=false; }
 
-  // content reveals
-  const rvIO = new IntersectionObserver((es) => {
-    es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); rvIO.unobserve(e.target); } });
-  }, { threshold:.16, rootMargin:'0px 0px -8% 0px' });
-  document.querySelectorAll('.rv').forEach(n => rvIO.observe(n));
+  cv.addEventListener('pointermove', e=>{ const r=cv.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
+  cv.addEventListener('pointerleave', ()=>{ mouse.x=mouse.y=-9999; });
+  const hero = document.getElementById('s-hero');
+  hero.addEventListener('click', e=>{ // fire a pass from nearest input node
+    const r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    let best=layerStart[0], bd=1e9;
+    for(let i=layerStart[0];i<layerStart[0]+LAYERS[0];i++){ const d=Math.hypot(nodes[i].bx-mx,nodes[i].by-my); if(d<bd){bd=d;best=i;} }
+    nodes[best].glow=1; fire(best);
+  });
+
+  let staticDrawn=false;
+  function drawStatic(){ // reduced-motion / no-anim frame
+    ctx.clearRect(0,0,W,H);
+    ctx.lineWidth=1;
+    for(const [a,b] of edges){ ctx.strokeStyle='rgba(241,233,217,.06)'; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
+    for(const n of nodes){ ctx.fillStyle = n.layer===LAYERS.length-1?'rgba(245,196,81,.7)':'rgba(255,122,77,.55)'; ctx.beginPath(); ctx.arc(n.x,n.y,3,0,7); ctx.fill(); }
+    staticDrawn=true;
+  }
+
+  addEventListener('resize', ()=>{ size(); if(reduce) drawStatic(); }, {passive:true});
+  size();
+  if(reduce){ drawStatic(); }
+  else {
+    new IntersectionObserver((es)=>es.forEach(e=> e.isIntersecting ? start() : stop())).observe(hero);
+    document.addEventListener('visibilitychange', ()=> document.hidden ? stop() : start());
+  }
+})();
 </script>
 </body>
 </html>
