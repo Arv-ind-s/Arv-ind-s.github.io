@@ -101,11 +101,12 @@
   .stag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.5}
 
   /* ---------- hero ---------- */
-  .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;gap:10px}
+  .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+  @media(max-width:560px){.hero-kick .sep{display:none}.hero-kick{font-size:.76rem}}
   .hero-kick .live{display:inline-flex;align-items:center;gap:7px;color:var(--gold)}
   .hero-kick .live .d{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:blink 2.2s var(--ease) infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-  h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.7rem,7.2vw,5.6rem);line-height:1.02;letter-spacing:-.02em;margin-bottom:30px;max-width:16ch}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(2rem,7vw,5.6rem);line-height:1.03;letter-spacing:-.02em;margin-bottom:30px;max-width:16ch}
   h1 .em{font-style:italic;color:var(--accent);font-weight:600}
   h1 .gold{color:var(--gold);font-style:italic;font-weight:600}
   .h1line{display:block;overflow:hidden}
@@ -253,7 +254,7 @@
     <h1>
       <span class="h1line"><span style="--d:.2s">I take models from</span></span>
       <span class="h1line"><span class="em" style="--d:.32s">research</span></span>
-      <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production&nbsp;endpoint.</span></span></span>
+      <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production endpoint.</span></span></span>
     </h1>
     <div class="hero-sub load" style="--d:.66s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
     <div class="cta load" style="--d:.78s">
