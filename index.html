@@ -4,235 +4,279 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Aravind S — AI Engineer &amp; Builder</title>
-<meta name="description" content="Aravind S — AI Engineer &amp; Builder. GenAI, RAG, LLM agents and MLOps on AWS. Creator of thought2build.com." />
-<meta property="og:title" content="Aravind S — AI Engineer &amp; Builder" />
-<meta property="og:description" content="GenAI · RAG · LLM Agents · AWS MLOps. Creator of thought2build.com." />
+<meta name="description" content="Aravind S — AI Engineer & Builder. I take machine-learning models from research to a live production endpoint. Creator of thought2build.com." />
+<meta property="og:title" content="Aravind S — AI Engineer & Builder" />
+<meta property="og:description" content="From research to a live production endpoint. GenAI · RAG · LLM agents · AWS MLOps. Creator of thought2build.com." />
 <meta property="og:type" content="website" />
-<meta name="theme-color" content="#17140f" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2317140f'/%3E%3Ctext x='50' y='72' font-family='monospace' font-size='64' font-weight='700' text-anchor='middle' fill='%23f7b23b'%3Ea%3C/text%3E%3C/svg%3E" />
+<meta name="theme-color" content="#081a23" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23081a23'/%3E%3Ccircle cx='50' cy='30' r='7' fill='%23ff7a4d'/%3E%3Crect x='47' y='34' width='6' height='40' fill='%23ff7a4d' opacity='.5'/%3E%3Ccircle cx='50' cy='74' r='9' fill='none' stroke='%23f5c451' stroke-width='5'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#17140f; --bg2:#1d1913; --card:#201b14; --card2:#242019;
-    --ink:#f3ead7; --muted:#b0a48c; --dim:#7b7160;
-    --line:rgba(243,234,215,.09); --line2:rgba(243,234,215,.14);
-    --accent:#f7b23b; --accent-2:#ffc862; --accent-dim:rgba(247,178,59,.14);
-    --live:#c8b45f;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-    --disp:'Bricolage Grotesque',system-ui,sans-serif;
+    --bg:#081a23; --bg2:#0b2431; --panel:#0e2c3b; --panel2:#123647;
+    --ink:#f1e9d9; --muted:#9db0b5; --dim:#5f757b;
+    --line:rgba(241,233,217,.10); --line2:rgba(241,233,217,.17);
+    --accent:#ff7a4d; --accent-soft:rgba(255,122,77,.13); --accent-line:rgba(255,122,77,.4);
+    --gold:#f5c451;
+    --spine:rgba(241,233,217,.13);
+    --serif:'Fraunces',Georgia,'Times New Roman',serif;
     --body:'Inter',system-ui,-apple-system,sans-serif;
-    --ease:cubic-bezier(.19,1,.22,1);
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --ease:cubic-bezier(.22,1,.36,1);
+    --rail:96px;   /* desktop spine x + content offset */
+    --spx:40px;    /* spine x position */
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-  body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
-  ::selection{background:var(--accent);color:#17140f}
+  ::selection{background:var(--accent);color:#081a23}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
 
-  /* ---------- crafted background: warm dot texture + faint wash ---------- */
-  .bg-wrap{position:fixed;inset:0;z-index:-2;background:
-    radial-gradient(820px 460px at 84% -6%, rgba(247,178,59,.055), transparent 62%),
-    radial-gradient(640px 640px at -8% 108%, rgba(247,178,59,.035), transparent 60%),
+  /* ambient background: deep vignette + faint contour texture */
+  .amb{position:fixed;inset:0;z-index:-2;background:
+    radial-gradient(1100px 620px at 88% -8%,rgba(255,122,77,.08),transparent 60%),
+    radial-gradient(760px 760px at -6% 106%,rgba(245,196,81,.05),transparent 62%),
     var(--bg);}
-  .dots{position:fixed;inset:0;z-index:-1;
-    background-image:radial-gradient(rgba(243,234,215,.055) 1px,transparent 1.4px);
-    background-size:26px 26px;
-    -webkit-mask-image:radial-gradient(circle at 50% -8%,#000 38%,transparent 76%);
-    mask-image:radial-gradient(circle at 50% -8%,#000 38%,transparent 76%);}
+  .amb::after{content:'';position:absolute;inset:0;opacity:.5;
+    background-image:radial-gradient(rgba(241,233,217,.045) 1px,transparent 1.3px);background-size:30px 30px;
+    -webkit-mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);}
 
-  /* ---------- nav ---------- */
-  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
-    padding:20px clamp(20px,5vw,60px);transition:.35s var(--ease);border-bottom:1px solid transparent}
-  nav.scrolled{background:rgba(23,20,15,.78);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:13px;padding-bottom:13px}
-  .logo{font-family:var(--mono);font-weight:700;font-size:1.02rem;letter-spacing:-.01em}
-  .logo b{color:var(--accent)}
-  .navlinks{display:flex;gap:30px;align-items:center;font-size:.9rem;font-weight:500}
-  .navlinks a{color:var(--muted);position:relative;transition:color .2s}
-  .navlinks a:not(.nav-cta):hover{color:var(--ink)}
-  .navlinks a:not(.nav-cta)::after{content:'';position:absolute;left:0;bottom:-5px;height:1.5px;width:0;background:var(--accent);transition:width .32s var(--ease)}
-  .navlinks a:not(.nav-cta):hover::after{width:100%}
-  .nav-cta{padding:8px 16px;border:1px solid var(--line2);border-radius:8px;color:var(--ink)!important;font-weight:600;transition:.25s var(--ease)}
-  .nav-cta:hover{border-color:var(--accent);color:var(--accent)!important}
-  @media(max-width:720px){.navlinks a:not(.nav-cta){display:none}}
+  /* ---------- top bar ---------- */
+  header.bar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px);transition:.35s var(--ease);border-bottom:1px solid transparent}
+  header.bar.scrolled{background:rgba(8,26,35,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:12px;padding-bottom:12px}
+  .brand{font-family:var(--mono);font-weight:700;font-size:.98rem;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .brand .bdot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+  .navlinks{display:flex;gap:26px;align-items:center;font-family:var(--mono);font-size:.82rem}
+  .navlinks a{color:var(--muted);position:relative;transition:color .2s;letter-spacing:.02em}
+  .navlinks a:not(.ghn):hover{color:var(--ink)}
+  .navlinks a:not(.ghn)::after{content:'';position:absolute;left:0;bottom:-5px;height:1.5px;width:0;background:var(--accent);transition:width .3s var(--ease)}
+  .navlinks a:not(.ghn):hover::after{width:100%}
+  .ghn{border:1px solid var(--line2);padding:7px 13px;border-radius:7px;color:var(--ink)!important;transition:.25s var(--ease)}
+  .ghn:hover{border-color:var(--accent);color:var(--accent)!important}
+  @media(max-width:760px){.navlinks a:not(.ghn){display:none}}
 
-  /* ---------- layout primitives ---------- */
-  section{padding:clamp(72px,11vw,140px) clamp(20px,6vw,80px);max-width:1120px;margin:0 auto}
-  .kicker{font-family:var(--mono);font-size:.76rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;display:flex;align-items:center;gap:12px}
-  .kicker::before{content:'';width:26px;height:1px;background:var(--accent)}
-  h2.sec{font-family:var(--disp);font-size:clamp(1.9rem,4.4vw,3rem);font-weight:600;letter-spacing:-.025em;margin-bottom:18px;line-height:1.08}
-  .sec-sub{color:var(--muted);max-width:620px;margin-bottom:52px;font-size:1.02rem}
+  /* deploy progress readout (fixed) */
+  .deploy{position:fixed;bottom:22px;right:22px;z-index:60;font-family:var(--mono);font-size:.72rem;color:var(--muted);
+    display:flex;align-items:center;gap:9px;background:rgba(8,26,35,.7);backdrop-filter:blur(8px);border:1px solid var(--line);padding:8px 12px;border-radius:9px}
+  .deploy .track{width:70px;height:4px;border-radius:3px;background:var(--spine);overflow:hidden}
+  .deploy .fill{height:100%;width:0;background:var(--accent);border-radius:3px}
+  .deploy b{color:var(--ink);font-weight:500;min-width:34px;text-align:right}
+  @media(max-width:560px){.deploy{display:none}}
+
+  /* ---------- pipeline scaffold ---------- */
+  .pipeline{position:relative;max-width:1080px;margin:0 auto;padding:0 clamp(20px,5vw,56px)}
+  .spine{position:absolute;top:0;bottom:0;left:calc(clamp(20px,5vw,56px) + var(--spx));width:2px;background:var(--spine);z-index:0}
+  .spine .fill{position:absolute;top:0;left:0;width:100%;height:0;background:linear-gradient(var(--accent),var(--accent) 82%,var(--gold));box-shadow:0 0 14px rgba(255,122,77,.5)}
+  .tok{position:absolute;left:50%;width:5px;height:5px;border-radius:50%;background:var(--accent);transform:translateX(-50%);filter:drop-shadow(0 0 5px var(--accent));animation:flow 5.5s linear infinite;opacity:0}
+  @keyframes flow{0%{top:-1%;opacity:0}8%{opacity:.9}92%{opacity:.9}100%{top:101%;opacity:0}}
+
+  /* ---------- stage ---------- */
+  .stage{position:relative;padding:clamp(80px,12vh,150px) 0 clamp(80px,12vh,150px) var(--rail);min-height:60vh}
+  #s-hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:120px}
+  @media(max-width:640px){
+    :root{--rail:56px;--spx:20px}
+    .stage{padding-left:var(--rail)}
+  }
+
+  /* node marker on spine */
+  .node{position:absolute;left:calc(var(--spx) - 11px);top:clamp(80px,12vh,150px);width:24px;height:24px;z-index:2}
+  #s-hero .node{top:120px}
+  .node .core{position:absolute;inset:7px;border-radius:50%;background:var(--bg);border:2px solid var(--dim);transition:.5s var(--ease)}
+  .node .ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);opacity:0;transform:scale(.4)}
+  .stage.live .node .core{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 5px var(--accent-soft),0 0 18px rgba(255,122,77,.6)}
+  .stage.live .node .ring{animation:ping 2.6s var(--ease) infinite}
+  @keyframes ping{0%{opacity:.7;transform:scale(.5)}70%,100%{opacity:0;transform:scale(1.5)}}
+  .stage.ship.live .node .core{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 5px rgba(245,196,81,.15),0 0 18px rgba(245,196,81,.6)}
+  .stage.ship.live .node .ring{border-color:var(--gold)}
+
+  /* stage tag (mono label beside node) */
+  .stag{font-family:var(--mono);font-size:.76rem;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:12px;margin-bottom:22px;transition:color .5s var(--ease)}
+  .stage.live .stag{color:var(--accent)}
+  .stage.ship.live .stag{color:var(--gold)}
+  .stag .idx{color:var(--dim);opacity:.6}
+  .stag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.5}
 
   /* ---------- hero ---------- */
-  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:1120px;margin:0 auto;padding:128px clamp(20px,6vw,80px) 90px}
-  .avail{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.78rem;letter-spacing:.02em;color:var(--muted);
-    border:1px solid var(--line2);padding:7px 14px;border-radius:999px;margin-bottom:30px;width:max-content}
-  .avail .dot{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 0 rgba(200,180,95,.6);animation:ping 2.4s var(--ease) infinite}
-  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(200,180,95,.5)}70%,100%{box-shadow:0 0 0 7px rgba(200,180,95,0)}}
-  .hero h1{font-family:var(--disp);font-weight:600;font-size:clamp(3rem,9vw,6.6rem);line-height:.94;letter-spacing:-.04em;margin-bottom:22px}
-  .mask{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.06em;margin-bottom:-.06em}
-  .rise{display:inline-block;transform:translateY(110%);animation:rise 1s var(--d,0s) var(--ease) both}
+  .hero-kick{font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;color:var(--muted);margin-bottom:26px;display:flex;align-items:center;gap:10px}
+  .hero-kick .live{display:inline-flex;align-items:center;gap:7px;color:var(--gold)}
+  .hero-kick .live .d{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:blink 2.2s var(--ease) infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+  h1{font-family:var(--serif);font-weight:500;font-size:clamp(2.7rem,7.2vw,5.6rem);line-height:1.02;letter-spacing:-.02em;margin-bottom:30px;max-width:16ch}
+  h1 .em{font-style:italic;color:var(--accent);font-weight:600}
+  h1 .gold{color:var(--gold);font-style:italic;font-weight:600}
+  .h1line{display:block;overflow:hidden}
+  .h1line>span{display:block;transform:translateY(105%);animation:rise 1s var(--d,0s) var(--ease) both}
   @keyframes rise{to{transform:translateY(0)}}
-  .hero h1 .accent{color:var(--accent)}
-  .subtitle{font-family:var(--mono);font-size:clamp(.95rem,2.4vw,1.35rem);color:var(--ink);letter-spacing:-.01em;margin-bottom:24px}
-  .subtitle .sep{color:var(--accent);margin:0 .5em;font-weight:700}
-  .hero p.lead{color:var(--muted);font-size:clamp(1rem,2vw,1.14rem);max-width:600px;margin-bottom:38px}
-  .hero p.lead b{color:var(--ink);font-weight:600}
-  .hero p.lead .mono{font-family:var(--mono);font-size:.9em;color:var(--accent)}
-  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:9px;font-weight:600;font-size:.94rem;transition:.28s var(--ease);border:1px solid transparent;font-family:var(--body)}
-  .btn .arw{transition:transform .28s var(--ease)}
+  .hero-sub{font-family:var(--mono);font-size:clamp(.9rem,1.8vw,1.05rem);color:var(--muted);margin-bottom:34px;letter-spacing:.02em}
+  .hero-sub .sep{color:var(--accent);padding:0 .5em}
+  .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;border-radius:9px;font-weight:600;font-size:.94rem;font-family:var(--body);transition:.3s var(--ease);border:1px solid transparent;cursor:pointer}
+  .btn .arw{transition:transform .3s var(--ease)}
   .btn:hover .arw{transform:translate(3px,-3px)}
-  .btn.primary{background:var(--accent);color:#17140f}
-  .btn.primary:hover{background:var(--accent-2);transform:translateY(-2px)}
+  .btn.primary{background:var(--accent);color:#12100c}
+  .btn.primary:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(255,122,77,.34)}
   .btn.ghost{border-color:var(--line2);color:var(--ink)}
   .btn.ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
-  .scroll-hint{margin-top:70px;font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;color:var(--dim);display:flex;align-items:center;gap:11px;text-transform:uppercase}
-  .scroll-hint .mouse{width:20px;height:32px;border:1.5px solid var(--dim);border-radius:11px;position:relative}
-  .scroll-hint .mouse::before{content:'';position:absolute;top:6px;left:50%;transform:translateX(-50%);width:3px;height:6px;border-radius:2px;background:var(--accent);animation:scroll 1.8s var(--ease) infinite}
-  @keyframes scroll{0%{opacity:0;transform:translate(-50%,0)}40%{opacity:1}80%{opacity:0;transform:translate(-50%,11px)}}
+  .load{opacity:0;animation:fade .9s var(--d,0s) var(--ease) forwards}
+  @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-  /* hero staggered entrance */
-  .load{opacity:0;animation:fadeUp .85s var(--d,0s) var(--ease) forwards}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  /* ---------- generic stage content ---------- */
+  .stage h2{font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,4.4vw,3.1rem);letter-spacing:-.02em;line-height:1.08;margin-bottom:22px;max-width:20ch}
+  .stage h2 .em{font-style:italic;color:var(--accent)}
+  .lede{color:var(--muted);font-size:clamp(1rem,1.7vw,1.14rem);max-width:640px;margin-bottom:14px}
+  .lede b{color:var(--ink);font-weight:600}
+  .lede .mono{font-family:var(--mono);font-size:.88em;color:var(--accent)}
 
-  /* ---------- about ---------- */
-  .about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
-  @media(max-width:860px){.about-grid{grid-template-columns:1fr;gap:36px}}
-  .about-grid p{color:var(--muted);margin-bottom:20px;font-size:1.02rem}
-  .about-grid p b{color:var(--ink);font-weight:600}
-  .about-grid .mono{font-family:var(--mono);color:var(--accent);font-size:.88em}
-  .about-tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
-  .about-tags span{font-family:var(--mono);font-size:.82rem;color:var(--muted);border:1px solid var(--line);padding:7px 13px;border-radius:8px}
-  .terminal{background:var(--bg2);border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.45);font-family:var(--mono);font-size:.84rem}
-  .term-bar{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}
-  .term-bar i{width:11px;height:11px;border-radius:50%;display:inline-block;opacity:.85}
-  .term-bar i:nth-child(1){background:#cc6b4f}.term-bar i:nth-child(2){background:#d8a657}.term-bar i:nth-child(3){background:#a9b665}
-  .term-bar span{margin-left:8px;color:var(--dim);font-size:.78rem}
-  .term-body{padding:22px;line-height:1.9;overflow-x:auto}
-  .term-body .kw{color:#e78a4e}.term-body .cls{color:#d8a657}.term-body .self{color:#ea6962}.term-body .str{color:#a9b665}.term-body .fn{color:#89b482}.term-body .cm{color:var(--dim)}
+  /* research: two-column with artifact */
+  .research-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:start;margin-top:12px}
+  @media(max-width:820px){.research-grid{grid-template-columns:1fr;gap:32px}}
+  .about-p{color:var(--muted);margin-bottom:18px;font-size:1.02rem}
+  .about-p b{color:var(--ink);font-weight:600}
+  .facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+  .facts span{font-family:var(--mono);font-size:.8rem;color:var(--muted);border:1px solid var(--line);padding:7px 13px;border-radius:7px}
+  .term{background:var(--bg2);border:1px solid var(--line2);border-radius:12px;overflow:hidden;box-shadow:0 26px 54px rgba(0,0,0,.5);font-family:var(--mono);font-size:.83rem}
+  .term .tb{display:flex;align-items:center;gap:7px;padding:12px 15px;border-bottom:1px solid var(--line);background:rgba(0,0,0,.15)}
+  .term .tb i{width:11px;height:11px;border-radius:50%}
+  .term .tb i:nth-child(1){background:#e06a52}.term .tb i:nth-child(2){background:var(--gold)}.term .tb i:nth-child(3){background:#7fb08a}
+  .term .tb span{margin-left:8px;color:var(--dim);font-size:.77rem}
+  .term .body{padding:20px;line-height:1.9;overflow-x:auto}
+  .term .kw{color:#ff9e6b}.term .cls{color:var(--gold)}.term .self{color:#ef7d8f}.term .str{color:#8fce9b}.term .fn{color:#6fb6d6}.term .cm{color:var(--dim)}
 
-  /* ---------- skills ---------- */
-  .skill-group{padding:22px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:180px 1fr;gap:24px;align-items:start}
-  .skill-group:last-child{border-bottom:1px solid var(--line)}
-  @media(max-width:640px){.skill-group{grid-template-columns:1fr;gap:12px}}
-  .skill-group h4{font-family:var(--mono);font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);padding-top:6px}
-  .chips{display:flex;flex-wrap:wrap;gap:9px}
-  .chip{font-family:var(--mono);font-size:.85rem;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--muted);transition:.24s var(--ease);cursor:default}
-  .chip:hover{color:var(--ink);border-color:var(--accent);transform:translateY(-2px)}
+  /* train: layer stack */
+  .layers{display:flex;flex-direction:column;gap:14px;margin-top:8px}
+  .layer{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:center;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);transition:.32s var(--ease)}
+  .layer:hover{border-color:var(--accent-line);transform:translateX(6px);background:var(--panel2)}
+  @media(max-width:640px){.layer{grid-template-columns:1fr;gap:10px}}
+  .layer .lname{font-family:var(--mono);font-size:.76rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .layer .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-family:var(--mono);font-size:.83rem;padding:6px 12px;border-radius:7px;border:1px solid var(--line2);color:var(--ink);transition:.22s var(--ease)}
+  .layer:hover .chip{border-color:var(--line2)}
+  .chip:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
 
-  /* ---------- work ---------- */
-  .flagship{border:1px solid var(--line2);border-radius:16px;background:linear-gradient(168deg,var(--card2),var(--bg2));padding:clamp(26px,4vw,46px);position:relative;overflow:hidden;margin-bottom:26px}
-  .flagship::before{content:'';position:absolute;left:0;top:0;height:100%;width:3px;background:var(--accent)}
-  .flag-kicker{font-family:var(--mono);font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:11px;margin-bottom:16px}
-  .flag-kicker .live{display:inline-flex;align-items:center;gap:7px;color:var(--live);letter-spacing:.1em}
-  .flag-kicker .live .dot{width:6px;height:6px;border-radius:50%;background:var(--live);animation:ping 2.4s var(--ease) infinite}
-  .flagship h3{font-family:var(--disp);font-size:clamp(1.7rem,4vw,2.5rem);font-weight:600;letter-spacing:-.025em;line-height:1.05}
-  .flagship .tagline{color:var(--ink);font-family:var(--mono);font-size:.94rem;margin:12px 0 20px;padding-left:14px;border-left:2px solid var(--line2)}
-  .flagship .desc{color:var(--muted);max-width:660px;margin-bottom:26px;font-size:1.02rem}
-  .flagship .desc b{color:var(--ink);font-weight:600}
-  .pipe{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:26px}
-  .pipe span{font-family:var(--mono);font-size:.82rem;padding:7px 14px;border-radius:7px;background:var(--accent-dim);border:1px solid rgba(247,178,59,.28);color:var(--accent-2)}
-  .pipe .arw{background:none;border:none;color:var(--dim);padding:0}
-  .flag-cols{display:grid;grid-template-columns:1.3fr .7fr;gap:34px}
-  @media(max-width:760px){.flag-cols{grid-template-columns:1fr;gap:26px}}
-  .feat-list{list-style:none;display:flex;flex-direction:column;gap:15px}
-  .feat-list li{display:flex;gap:13px;color:var(--muted);font-size:.96rem}
-  .feat-list li b{color:var(--ink);font-weight:600}
-  .feat-list .mk{color:var(--accent);flex-shrink:0;font-family:var(--mono);line-height:1.5}
-  .built h4{font-family:var(--mono);font-size:.73rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
-  .built p{color:var(--muted);font-size:.92rem;margin-bottom:18px}
+  /* ship: deployment records */
+  .flag{border:1px solid var(--line2);border-radius:14px;background:linear-gradient(165deg,var(--panel2),var(--bg2));padding:clamp(24px,4vw,40px);position:relative;overflow:hidden;margin:8px 0 22px}
+  .flag::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold)}
+  .flag .badge{font-family:var(--mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:8px;margin-bottom:14px}
+  .flag .badge .d{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:blink 2.2s var(--ease) infinite}
+  .flag h3{font-family:var(--serif);font-weight:600;font-size:clamp(1.7rem,3.6vw,2.4rem);letter-spacing:-.01em;line-height:1.06}
+  .flag .tag{font-family:var(--mono);color:var(--ink);font-size:.9rem;margin:12px 0 18px;padding-left:14px;border-left:2px solid var(--line2)}
+  .flag .desc{color:var(--muted);max-width:640px;margin-bottom:22px}
+  .flag .desc b{color:var(--ink);font-weight:600}
+  .pipe{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+  .pipe span{font-family:var(--mono);font-size:.8rem;padding:7px 13px;border-radius:7px;background:rgba(245,196,81,.12);border:1px solid rgba(245,196,81,.32);color:var(--gold)}
+  .pipe .a{background:none;border:none;color:var(--dim);padding:0}
+  .fcols{display:grid;grid-template-columns:1.35fr .65fr;gap:32px}
+  @media(max-width:720px){.fcols{grid-template-columns:1fr;gap:24px}}
+  .flist{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .flist li{display:flex;gap:12px;color:var(--muted);font-size:.95rem}
+  .flist li b{color:var(--ink);font-weight:600}
+  .flist .m{color:var(--gold);flex-shrink:0}
+  .built h4{font-family:var(--mono);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+  .built p{color:var(--muted);font-size:.9rem;margin-bottom:16px}
   .built p i{color:var(--ink);font-style:normal}
-  .mini-tags{display:flex;flex-wrap:wrap;gap:8px}
-  .mini-tags span{font-family:var(--mono);font-size:.74rem;color:var(--dim);border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+  .mtags{display:flex;flex-wrap:wrap;gap:7px}
+  .mtags span{font-family:var(--mono);font-size:.73rem;color:var(--dim);border:1px solid var(--line);padding:5px 9px;border-radius:6px}
 
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-  @media(max-width:760px){.cards{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px;transition:.3s var(--ease);position:relative;display:block}
-  .card::before{content:'';position:absolute;left:0;top:0;height:2px;width:0;background:var(--accent);border-radius:2px 2px 0 0;transition:width .4s var(--ease)}
-  .card:hover{transform:translateY(-5px);border-color:var(--line2)}
-  .card:hover::before{width:100%}
-  .card .ckicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:16px}
-  .card h3{font-family:var(--disp);font-size:1.32rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;letter-spacing:-.01em}
-  .card h3 .arw{color:var(--dim);font-size:.9rem;transition:.28s var(--ease)}
-  .card:hover h3 .arw{color:var(--accent);transform:translate(3px,-3px)}
-  .card p{color:var(--muted);font-size:.94rem;margin-bottom:18px}
-  .card p b{color:var(--ink);font-weight:600}
-  .card ul{list-style:none;margin-bottom:20px;display:flex;flex-direction:column;gap:9px}
-  .card ul li{color:var(--muted);font-size:.9rem;padding-left:16px;position:relative}
-  .card ul li::before{content:'';position:absolute;left:0;top:.7em;width:6px;height:1.5px;background:var(--accent)}
-  .card ul li b{color:var(--ink);font-weight:600}
-  .more{text-align:center;margin-top:36px}
+  .deploys{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px}
+  @media(max-width:720px){.deploys{grid-template-columns:1fr}}
+  .rec{display:block;border:1px solid var(--line);border-radius:12px;padding:26px;background:var(--panel);position:relative;transition:.3s var(--ease)}
+  .rec::before{content:'';position:absolute;left:0;top:0;height:2px;width:0;background:var(--accent);border-radius:2px 2px 0 0;transition:width .4s var(--ease)}
+  .rec:hover{transform:translateY(-5px);border-color:var(--line2)}
+  .rec:hover::before{width:100%}
+  .rec .rk{font-family:var(--mono);font-size:.71rem;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .rec .rk .s{width:6px;height:6px;border-radius:50%;background:#7fb08a;box-shadow:0 0 8px #7fb08a}
+  .rec h3{font-family:var(--serif);font-weight:600;font-size:1.28rem;margin-bottom:11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .rec h3 .arw{font-family:var(--mono);color:var(--dim);font-size:.85rem;transition:.28s var(--ease)}
+  .rec:hover h3 .arw{color:var(--accent);transform:translate(3px,-3px)}
+  .rec p{color:var(--muted);font-size:.92rem;margin-bottom:15px}
+  .rec p b{color:var(--ink);font-weight:600}
+  .rec ul{list-style:none;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+  .rec ul li{color:var(--muted);font-size:.88rem;padding-left:15px;position:relative}
+  .rec ul li::before{content:'';position:absolute;left:0;top:.65em;width:6px;height:1.5px;background:var(--accent)}
+  .rec ul li b{color:var(--ink);font-weight:600}
+  .more{margin-top:26px}
 
-  /* ---------- contact ---------- */
-  .contact{text-align:center}
-  .contact h2{font-family:var(--disp);font-size:clamp(2.1rem,6.5vw,4.2rem);font-weight:600;letter-spacing:-.035em;margin-bottom:20px;line-height:1.03}
-  .contact h2 .accent{color:var(--accent)}
-  .contact p{color:var(--muted);max-width:500px;margin:0 auto 40px;font-size:1.05rem}
-  .contact-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  footer{border-top:1px solid var(--line);padding:30px clamp(20px,6vw,80px);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;max-width:1120px;margin:0 auto;color:var(--dim);font-family:var(--mono);font-size:.78rem}
-  footer a:hover{color:var(--accent)}
+  /* endpoint: contact */
+  #s-contact h2{max-width:18ch}
+  .endpoint{color:var(--muted);max-width:520px;margin-bottom:34px;font-size:1.06rem}
+  .crow{display:flex;gap:13px;flex-wrap:wrap}
+  .foot{margin-top:70px;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--dim);font-family:var(--mono);font-size:.77rem}
+  .foot a:hover{color:var(--accent)}
 
-  /* ---------- scroll reveal (staggered, varied) ---------- */
-  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease);transition-delay:var(--rd,0s)}
-  .reveal.in{opacity:1;transform:none}
+  /* scroll reveals */
+  .rv{opacity:0;transform:translateY(24px);transition:opacity .75s var(--ease),transform .75s var(--ease);transition-delay:var(--rd,0s)}
+  .rv.in{opacity:1;transform:none}
 
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-    .reveal,.load,.rise{opacity:1!important;transform:none!important}
+    .rv,.load,.h1line>span{opacity:1!important;transform:none!important}
+    .tok{display:none}
   }
 </style>
-<noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+<noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}</style></noscript>
 </head>
 <body>
-<div class="bg-wrap"></div>
-<div class="dots"></div>
+<div class="amb"></div>
 
-<nav id="nav">
-  <a href="#top" class="logo">aravind<b>.s</b></a>
-  <div class="navlinks">
-    <a href="#about">About</a>
-    <a href="#skills">Stack</a>
-    <a href="#work">Work</a>
-    <a href="#contact">Contact</a>
-    <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="nav-cta">GitHub ↗</a>
-  </div>
-</nav>
-
-<!-- ================= HERO ================= -->
-<header class="hero" id="top">
-  <div class="avail load" style="--d:.05s"><span class="dot"></span> Open to AI / ML Engineer roles</div>
-  <h1>
-    <span class="mask"><span class="rise" style="--d:.15s">Aravind</span></span>
-    <span class="mask"><span class="rise accent" style="--d:.28s">S.</span></span>
-  </h1>
-  <div class="subtitle load" style="--d:.5s">AI Engineer <span class="sep">/</span> Full-stack GenAI Builder</div>
-  <p class="lead load" style="--d:.62s">I turn raw data and research papers into <b>intelligent, scalable systems</b> — carrying them from <span class="mono">import</span> to a live <b>production endpoint</b>. Creator of <b>thought2build.com</b>.</p>
-  <div class="cta-row load" style="--d:.74s">
-    <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary">Explore Thought2Build <span class="arw">↗</span></a>
-    <a href="#work" class="btn ghost">Selected work</a>
-    <a href="mailto:arvindsathyan@gmail.com" class="btn ghost">Get in touch</a>
-  </div>
-  <div class="scroll-hint load" style="--d:.9s"><span class="mouse"></span> scroll</div>
+<header class="bar" id="bar">
+  <a href="#top" class="brand"><span class="bdot"></span>aravind.s</a>
+  <nav class="navlinks">
+    <a href="#s-research">research</a>
+    <a href="#s-train">train</a>
+    <a href="#s-ship">ship</a>
+    <a href="#s-contact">endpoint</a>
+    <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="ghn">GitHub ↗</a>
+  </nav>
 </header>
 
-<!-- ================= ABOUT ================= -->
-<section id="about">
-  <div class="kicker reveal">About</div>
-  <h2 class="sec reveal" style="--rd:.05s">I build AI that survives production.</h2>
-  <div class="about-grid">
-    <div>
-      <p class="reveal" style="--rd:.1s">My work sits at the intersection of <b>deep learning, large language models, and cloud infrastructure</b>. I care less about a model passing a demo and more about understanding <b>when and why it fails</b> — then engineering around it.</p>
-      <p class="reveal" style="--rd:.16s">Right now I'm going deeper on <b>LLM agent orchestration</b>, <span class="mono">vector search at scale</span>, and <b>cost-efficient inference</b> — while shipping <b>thought2build.com</b>, an AI workspace that turns rough product ideas into build-ready specs, tests &amp; tasks.</p>
-      <p class="reveal" style="--rd:.22s">Notebooks are for exploration. I build for <b>production</b>.</p>
-      <div class="about-tags reveal" style="--rd:.28s">
-        <span>Kochi, Kerala · India</span><span>Remote-friendly</span><span>Self-taught</span>
-      </div>
+<div class="deploy" aria-hidden="true">
+  <span>deploy</span><span class="track"><span class="fill" id="dfill"></span></span><b id="dpct">0%</b>
+</div>
+
+<main class="pipeline" id="top">
+  <div class="spine" aria-hidden="true">
+    <div class="fill" id="spineFill"></div>
+    <span class="tok" style="animation-delay:0s"></span>
+    <span class="tok" style="animation-delay:-1.4s"></span>
+    <span class="tok" style="animation-delay:-2.8s"></span>
+    <span class="tok" style="animation-delay:-4.1s"></span>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <section class="stage" id="s-hero">
+    <div class="node"><span class="ring"></span><span class="core"></span></div>
+    <div class="hero-kick load" style="--d:.1s">Aravind&nbsp;S <span class="sep" style="color:var(--dim)">·</span> AI Engineer &amp; Builder <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
+    <h1>
+      <span class="h1line"><span style="--d:.2s">I take models from</span></span>
+      <span class="h1line"><span class="em" style="--d:.32s">research</span></span>
+      <span class="h1line"><span style="--d:.44s">to a live <span class="gold">production&nbsp;endpoint.</span></span></span>
+    </h1>
+    <div class="hero-sub load" style="--d:.66s">GenAI<span class="sep">/</span>RAG<span class="sep">/</span>LLM Agents<span class="sep">/</span>AWS MLOps</div>
+    <div class="cta load" style="--d:.78s">
+      <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary">Explore Thought2Build <span class="arw">↗</span></a>
+      <a href="#s-ship" class="btn ghost">Selected work</a>
     </div>
-    <div class="terminal reveal" style="--rd:.14s">
-      <div class="term-bar"><i></i><i></i><i></i><span>aravind.py</span></div>
-      <div class="term-body">
+  </section>
+
+  <!-- ============ RESEARCH / about ============ -->
+  <section class="stage" id="s-research" data-tag="research" data-idx="01">
+    <div class="node"><span class="ring"></span><span class="core"></span></div>
+    <div class="stag rv"><span class="idx">01</span> Research</div>
+    <h2 class="rv" style="--rd:.05s">I care about <span class="em">why a model fails</span> — then engineer around it.</h2>
+    <div class="research-grid">
+      <div>
+        <p class="about-p rv" style="--rd:.1s">My work sits where <b>deep learning, large language models, and cloud infrastructure</b> meet. I'm self-taught, and I'd rather understand the mechanics of <b>when and why something breaks</b> than watch it pass a demo.</p>
+        <p class="about-p rv" style="--rd:.16s">Right now I'm going deeper on <b>LLM agent orchestration</b>, <span style="font-family:var(--mono);color:var(--accent);font-size:.9em">vector search at scale</span>, and <b>cost-efficient inference</b>.</p>
+        <p class="about-p rv" style="--rd:.22s">Notebooks are for exploration. I build for <b>production</b>.</p>
+        <div class="facts rv" style="--rd:.28s"><span>Kochi, Kerala · India</span><span>Remote-friendly</span><span>Self-taught</span></div>
+      </div>
+      <div class="term rv" style="--rd:.14s">
+        <div class="tb"><i></i><i></i><i></i><span>aravind.py</span></div>
+        <div class="body">
 <span class="kw">class</span> <span class="cls">AravindS</span>:<br>
 &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">__init__</span>(<span class="self">self</span>):<br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="self">self</span>.role&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="str">"AI Engineer &amp; Builder"</span><br>
@@ -241,119 +285,134 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="self">self</span>.shipping&nbsp;= <span class="str">"thought2build.com"</span><br>
 <br>
 &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">philosophy</span>(<span class="self">self</span>):<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># understand the *why*, then deploy it</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># understand the *why*, then deploy</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="str">"research today, deploy tomorrow"</span>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ================= STACK ================= -->
-<section id="skills">
-  <div class="kicker reveal">Stack</div>
-  <h2 class="sec reveal" style="--rd:.05s">Tools I reach for.</h2>
-  <p class="sec-sub reveal" style="--rd:.1s">From prototype to production — the toolkit behind the work.</p>
-  <div>
-    <div class="skill-group reveal"><h4>Languages</h4><div class="chips"><span class="chip">Python</span></div></div>
-    <div class="skill-group reveal" style="--rd:.05s"><h4>AI / Machine Learning</h4><div class="chips">
-      <span class="chip">PyTorch</span><span class="chip">scikit-learn</span><span class="chip">Hugging Face</span><span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">BERT</span>
-    </div></div>
-    <div class="skill-group reveal" style="--rd:.1s"><h4>GenAI / LLM</h4><div class="chips">
-      <span class="chip">LangChain</span><span class="chip">RAG</span><span class="chip">ChromaDB</span><span class="chip">LlamaCloud</span><span class="chip">Tavily</span><span class="chip">GPT-4o-mini</span>
-    </div></div>
-    <div class="skill-group reveal" style="--rd:.15s"><h4>Cloud / MLOps</h4><div class="chips">
-      <span class="chip">AWS</span><span class="chip">SageMaker</span><span class="chip">Lambda</span><span class="chip">DynamoDB</span><span class="chip">Terraform</span><span class="chip">Docker</span>
-    </div></div>
-    <div class="skill-group reveal" style="--rd:.2s"><h4>APIs / Data / Deploy</h4><div class="chips">
-      <span class="chip">FastAPI</span><span class="chip">Pydantic</span><span class="chip">Streamlit</span><span class="chip">PySpark</span><span class="chip">SQLite</span><span class="chip">Git</span>
-    </div></div>
-  </div>
-</section>
+  <!-- ============ TRAIN / stack ============ -->
+  <section class="stage" id="s-train" data-tag="train" data-idx="02">
+    <div class="node"><span class="ring"></span><span class="core"></span></div>
+    <div class="stag rv"><span class="idx">02</span> Train</div>
+    <h2 class="rv" style="--rd:.05s">The <span class="em">layers</span> I build with.</h2>
+    <p class="lede rv" style="--rd:.1s">From raw data up to a deployed endpoint — the working toolkit behind the projects.</p>
+    <div class="layers" style="margin-top:34px">
+      <div class="layer rv"><div class="lname">Language</div><div class="chips"><span class="chip">Python</span></div></div>
+      <div class="layer rv" style="--rd:.05s"><div class="lname">ML / DL</div><div class="chips"><span class="chip">PyTorch</span><span class="chip">scikit-learn</span><span class="chip">Hugging Face</span><span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">BERT</span></div></div>
+      <div class="layer rv" style="--rd:.1s"><div class="lname">GenAI / LLM</div><div class="chips"><span class="chip">LangChain</span><span class="chip">RAG</span><span class="chip">ChromaDB</span><span class="chip">LlamaCloud</span><span class="chip">Tavily</span><span class="chip">GPT-4o-mini</span></div></div>
+      <div class="layer rv" style="--rd:.15s"><div class="lname">Cloud / MLOps</div><div class="chips"><span class="chip">AWS</span><span class="chip">SageMaker</span><span class="chip">Lambda</span><span class="chip">DynamoDB</span><span class="chip">Terraform</span><span class="chip">Docker</span></div></div>
+      <div class="layer rv" style="--rd:.2s"><div class="lname">Serve / Deploy</div><div class="chips"><span class="chip">FastAPI</span><span class="chip">Pydantic</span><span class="chip">Streamlit</span><span class="chip">PySpark</span><span class="chip">SQLite</span><span class="chip">Git</span></div></div>
+    </div>
+  </section>
 
-<!-- ================= WORK ================= -->
-<section id="work">
-  <div class="kicker reveal">Selected Work</div>
-  <h2 class="sec reveal" style="--rd:.05s">Built &amp; shipped.</h2>
-  <p class="sec-sub reveal" style="--rd:.1s">A flagship live product, plus systems where the engineering was the point.</p>
+  <!-- ============ SHIP / work ============ -->
+  <section class="stage ship" id="s-ship" data-tag="ship" data-idx="03">
+    <div class="node"><span class="ring"></span><span class="core"></span></div>
+    <div class="stag rv"><span class="idx">03</span> Ship</div>
+    <h2 class="rv" style="--rd:.05s">Deployed to <span class="em">production.</span></h2>
 
-  <div class="flagship reveal" style="--rd:.05s">
-    <div class="flag-kicker">Flagship <span class="live"><span class="dot"></span>Live · thought2build.com</span></div>
-    <h3>Thought2Build</h3>
-    <div class="tagline">"Turn rough product ideas into build-ready specs, tests, and tasks."</div>
-    <p class="desc">An <b>AI-powered product workspace</b> I built and shipped — it closes the gap between <b>"we should build this"</b> and <b>"here's exactly how,"</b> where most product ideas quietly die.</p>
-    <div class="pipe"><span>Spec</span><span class="arw">→</span><span>Plan</span><span class="arw">→</span><span>Harness</span><span class="arw">→</span><span>Tasks</span></div>
-    <div class="flag-cols">
-      <ul class="feat-list">
-        <li><span class="mk">→</span><span><b>Four-stage delivery pipeline</b> — every stage sits behind a <b>review gate</b> before it advances.</span></li>
-        <li><span class="mk">→</span><span><b>Harness-first quality</b> — validation assets are generated <i>alongside</i> the plan, not bolted on afterward.</span></li>
-        <li><span class="mk">→</span><span><b>Full requirement traceability</b>, with clean <b>export packages</b> for human teams <i>or</i> AI agents to continue.</span></li>
-        <li><span class="mk">→</span><span>OAuth-secured · free starter tier · <b>bring-your-own LLM keys</b> (Anthropic · OpenAI · Google).</span></li>
-      </ul>
-      <div class="built">
-        <h4>Built for</h4>
-        <p>Founders, product teams, engineers &amp; AI-agent workflows that need real structure between <i>idea</i> and <i>execution</i>.</p>
-        <div class="mini-tags"><span>GenAI</span><span>LLM Orchestration</span><span>Multi-provider</span><span>Full-stack</span><span>Product Engineering</span></div>
-        <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary" style="margin-top:22px">Launch app <span class="arw">↗</span></a>
+    <div class="flag rv" style="--rd:.05s">
+      <div class="badge"><span class="d"></span>Flagship · Live · thought2build.com</div>
+      <h3>Thought2Build</h3>
+      <div class="tag">"Turn rough product ideas into build-ready specs, tests, and tasks."</div>
+      <p class="desc">An <b>AI-powered product workspace</b> I built and shipped — it closes the gap between <b>"we should build this"</b> and <b>"here's exactly how,"</b> where most product ideas quietly die.</p>
+      <div class="pipe"><span>Spec</span><span class="a">→</span><span>Plan</span><span class="a">→</span><span>Harness</span><span class="a">→</span><span>Tasks</span></div>
+      <div class="fcols">
+        <ul class="flist">
+          <li><span class="m">→</span><span><b>Four-stage delivery pipeline</b> — every stage sits behind a <b>review gate</b> before it advances.</span></li>
+          <li><span class="m">→</span><span><b>Harness-first quality</b> — validation assets are generated <i>alongside</i> the plan, not bolted on afterward.</span></li>
+          <li><span class="m">→</span><span><b>Full requirement traceability</b>, with clean <b>export packages</b> for human teams <i>or</i> AI agents to continue.</span></li>
+          <li><span class="m">→</span><span>OAuth-secured · free starter tier · <b>bring-your-own LLM keys</b> (Anthropic · OpenAI · Google).</span></li>
+        </ul>
+        <div class="built">
+          <h4>Built for</h4>
+          <p>Founders, product teams, engineers &amp; AI-agent workflows that need real structure between <i>idea</i> and <i>execution</i>.</p>
+          <div class="mtags"><span>GenAI</span><span>LLM Orchestration</span><span>Multi-provider</span><span>Full-stack</span></div>
+          <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary" style="margin-top:20px">Launch app <span class="arw">↗</span></a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="cards">
-    <a class="card reveal" style="--rd:.05s" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">
-      <div class="ckicker">Open source · Python</div>
-      <h3>Nexus Research Assistant <span class="arw">↗</span></h3>
-      <p>Agentic LLM research assistant fusing a <b>private knowledge base</b> with <b>real-time web intelligence</b>.</p>
-      <ul>
-        <li><b>Hybrid retrieval</b> — an intent classifier routes each query to ChromaDB, Tavily, or both</li>
-        <li><b>Multi-agent pipeline:</b> Classifier → Researcher → Synthesizer</li>
-        <li><b>Dual-source citations</b> + SQLite caching to cut API cost &amp; latency</li>
-      </ul>
-      <div class="mini-tags"><span>LangChain</span><span>GPT-4o-mini</span><span>ChromaDB</span><span>Tavily</span><span>Streamlit</span></div>
-    </a>
+    <div class="deploys">
+      <a class="rec rv" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">
+        <div class="rk"><span class="s"></span>Open source · Python</div>
+        <h3>Nexus Research Assistant <span class="arw">↗</span></h3>
+        <p>Agentic LLM research assistant fusing a <b>private knowledge base</b> with <b>real-time web intelligence</b>.</p>
+        <ul>
+          <li><b>Hybrid retrieval</b> — intent classifier routes each query to ChromaDB, Tavily, or both</li>
+          <li><b>Multi-agent:</b> Classifier → Researcher → Synthesizer</li>
+          <li><b>Dual-source citations</b> + SQLite caching for cost &amp; latency</li>
+        </ul>
+        <div class="mtags"><span>LangChain</span><span>GPT-4o-mini</span><span>ChromaDB</span><span>Tavily</span></div>
+      </a>
+      <a class="rec rv" style="--rd:.1s" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">
+        <div class="rk"><span class="s"></span>Serverless · AWS</div>
+        <h3>Content Moderation <span class="arw">↗</span></h3>
+        <p>Real-time NLP toxicity detection, <b>serverless and sub-second at scale</b>.</p>
+        <ul>
+          <li>Fine-tuned <b>BERT</b> for 6-category toxicity classification</li>
+          <li><b>Serverless AWS</b> with async audit logging</li>
+          <li>Auto-scaling deployment targeting <b>99.9% uptime</b></li>
+        </ul>
+        <div class="mtags"><span>BERT</span><span>AWS Lambda</span><span>DynamoDB</span></div>
+      </a>
+    </div>
+    <div class="more rv"><a href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener" class="btn ghost">More on GitHub <span class="arw">↗</span></a></div>
+  </section>
 
-    <a class="card reveal" style="--rd:.12s" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">
-      <div class="ckicker">Serverless · AWS</div>
-      <h3>Content Moderation System <span class="arw">↗</span></h3>
-      <p>Real-time NLP toxicity detection, <b>serverless and sub-second at scale</b>.</p>
-      <ul>
-        <li>Fine-tuned <b>BERT</b> for 6-category toxicity classification</li>
-        <li><b>Serverless AWS</b> architecture with async audit logging</li>
-        <li>Auto-scaling production deployment targeting <b>99.9% uptime</b></li>
-      </ul>
-      <div class="mini-tags"><span>BERT</span><span>AWS Lambda</span><span>DynamoDB</span><span>Serverless</span></div>
-    </a>
-  </div>
-  <div class="more reveal"><a href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener" class="btn ghost">More on GitHub <span class="arw">↗</span></a></div>
-</section>
-
-<!-- ================= CONTACT ================= -->
-<section id="contact" class="contact">
-  <div class="kicker reveal" style="justify-content:center">Contact</div>
-  <h2 class="reveal" style="--rd:.05s">Let's build something <span class="accent">worth shipping.</span></h2>
-  <p class="reveal" style="--rd:.1s">Open to AI / ML Engineer roles and ambitious collaborative projects. Always happy to talk AI, cloud architecture, or a hard technical problem.</p>
-  <div class="contact-row reveal" style="--rd:.15s">
-    <a href="mailto:arvindsathyan@gmail.com" class="btn primary">arvindsathyan@gmail.com <span class="arw">↗</span></a>
-    <a href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener" class="btn ghost">LinkedIn <span class="arw">↗</span></a>
-    <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="btn ghost">GitHub <span class="arw">↗</span></a>
-  </div>
-</section>
-
-<footer>
-  <span>© <span id="yr"></span> Aravind S</span>
-  <span>Research today · Deploy tomorrow</span>
-</footer>
+  <!-- ============ ENDPOINT / contact ============ -->
+  <section class="stage" id="s-contact" data-tag="endpoint" data-idx="04">
+    <div class="node"><span class="ring"></span><span class="core"></span></div>
+    <div class="stag rv"><span class="idx">04</span> Endpoint</div>
+    <h2 class="rv" style="--rd:.05s">Let's build something <span class="em">worth shipping.</span></h2>
+    <p class="endpoint rv" style="--rd:.1s">Open to AI / ML Engineer roles and ambitious collaborative projects. Always happy to talk AI, cloud architecture, or a hard technical problem.</p>
+    <div class="crow rv" style="--rd:.15s">
+      <a href="mailto:arvindsathyan@gmail.com" class="btn primary">arvindsathyan@gmail.com <span class="arw">↗</span></a>
+      <a href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener" class="btn ghost">LinkedIn <span class="arw">↗</span></a>
+      <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="btn ghost">GitHub <span class="arw">↗</span></a>
+    </div>
+    <div class="foot">
+      <span>© <span id="yr"></span> Aravind S</span>
+      <span>Research today · Deploy tomorrow</span>
+    </div>
+  </section>
+</main>
 
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
+  const bar = document.getElementById('bar');
+  const spineFill = document.getElementById('spineFill');
+  const dfill = document.getElementById('dfill');
+  const dpct = document.getElementById('dpct');
+  const pipeline = document.getElementById('top');
+  let ticking = false;
 
-  const nav = document.getElementById('nav');
-  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+  function onScroll(){
+    bar.classList.toggle('scrolled', scrollY > 40);
+    const rect = pipeline.getBoundingClientRect();
+    const total = pipeline.offsetHeight - innerHeight;
+    const prog = Math.min(1, Math.max(0, (-rect.top) / (total || 1)));
+    spineFill.style.height = (prog * 100).toFixed(2) + '%';
+    dfill.style.width = (prog * 100).toFixed(1) + '%';
+    dpct.textContent = Math.round(prog * 100) + '%';
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
+  onScroll();
 
-  // staggered, section-aware scroll reveals
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: .14, rootMargin: '0px 0px -8% 0px' });
-  document.querySelectorAll('.reveal').forEach(n => io.observe(n));
+  // node ignition per stage
+  const stageIO = new IntersectionObserver((es) => {
+    es.forEach(e => e.target.classList.toggle('live', e.isIntersecting));
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  document.querySelectorAll('.stage').forEach(s => stageIO.observe(s));
+
+  // content reveals
+  const rvIO = new IntersectionObserver((es) => {
+    es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); rvIO.unobserve(e.target); } });
+  }, { threshold:.16, rootMargin:'0px 0px -8% 0px' });
+  document.querySelectorAll('.rv').forEach(n => rvIO.observe(n));
 </script>
 </body>
 </html>
