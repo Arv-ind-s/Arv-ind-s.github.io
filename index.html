@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  /* Stop the browser restoring a stale scroll position (session restore, bfcache,
+     or an address-bar autocomplete that appended a stale #s-... fragment from a
+     previous visit) from landing the page anywhere but the top on a fresh load.
+     A deliberate deep link (e.g. sharing a #s-ship URL) is still honored. */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (!location.hash) window.scrollTo(0, 0);
+  addEventListener('pageshow', function(e){ if(e.persisted && !location.hash) window.scrollTo(0, 0); });
+</script>
 <title>Aravind S — AI Engineer &amp; Builder</title>
 <meta name="description" content="Aravind S — AI Engineer & Builder. I take machine-learning models from research to a live production endpoint. Creator of thought2build.com." />
 <meta property="og:title" content="Aravind S — AI Engineer & Builder" />
