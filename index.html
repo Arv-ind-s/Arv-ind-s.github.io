@@ -43,12 +43,22 @@
   ::selection{background:var(--accent);color:#081a23}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:3px}
 
-  .amb{position:fixed;inset:0;z-index:-2;background:
+  .amb{position:fixed;inset:0;z-index:-3;background:
     radial-gradient(1100px 620px at 88% -8%,rgba(255,122,77,.07),transparent 60%),
     radial-gradient(760px 760px at -6% 106%,rgba(245,196,81,.05),transparent 62%),var(--bg);}
   .amb::after{content:'';position:absolute;inset:0;opacity:.5;
     background-image:radial-gradient(rgba(241,233,217,.04) 1px,transparent 1.3px);background-size:30px 30px;
     -webkit-mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);mask-image:radial-gradient(circle at 50% 0,#000 30%,transparent 72%);}
+
+  /* immersive 3d backdrop: dolly-through pipeline scene, sits between .amb (fallback) and content */
+  #scene-canvas{position:fixed;inset:0;z-index:-2;width:100%;height:100%;display:block;pointer-events:none}
+  .scene-fade{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.86) 26%,rgba(8,26,35,.42) 48%,rgba(8,26,35,.06) 64%,transparent 78%),
+      linear-gradient(rgba(8,26,35,.5),transparent 16%,transparent 84%,rgba(8,26,35,.6))}
+  @media(max-width:760px){
+    .scene-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.82) 50%,rgba(8,26,35,.5) 100%),
+      linear-gradient(rgba(8,26,35,.55),transparent 16%,transparent 84%,rgba(8,26,35,.65))}
+  }
 
   header.bar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
     padding:18px clamp(20px,5vw,56px);transition:.35s var(--ease);border-bottom:1px solid transparent}
@@ -97,14 +107,9 @@
   .stag .idx{opacity:.6}
   .stag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.5}
 
-  /* neural canvas hero */
-  #net{position:absolute;top:0;bottom:0;left:var(--rail);right:0;width:calc(100% - var(--rail));height:100%;z-index:0;display:block}
-  .net-fade{position:absolute;top:0;bottom:0;left:var(--rail);right:0;z-index:1;pointer-events:none;
-    background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.82) 30%,rgba(8,26,35,.06) 52%,transparent 64%)}
   .hero-inner{position:relative;z-index:2;pointer-events:none;max-width:530px}
   .hero-inner a,.hero-inner .mag{pointer-events:auto}
   @media(max-width:760px){
-    .net-fade{background:linear-gradient(90deg,var(--bg) 0%,rgba(8,26,35,.74) 46%,rgba(8,26,35,.42) 100%)}
     .hero-inner{max-width:100%}
   }
 
@@ -221,12 +226,15 @@
     *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
     .rv,.load,.h1line>span{opacity:1!important;transform:none!important}
     .tok{display:none}
+    #scene-canvas,.scene-fade{display:none}
   }
 </style>
-<noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}#net{display:none}</style></noscript>
+<noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}#scene-canvas,.scene-fade{display:none}</style></noscript>
 </head>
 <body>
 <div class="amb"></div>
+<canvas id="scene-canvas" aria-hidden="true"></canvas>
+<div class="scene-fade" aria-hidden="true"></div>
 
 <header class="bar" id="bar">
   <a href="#top" class="brand"><span class="bdot"></span>aravind.s</a>
@@ -250,8 +258,6 @@
 
   <!-- HERO -->
   <section class="stage" id="s-hero">
-    <canvas id="net" aria-hidden="true"></canvas>
-    <div class="net-fade" aria-hidden="true"></div>
     <div class="node"><span class="ring"></span><span class="core"></span></div>
     <div class="hero-inner">
       <div class="hero-kick load" style="--d:.1s">AI Engineer &amp; Builder <span class="sep" style="color:var(--dim)">·</span> Kochi, India <span class="live"><span class="d"></span>shipping thought2build.com</span></div>
@@ -264,7 +270,7 @@
         <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn primary mag">Explore Thought2Build <span class="arw">↗</span></a>
         <a href="#s-ship" class="btn ghost mag">Selected work</a>
       </div>
-      <div class="hint load" style="--d:.78s"><span class="m"></span> click the network · scroll to deploy</div>
+      <div class="hint load" style="--d:.78s"><span class="m"></span> scroll to ride the pipeline</div>
     </div>
   </section>
 
@@ -428,119 +434,8 @@ if(!reduce && matchMedia('(pointer:fine)').matches){
   });
 }
 
-/* ---------- interactive neural-network canvas ---------- */
-(function(){
-  const cv = document.getElementById('net');
-  if(!cv) return;
-  const ctx = cv.getContext('2d');
-  const LAYERS = [4,6,6,5,2];
-  let W=0,H=0,DPR=1, nodes=[], edges=[], outs=[], pulses=[], layerStart=[], mouse={x:-9999,y:-9999}, running=false, injTimer=0;
-
-  function size(){
-    DPR = Math.min(2, devicePixelRatio||1);
-    W = Math.max(1, cv.clientWidth); H = Math.max(1, cv.clientHeight);
-    cv.width = W*DPR; cv.height = H*DPR;
-    ctx.setTransform(DPR,0,0,DPR,0,0);
-    build();
-  }
-  function build(){
-    nodes=[]; edges=[]; outs=[]; layerStart=[];
-    const narrow = W < 640;
-    const padL = W*(narrow?0.18:0.34), padR = W*0.94;
-    const colW = (padR-padL)/(LAYERS.length-1);
-    let idx=0;
-    LAYERS.forEach((count,li)=>{
-      layerStart[li]=idx;
-      const gap = H/(count+1);
-      for(let i=0;i<count;i++){ const x=padL+colW*li, y=gap*(i+1); nodes.push({x,y,bx:x,by:y,ox:0,oy:0,glow:0,layer:li}); idx++; }
-    });
-    for(let n=0;n<nodes.length;n++) outs[n]=[];
-    for(let li=0; li<LAYERS.length-1; li++){
-      const a0=layerStart[li], a1=a0+LAYERS[li], b0=a1, b1=b0+LAYERS[li+1];
-      for(let a=a0;a<a1;a++) for(let b=b0;b<b1;b++){ edges.push([a,b]); outs[a].push(b); }
-    }
-    pulses=[];
-  }
-  function fire(nodeIdx){
-    const outsOf = outs[nodeIdx]; if(!outsOf.length) return;
-    // fan out to a random subset for organic waves
-    const k = Math.max(1, Math.round(outsOf.length*(0.5+Math.random()*0.5)));
-    const shuffled = outsOf.slice().sort(()=>Math.random()-0.5).slice(0,k);
-    shuffled.forEach(b=> pulses.push({a:nodeIdx,b, t:0, sp:0.014+Math.random()*0.012}));
-  }
-  function inject(){ for(let i=layerStart[0]; i<layerStart[0]+LAYERS[0]; i++){ if(Math.random()<0.75){ nodes[i].glow=1; fire(i); } } }
-
-  function frame(ts){
-    if(!running) return;
-    ctx.clearRect(0,0,W,H);
-    // periodic forward pass
-    if(ts-injTimer > 2200){ inject(); injTimer=ts; }
-    // edges
-    ctx.lineWidth = 1;
-    for(const [a,b] of edges){
-      const na=nodes[a], nb=nodes[b];
-      const act = Math.max(na.glow, nb.glow);
-      ctx.strokeStyle = `rgba(241,233,217,${0.04+act*0.16})`;
-      ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y); ctx.stroke();
-    }
-    // pulses
-    for(let i=pulses.length-1;i>=0;i--){
-      const p=pulses[i], na=nodes[p.a], nb=nodes[p.b];
-      p.t += p.sp;
-      const x=na.x+(nb.x-na.x)*p.t, y=na.y+(nb.y-na.y)*p.t;
-      const isGold = nb.layer===LAYERS.length-1;
-      ctx.fillStyle = isGold ? 'rgba(245,196,81,.95)' : 'rgba(255,122,77,.95)';
-      ctx.shadowColor = isGold ? '#f5c451' : '#ff7a4d'; ctx.shadowBlur = 10;
-      ctx.beginPath(); ctx.arc(x,y,2.4,0,7); ctx.fill();
-      ctx.shadowBlur = 0;
-      if(p.t>=1){ nb.glow=1; fire(p.b); pulses.splice(i,1); }
-    }
-    // nodes + cursor spring
-    for(const n of nodes){
-      const dx=n.bx-mouse.x, dy=n.by-mouse.y, d=Math.hypot(dx,dy);
-      let tx=0,ty=0;
-      if(d<120){ const f=(1-d/120)*22; tx=dx/d*f; ty=dy/d*f; n.glow=Math.max(n.glow,(1-d/120)*0.6); }
-      n.ox += (tx-n.ox)*0.12; n.oy += (ty-n.oy)*0.12;
-      n.x = n.bx+n.ox; n.y = n.by+n.oy;
-      n.glow *= 0.955;
-      const r = 2.6 + n.glow*3.4;
-      if(n.glow>0.05){ ctx.shadowColor='#ff7a4d'; ctx.shadowBlur=8*n.glow; }
-      ctx.fillStyle = `rgba(255,122,77,${0.22+n.glow*0.78})`;
-      if(n.layer===LAYERS.length-1) ctx.fillStyle = `rgba(245,196,81,${0.3+n.glow*0.7})`;
-      ctx.beginPath(); ctx.arc(n.x,n.y,r,0,7); ctx.fill(); ctx.shadowBlur=0;
-    }
-    requestAnimationFrame(frame);
-  }
-  function start(){ if(running||reduce) return; running=true; injTimer=performance.now(); requestAnimationFrame(frame); }
-  function stop(){ running=false; }
-
-  cv.addEventListener('pointermove', e=>{ const r=cv.getBoundingClientRect(); mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top; });
-  cv.addEventListener('pointerleave', ()=>{ mouse.x=mouse.y=-9999; });
-  const hero = document.getElementById('s-hero');
-  hero.addEventListener('click', e=>{ // fire a pass from nearest input node
-    const r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
-    let best=layerStart[0], bd=1e9;
-    for(let i=layerStart[0];i<layerStart[0]+LAYERS[0];i++){ const d=Math.hypot(nodes[i].bx-mx,nodes[i].by-my); if(d<bd){bd=d;best=i;} }
-    nodes[best].glow=1; fire(best);
-  });
-
-  let staticDrawn=false;
-  function drawStatic(){ // reduced-motion / no-anim frame
-    ctx.clearRect(0,0,W,H);
-    ctx.lineWidth=1;
-    for(const [a,b] of edges){ ctx.strokeStyle='rgba(241,233,217,.06)'; ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y); ctx.stroke(); }
-    for(const n of nodes){ ctx.fillStyle = n.layer===LAYERS.length-1?'rgba(245,196,81,.7)':'rgba(255,122,77,.55)'; ctx.beginPath(); ctx.arc(n.x,n.y,3,0,7); ctx.fill(); }
-    staticDrawn=true;
-  }
-
-  addEventListener('resize', ()=>{ size(); if(reduce) drawStatic(); }, {passive:true});
-  size();
-  if(reduce){ drawStatic(); }
-  else {
-    new IntersectionObserver((es)=>es.forEach(e=> e.isIntersecting ? start() : stop())).observe(hero);
-    document.addEventListener('visibilitychange', ()=> document.hidden ? stop() : start());
-  }
-})();
 </script>
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
+<script type="module" src="js/pipeline-scene.js"></script>
 </body>
 </html>
