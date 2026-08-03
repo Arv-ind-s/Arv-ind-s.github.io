@@ -5,13 +5,16 @@
   as the camera passes it — motion is authored (on rails), never free/orbit.
 
   The DOM (spine, nodes, copy, cards) is the source of truth for content and
-  navigation; this canvas is a background layer only. If WebGL is unavailable
-  or the visitor prefers reduced motion, we bail out and the static .amb
-  gradient (already in the page) shows instead.
+  navigation; this canvas is a background layer only. If WebGL is unavailable,
+  the visitor prefers reduced motion, or the viewport is narrow, we bail out
+  and the static .amb gradient (already in the page) shows instead — station
+  lateral offsets are tuned for a landscape-ish aspect ratio and go outside
+  the frustum entirely on phone-width portrait screens.
 */
 import * as THREE from 'three';
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const narrow = innerWidth < 820;
 const canvas = document.getElementById('scene-canvas');
 
 function supportsWebGL() {
@@ -326,6 +329,17 @@ function init() {
   }
   addEventListener('resize', () => { computeBreakpoints(); resize(); }, { passive: true });
 
+  /* ---------- ambient pointer parallax — the scene notices you, but only ----------
+     ever nudges the view a couple of degrees; the path itself never changes,
+     which is what keeps this out of free-orbit territory. */
+  const mouse = { x: 0, y: 0 }, mouseTarget = { x: 0, y: 0 };
+  if (matchMedia('(pointer:fine)').matches) {
+    addEventListener('pointermove', (e) => {
+      mouseTarget.x = (e.clientX / innerWidth - 0.5) * 2;
+      mouseTarget.y = (e.clientY / innerHeight - 0.5) * 2;
+    }, { passive: true });
+  }
+
   /* ---------- render loop ---------- */
   let smoothT = 0, running = true;
   const clock = new THREE.Clock();
@@ -333,7 +347,7 @@ function init() {
     if (!running) return;
     const t = clock.getElapsedTime();
     const targetT = progToPathT(scrollProg());
-    smoothT += (targetT - smoothT) * 0.07;
+    smoothT += (targetT - smoothT) * 0.14;
 
     const camPos = pathAt(CAM_PATH, smoothT);
     camera.position.set(camPos.x, camPos.y + 0.15, camPos.z);
@@ -357,6 +371,10 @@ function init() {
     const look = new THREE.Vector3(lookPos.x, lookPos.y + 0.15, lookPos.z);
     if (station) look.lerp(station.position, bias);
     camera.lookAt(look);
+    mouse.x += (mouseTarget.x - mouse.x) * 0.04;
+    mouse.y += (mouseTarget.y - mouse.y) * 0.04;
+    camera.rotation.y -= mouse.x * 0.05;
+    camera.rotation.x -= mouse.y * 0.03;
 
     stations.forEach((g) => g && g.userData.tick && g.userData.tick(t));
 
@@ -388,7 +406,7 @@ function init() {
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(computeBreakpoints);
 }
 
-if (canvas && !reduce && supportsWebGL()) {
+if (canvas && !reduce && !narrow && supportsWebGL()) {
   init();
 } else if (canvas) {
   canvas.remove();

@@ -228,6 +228,9 @@
     .tok{display:none}
     #scene-canvas,.scene-fade{display:none}
   }
+  /* station lateral offsets are tuned for landscape-ish aspect; narrow portrait
+     viewports fall back to the static .amb gradient (see pipeline-scene.js) */
+  @media(max-width:820px){ #scene-canvas,.scene-fade{display:none} }
 </style>
 <noscript><style>.rv{opacity:1!important;transform:none!important}.stage .node .core{background:var(--accent);border-color:var(--accent)}#scene-canvas,.scene-fade{display:none}</style></noscript>
 </head>
