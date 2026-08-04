@@ -59,18 +59,50 @@ function supportsWebGL() {
 
 /* ---------- geometry ---------- */
 
+/*
+  Each layer is bowed out of the XY plane, alternating direction layer to layer.
+  This matters: with every node on z=0 the whole network is a flat sheet, and
+  rotating a sheet only ever looks like an obliquely-viewed sheet — which is
+  why dragging felt like moving a 2D screen. The alternating bow makes the
+  structure genuinely non-planar, so rotation produces real parallax between
+  nodes as well as between layers. Face-on the bow is nearly invisible and the
+  columns still read straight.
+*/
+const BOW = 0.95;
 function buildNodePositions() {
   nodes = []; nodeStartOfLayer = [];
   let run = 0;
   LAYER_SIZES.forEach((n, li) => {
     nodeStartOfLayer.push(run);
+    const dir = li % 2 ? -1 : 1;
     for (let i = 0; i < n; i++) {
-      // z is flat: any depth offset would project neighbouring nodes at
-      // different sizes, which is exactly the irregularity we're removing
-      nodes.push({ layer: li, idx: i, pos: new THREE.Vector3(LAYER_X[li], (i - (n - 1) / 2) * SPACING_Y, 0) });
+      const t = n === 1 ? 0 : (i / (n - 1)) * 2 - 1;   // -1..1 across the column
+      nodes.push({
+        layer: li, idx: i,
+        pos: new THREE.Vector3(LAYER_X[li], (i - (n - 1) / 2) * SPACING_Y, dir * BOW * (1 - t * t)),
+        scale: 1,
+      });
     }
     run += n;
   });
+}
+
+/*
+  Node size is equalised for the RESTING camera only, then held. At rest every
+  node projects to exactly the same size on screen (the uniformity that was
+  asked for); as soon as you drag, natural perspective takes over and nearer
+  nodes really do read larger — which is a depth cue, not an irregularity.
+*/
+function bakeScales() {
+  const cam = tmpV.set(camX, 0, fitDist);
+  const ref = cam.distanceTo(nodes[0].pos);
+  nodes.forEach((n) => { n.scale = cam.distanceTo(n.pos) / ref; });
+  if (!nodeMesh) return;
+  nodes.forEach((n, i) => {
+    tmpM.compose(n.pos, tmpQ, tmpS.setScalar(n.scale));
+    nodeMesh.setMatrixAt(i, tmpM);
+  });
+  nodeMesh.instanceMatrix.needsUpdate = true;
 }
 
 function buildEdges() {
@@ -141,7 +173,7 @@ function buildNodes() {
     nodes.length
   );
   nodes.forEach((n, i) => {
-    tmpM.compose(n.pos, tmpQ, tmpS);      // identity scale, always
+    tmpM.compose(n.pos, tmpQ, tmpS.setScalar(n.scale));
     nodeMesh.setMatrixAt(i, tmpM);
     nodeMesh.setColorAt(i, C_NODE);
   });
@@ -257,6 +289,13 @@ function computeFit() {
   const w = x1 - x0;
   fitDist = Math.max(halfH / tan, halfW / (w * tan * camera.aspect)) * 1.1;
   camX = -(((x0 + x1) / 2) - 0.5) * 2 * tan * camera.aspect * fitDist;
+  // depth haze: nodes and edges further from the camera fade toward the
+  // background, so turning the network reads as turning a solid volume
+  if (scene.fog) {
+    scene.fog.near = fitDist - halfW * 1.15;
+    scene.fog.far = fitDist + halfW * 2.3;
+  }
+  bakeScales();
 }
 
 function resize() {
@@ -316,7 +355,10 @@ export function initNetwork(canvasEl) {
   }
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(22, 1, 0.1, 200);   // long lens ⇒ near-uniform node sizes
+  // a real lens, not the near-orthographic 22° this used to use: orthographic
+  // projection is what made a rotating network look like a turning flat card
+  camera = new THREE.PerspectiveCamera(38, 1, 0.1, 200);
+  scene.fog = new THREE.Fog(0x090a0f, 1, 100);
 
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'low-power' });
@@ -335,8 +377,11 @@ export function initNetwork(canvasEl) {
   controls.dampingFactor = 0.075;
   controls.enableZoom = false;
   controls.enablePan = false;
-  controls.minAzimuthAngle = -0.3; controls.maxAzimuthAngle = 0.3;
-  controls.minPolarAngle = Math.PI / 2 - 0.22; controls.maxPolarAngle = Math.PI / 2 + 0.22;
+  // wide enough that a drag genuinely swings the network through depth, still
+  // clamped so it always returns to a readable diagram
+  controls.rotateSpeed = 0.55;
+  controls.minAzimuthAngle = -0.85; controls.maxAzimuthAngle = 0.85;
+  controls.minPolarAngle = Math.PI / 2 - 0.5; controls.maxPolarAngle = Math.PI / 2 + 0.5;
 
   resize();
   curDist = fitDist; curX = camX;
