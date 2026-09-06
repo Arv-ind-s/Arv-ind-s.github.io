@@ -13,290 +13,351 @@
 <meta property="og:title" content="Aravind S — AI Engineer & Builder" />
 <meta property="og:description" content="Research becomes a production endpoint. GenAI · RAG · LLM agents · AWS MLOps. Creator of thought2build.com." />
 <meta property="og:type" content="website" />
-<meta name="theme-color" content="#0f1013" />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230f1013'/%3E%3Cg stroke='%230066ff' stroke-width='2.5'%3E%3Cline x1='30' y1='26' x2='70' y2='50'/%3E%3Cline x1='30' y1='50' x2='70' y2='50'/%3E%3Cline x1='30' y1='74' x2='70' y2='50'/%3E%3C/g%3E%3Cg fill='%2300ffff'%3E%3Ccircle cx='30' cy='26' r='7'/%3E%3Ccircle cx='30' cy='50' r='7'/%3E%3Ccircle cx='30' cy='74' r='7'/%3E%3Ccircle cx='70' cy='50' r='7'/%3E%3C/g%3E%3C/svg%3E" />
+<meta name="theme-color" content="#04050c" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2304050c'/%3E%3Cg fill='none' stroke='%237ba7ff' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M50 22a28 28 0 0 1 24 34'/%3E%3Cpath d='M50 78a28 28 0 0 1-24-34'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='11' fill='%23ffb45c'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Sora:wght@300;400;600&display=swap" rel="stylesheet" />
 <style>
   /*
-    Monochrome page — bone ink on graphite. The only colour in the document
-    lives in the network behind it: colour means "you are looking at the model."
-    One warm signal is allowed, for LIVE.
+    Deep field. The page is a plate: the luminous object is the content, and the
+    document is the annotation running down its left margin.
+
+    Colour discipline — starlight blue-white is structure; GOLD is reserved for
+    things that are live in the world, and appears about four times on the whole
+    page. Nothing else is coloured.
   */
   :root{
-    --ground:#0f1013; --ground-2:#15161a; --figure:#090a0f;
-    --ink:#e9e6e0; --ink-2:#94938f; --ink-3:#5b5c60;
-    --rule:rgba(233,230,224,.13); --rule-2:rgba(233,230,224,.26);
-    --cyan:#00ffff; --live:#e8a33d;
-    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-    --sans:'Archivo',system-ui,-apple-system,sans-serif;
+    --void:#04050c; --deep:#090d1c; --panel:#0c1020;
+    --ink:#eef1fb; --ink-dim:#a3aac6; --ink-far:#7e87b2;
+    --gold:#ffb45c; --blue:#7ba7ff;
+    --rule:rgba(190,205,255,.14); --rule-2:rgba(190,205,255,.30);
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --sans:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
     --ease:cubic-bezier(.22,1,.36,1);
-    --head:56px; --gut:clamp(20px,5vw,64px); --col:min(56vw,620px);
+    --bar:58px; --gut:clamp(22px,5vw,72px);
+    --col:min(46vw,540px);          /* the copy column: never crosses the object */
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{background:var(--figure);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;
-    overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+  body{background:var(--void);color:var(--ink);font-family:var(--sans);font-weight:300;
+    font-size:16px;line-height:1.62;overflow-x:hidden;-webkit-font-smoothing:antialiased}
   a{color:inherit;text-decoration:none}
-  ::selection{background:var(--ink);color:var(--ground)}
-  :focus-visible{outline:1.5px solid var(--cyan);outline-offset:3px}
+  ::selection{background:var(--blue);color:var(--void)}
+  :focus-visible{outline:1.5px solid var(--blue);outline-offset:4px}
   button{font:inherit;background:none;border:none;color:inherit;cursor:pointer;text-align:left}
-  .mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
 
-  /* ---------- the figure: a fixed backdrop the document scrolls over ---------- */
-  #fig{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;display:block;touch-action:pan-y}
-  /* scrim keeps the copy legible without hiding the network: opaque under the
-     text column on the left, clear over the network on the right */
-  .scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  /* ------------------------------------------------------------- the sky */
+  #sky{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;display:block;touch-action:pan-y}
+  /* the plate is read from the left, so the left is held dark and the object
+     is left alone; nothing is ever laid on top of the core */
+  .veil{position:fixed;inset:0;z-index:1;pointer-events:none;
     background:
-      linear-gradient(90deg,var(--ground) 0%,rgba(15,16,19,.96) 26%,rgba(15,16,19,.7) 40%,rgba(15,16,19,.22) 50%,transparent 58%),
-      linear-gradient(180deg,rgba(15,16,19,.72),rgba(15,16,19,0) 16%,rgba(15,16,19,0) 84%,rgba(15,16,19,.72))}
-  .axes{position:fixed;inset:0;z-index:2;pointer-events:none}
-  .axis{position:absolute;transform:translate(-50%,0);font-family:var(--mono);font-size:.64rem;
-    letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap;
-    transition:color .4s var(--ease),opacity .4s var(--ease)}
-  .axis.on{color:var(--cyan)}
-  .axis i{font-style:normal;opacity:.6}
+      linear-gradient(90deg,var(--void) 0%,rgba(4,5,12,.97) 26%,rgba(4,5,12,.78) 40%,rgba(4,5,12,.24) 52%,rgba(4,5,12,0) 62%),
+      linear-gradient(180deg,rgba(4,5,12,.85),rgba(4,5,12,0) 14%,rgba(4,5,12,0) 82%,rgba(4,5,12,.9))}
 
-  /* ---------- masthead ---------- */
-  .masthead{position:fixed;top:0;left:0;right:0;height:var(--head);z-index:40;
-    display:flex;align-items:center;justify-content:space-between;gap:20px;
-    padding:0 var(--gut);background:rgba(15,16,19,.86);backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--rule)}
-  .masthead .name{font-family:var(--mono);font-weight:700;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase}
-  .masthead nav{display:flex;align-items:center;gap:22px}
-  .masthead nav a{font-family:var(--mono);font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);transition:color .2s}
-  .masthead nav a:hover,.masthead nav a.cur{color:var(--ink)}
-  .masthead nav a.cur{text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1px}
-  @media(max-width:760px){.masthead nav a:not(.gh){display:none}}
+  /* the annotation layer: a leader line from an entry to the object it describes */
+  /* narrow screens only: a wash that comes up as the reader leaves the hero,
+     so the galaxy can be seen properly first and read over afterwards */
+  .dim{position:fixed;inset:0;z-index:2;pointer-events:none;background:var(--void);opacity:0}
 
-  /* ---------- document ---------- */
-  /* main itself is transparent to the pointer so the network behind stays
-     draggable; every actual piece of content re-enables it */
+  #tethers{position:fixed;inset:0;z-index:6;pointer-events:none;width:100vw;height:100vh}
+  #tethers{filter:drop-shadow(0 0 6px rgba(123,167,255,.45))}
+  #tethers line{stroke:var(--blue);stroke-width:1;opacity:0;transition:opacity .45s var(--ease)}
+  #tethers circle{fill:none;stroke:var(--blue);stroke-width:1;opacity:0;transition:opacity .45s var(--ease)}
+  #tethers.on line{opacity:.85}
+  #tethers.on circle{opacity:.6}
+
+  #marks{position:fixed;inset:0;z-index:7;pointer-events:none}
+  .mark{position:absolute;transform:translate(20px,-50%);white-space:nowrap;
+    opacity:0;transition:opacity .5s var(--ease),color .3s var(--ease);
+    /* names sit on top of luminous dust, so they carry their own night */
+    text-shadow:0 0 14px rgba(4,5,12,.98),0 0 5px rgba(4,5,12,.95),0 1px 2px rgba(4,5,12,.9)}
+  .mark.on{opacity:1}
+  .mark b{display:block;font-weight:400;font-size:.84rem;letter-spacing:.01em;
+    color:var(--ink-dim);transition:color .3s var(--ease)}
+  .mark i{font-style:normal;font-size:.68rem;letter-spacing:.1em;color:var(--ink-far)}
+  .mark.lit b{color:#ffffff}
+  .mark.gold.lit b{color:var(--gold)}
+
+  /* ---------------------------------------------------------- masthead */
+  .bar{position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:40;
+    display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 var(--gut);
+    background:rgba(4,5,12,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--rule)}
+  .bar .who{font-family:var(--display);font-weight:500;font-size:1.06rem;letter-spacing:.005em}
+  .bar nav{display:flex;align-items:center;gap:26px}
+  .bar nav a{font-size:.82rem;font-weight:300;color:var(--ink-far);transition:color .25s}
+  .bar nav a:hover,.bar nav a.cur{color:var(--ink)}
+  .bar nav a.cur{box-shadow:0 6px 0 -5px var(--blue)}
+  @media(max-width:780px){.bar nav a:not(.out){display:none}}
+
+  /* ---------------------------------------------------------- document */
+  /* transparent to the pointer so the sky behind stays draggable; the content
+     itself takes the pointer back */
   main{position:relative;z-index:10;pointer-events:none}
-  main .opening,main .cap-hd,main .lede,main .key,main .detail,main .btn,main .colophon,main a{pointer-events:auto}
+  main :is(h1,h2,p,a,button,li,.plate,footer){pointer-events:auto}
 
-  .opening{padding:calc(var(--head) + clamp(70px,15vh,170px)) var(--gut) clamp(56px,10vh,120px);
-    max-width:1360px;margin:0 auto}
-  .opening .meta{display:flex;flex-wrap:wrap;gap:8px 26px;margin-bottom:clamp(28px,5vh,52px)}
-  .opening h1{font-weight:900;font-stretch:118%;font-size:clamp(2.7rem,6.6vw,5.4rem);line-height:.94;
-    letter-spacing:-.035em;max-width:13ch;text-wrap:balance}
-  .opening h1 em{font-style:normal;color:var(--ink-2)}
-  .opening .say{color:var(--ink-2);font-size:clamp(1rem,1.6vw,1.1rem);max-width:46ch;margin-top:clamp(26px,4vh,40px)}
-  .opening .say b{color:var(--ink);font-weight:600}
-  .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
-  .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 20px;font-family:var(--mono);
-    font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--rule-2);
-    background:rgba(15,16,19,.6);
-    transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease);white-space:nowrap}
-  .btn:hover{background:var(--ink);color:var(--ground);border-color:var(--ink)}
-  .btn.solid{background:var(--ink);color:var(--ground);border-color:var(--ink)}
-  .btn.solid:hover{background:transparent;color:var(--ink)}
+  .wrap{max-width:1500px;margin:0 auto;padding:0 var(--gut)}
 
-  .caps{max-width:1360px;margin:0 auto;padding:0 var(--gut)}
-  .cap-sec{max-width:var(--col);padding:clamp(58px,9vh,104px) 0}
-  .cap-sec:last-child{padding-bottom:clamp(40px,6vh,64px)}
-  .cap-hd{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;padding-bottom:12px;
-    border-bottom:1px solid var(--rule);margin-bottom:22px}
-  @media(max-width:620px){.cap-hd{flex-direction:column;align-items:flex-start;gap:8px}}
-  .cap-hd .l{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--ink-3);transition:color .4s var(--ease)}
-  .cap-sec.on .cap-hd .l{color:var(--cyan)}
-  .cap-hd h2{font-weight:800;font-stretch:112%;font-size:clamp(1.35rem,2.6vw,1.9rem);letter-spacing:-.02em;line-height:1.1}
-  .lede{color:var(--ink-2);font-size:1.02rem;margin-bottom:24px}
+  /* hero: the type block sits low and left, the way a caption sits on a plate */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;
+    padding-bottom:clamp(56px,11vh,120px);padding-top:calc(var(--bar) + 80px)}
+  .hero h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,5.9vw,5.5rem);
+    line-height:.99;letter-spacing:-.018em;max-width:13ch;text-wrap:balance}
+  .hero .say{color:var(--ink-dim);font-size:clamp(1rem,1.4vw,1.12rem);max-width:44ch;
+    margin-top:clamp(22px,3.4vh,34px)}
+  .hero .who{color:var(--ink-far);font-size:.88rem;max-width:44ch;margin-top:16px}
+  .hero .who b{color:var(--ink-dim);font-weight:400}
+  .acts{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+  .btn{display:inline-flex;align-items:center;padding:13px 22px;font-size:.86rem;font-weight:400;
+    border:1px solid var(--rule-2);transition:background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease)}
+  .btn:hover{background:var(--ink);color:var(--void);border-color:var(--ink)}
+  .btn.fill{background:var(--gold);color:#241403;border-color:var(--gold);font-weight:400}
+  .btn.fill:hover{background:transparent;color:var(--gold)}
+  .hint{margin-top:30px;font-size:.72rem;letter-spacing:.13em;color:var(--ink-far);
+    opacity:0;transition:opacity 1.1s var(--ease) .6s}
+  .hint.show{opacity:1}
+  .hint.gone{opacity:0;transition-duration:.35s;transition-delay:0s}
 
-  .keys{border-top:1px solid var(--rule)}
-  .key{display:grid;grid-template-columns:38px 1fr auto;gap:16px;align-items:baseline;width:100%;
-    padding:15px 6px;border-bottom:1px solid var(--rule);
-    transition:background .18s var(--ease),padding-left .18s var(--ease)}
-  .key .n{font-family:var(--mono);font-size:.7rem;color:var(--ink-3);letter-spacing:.08em;transition:color .18s var(--ease)}
-  .key .t{font-weight:600;font-size:1rem}
-  .key .d{color:var(--ink-2);font-size:.92rem;font-weight:400;margin-left:10px}
-  .key .m{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
-  .key:hover,.key.hot{background:var(--ground-2);padding-left:12px}
-  .key.on .n,.key.hot .n,.key:hover .n{color:var(--cyan)}
-  @media(max-width:640px){
-    .key{grid-template-columns:30px 1fr;gap:12px}
-    .key .m{grid-column:2;margin-top:4px}
-    .key .d{display:block;margin-left:0;margin-top:3px}
-  }
+  /* ------------------------------------------------------------ sections */
+  section.plate{max-width:var(--col);padding:clamp(70px,13vh,140px) 0}
+  .plate > h2{font-family:var(--display);font-weight:400;font-size:clamp(2rem,3.4vw,2.9rem);
+    line-height:1.06;letter-spacing:-.015em}
+  .plate > .lede{color:var(--ink-dim);font-size:1rem;margin-top:12px;max-width:40ch}
 
-  .detail{padding:20px 6px 6px;border-bottom:1px solid var(--rule);display:none}
-  .detail.on{display:block}
-  .detail p{color:var(--ink-2);font-size:.96rem}
-  .detail p b{color:var(--ink);font-weight:600}
-  .detail .row{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
-  .detail .row span{font-family:var(--mono);font-size:.74rem;padding:5px 10px;border:1px solid var(--rule);color:var(--ink-2)}
-  .detail ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:9px}
-  /* NOT grid: inline <b>/<i> and text runs would each become a grid item and
-     stack one fragment per row */
-  .detail li{position:relative;padding-left:22px;color:var(--ink-2);font-size:.94rem}
-  .detail li::before{content:'—';position:absolute;left:0;top:0;color:var(--ink-3)}
-  .detail li b{color:var(--ink);font-weight:600}
-  .detail .go{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-family:var(--mono);
-    font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;border-bottom:1px solid var(--rule-2);padding-bottom:3px}
-  .detail .go:hover{border-color:var(--ink)}
-  .flagline{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.68rem;
-    letter-spacing:.13em;text-transform:uppercase;color:var(--live);margin-bottom:12px}
-  .flagline .d{width:6px;height:6px;border-radius:50%;background:var(--live)}
+  .list{margin-top:36px;border-top:1px solid var(--rule)}
+  .row{display:block;width:100%;padding:20px 4px;border-bottom:1px solid var(--rule);
+    transition:padding-left .3s var(--ease)}
+  .row:hover,.row.hot{padding-left:14px}
+  .row .top{display:flex;align-items:baseline;justify-content:space-between;gap:18px}
+  .row .nm{font-size:1.06rem;font-weight:400;letter-spacing:-.005em;transition:color .25s var(--ease)}
+  .row:hover .nm,.row.hot .nm,.row.open .nm{color:var(--blue)}
+  .row.gold:hover .nm,.row.gold.hot .nm,.row.gold.open .nm{color:var(--gold)}
+  .row .tag{font-size:.74rem;color:var(--ink-far);letter-spacing:.06em;white-space:nowrap;flex-shrink:0}
+  .row .sub{color:var(--ink-dim);font-size:.92rem;margin-top:5px;max-width:38ch}
+  .row.gold .tag{color:var(--gold)}
 
-  .colophon{max-width:1360px;margin:0 auto;padding:clamp(40px,7vh,70px) var(--gut) 40px;
-    display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;border-top:1px solid var(--rule)}
-  .colophon span{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;color:var(--ink-3)}
+  .body{border-bottom:1px solid var(--rule);padding:0 4px;
+    display:grid;grid-template-rows:0fr;transition:grid-template-rows .42s var(--ease)}
+  .body.open{grid-template-rows:1fr}
+  .body > div{overflow:hidden}
+  .body .in{padding:2px 0 24px}
+  .body p{color:var(--ink-dim);font-size:.95rem;max-width:40ch}
+  .body p b{color:var(--ink);font-weight:400}
+  .body ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:10px}
+  .body li{position:relative;padding-left:20px;color:var(--ink-dim);font-size:.92rem;max-width:40ch}
+  .body li::before{content:'';position:absolute;left:2px;top:.62em;width:5px;height:5px;
+    border-radius:50%;background:var(--rule-2)}
+  .body li b{color:var(--ink);font-weight:400}
+  .body .made{margin-top:18px;color:var(--ink-far);font-size:.86rem;max-width:40ch;line-height:1.7}
+  .body .go{display:inline-block;margin-top:20px;font-size:.84rem;color:var(--ink);
+    border-bottom:1px solid var(--rule-2);padding-bottom:3px;transition:border-color .25s}
+  .body .go:hover{border-color:var(--blue)}
 
-  /* readout, bottom right — the figure's caption line */
-  .readout{position:fixed;right:var(--gut);bottom:20px;z-index:20;pointer-events:none;
-    font-family:var(--mono);font-size:.68rem;letter-spacing:.11em;color:var(--ink-3);text-align:right}
-  .readout b{color:var(--ink-2);font-weight:400}
-  @media(max-width:820px){.readout{display:none}}
+  /* contact rows are links, not disclosures */
+  a.row .top{align-items:center}
+  a.row .nm{font-family:var(--display);font-size:1.24rem}
 
-  /* ---------- fallbacks: the figure is an enhancement, never the content ---------- */
-  @media(max-width:820px){
-    #fig,.scrim,.axes{display:none}
-    body{background:var(--ground)}
+  footer{padding:clamp(40px,7vh,74px) 0 44px;border-top:1px solid var(--rule);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    color:var(--ink-far);font-size:.8rem}
+
+  /* --------------------------------------------------------- fallbacks --
+     The sky is an enhancement. Every one of these paths still gets the whole
+     document, and the deep field is painted in CSS so the page is never a
+     black rectangle. */
+  .flat{background:
+      radial-gradient(1100px 720px at 74% 34%,rgba(90,120,220,.20),transparent 62%),
+      radial-gradient(560px 420px at 78% 40%,rgba(255,180,92,.13),transparent 66%),
+      var(--void)}
+  @media(max-width:900px){
+    /* the top third is left clear for the galaxy; the copy sits below it */
+    .veil{background:linear-gradient(180deg,
+      rgba(4,5,12,.06) 0%,rgba(4,5,12,.14) 24%,rgba(4,5,12,.72) 40%,
+      rgba(4,5,12,.93) 56%,rgba(4,5,12,.95) 100%)}
+    #tethers,#marks,.hint{display:none}
     main{pointer-events:auto}
-    .cap-sec{max-width:none}
+    :root{--col:none}
+    section.plate{max-width:none;padding:clamp(56px,9vh,96px) 0}
+    .hero{min-height:auto;padding-top:calc(var(--bar) + 30vh);
+      padding-bottom:clamp(40px,8vh,80px);justify-content:flex-start}
+    .hero h1{font-size:clamp(2.35rem,9.6vw,3.2rem)}
+    .hero .say{margin-top:20px}
   }
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
-    #fig,.scrim,.axes{display:none}
-    body{background:var(--ground)}
+    html{scroll-behavior:auto}
+    /* the canvas goes, but .flat stays: the deep field is a still image in CSS,
+       and dropping the body background here would leave ink on browser white */
+    #sky,.veil,.dim,#tethers,#marks,.hint{display:none}
     main{pointer-events:auto}
+    /* with nothing to sit beside, the copy stops hugging the left edge */
+    .wrap{max-width:860px}
+    section.plate{max-width:none}
+    .hero{min-height:auto;padding-top:calc(var(--bar) + clamp(70px,14vh,130px))}
+    /* the disclosures still WORK here — only their animation is removed. Forcing
+       them open would contradict the aria-expanded the buttons report. */
   }
 </style>
-<noscript><style>#fig,.scrim,.axes,.readout{display:none}body{background:var(--ground)}main{pointer-events:auto}.detail{display:block}</style></noscript>
+<noscript><style>
+  /* nothing can open a disclosure here, so everything is already open */
+  #sky,.veil,.dim,#tethers,#marks,.hint{display:none}
+  main{pointer-events:auto}
+  .wrap{max-width:860px}
+  section.plate{max-width:none}
+  .hero{min-height:auto;padding-top:calc(var(--bar) + clamp(70px,14vh,130px))}
+  .body{grid-template-rows:1fr}
+</style></noscript>
 </head>
-<body>
+<body class="flat">
 
-<canvas id="fig" aria-hidden="true"></canvas>
-<div class="scrim" aria-hidden="true"></div>
-<div class="axes" aria-hidden="true">
-  <span class="axis" data-axis="0">Input <i>×4</i></span>
-  <span class="axis" data-axis="1">Hidden₁ <i>×5</i></span>
-  <span class="axis" data-axis="2">Hidden₂ <i>×3</i></span>
-  <span class="axis" data-axis="3">Output <i>×3</i></span>
-</div>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="dim" aria-hidden="true"></div>
+<svg id="tethers" aria-hidden="true"><line id="tline" /><circle id="tdot" r="7" /></svg>
+<div id="marks" aria-hidden="true"></div>
 
-<header class="masthead">
-  <a href="#top" class="name">Aravind S<span style="color:var(--ink-3)">.</span></a>
+<header class="bar">
+  <a href="#top" class="who">Aravind S</a>
   <nav>
-    <a href="#s0" data-nav="0">Input</a>
-    <a href="#s1" data-nav="1">Weights</a>
-    <a href="#s2" data-nav="2">Activations</a>
-    <a href="#s3" data-nav="3">Output</a>
-    <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="gh">GitHub&nbsp;↗</a>
+    <a href="#work" data-nav="work">Work</a>
+    <a href="#instruments" data-nav="stack">Instruments</a>
+    <a href="#contact" data-nav="signal">Contact</a>
+    <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="out">GitHub</a>
   </nav>
 </header>
 
 <main id="top">
+  <div class="wrap">
 
-  <section class="opening">
-    <div class="meta">
-      <span class="mono">AI Engineer &amp; Builder</span>
-      <span class="mono">Kochi · India</span>
-      <span class="mono">Self-taught</span>
-      <span class="mono" style="color:var(--live)">● Shipping thought2build.com</span>
-    </div>
-    <h1>Research becomes a production <em>endpoint.</em></h1>
-    <p class="say">I build machine-learning systems that survive contact with production — <b>retrieval, agents, and the infrastructure underneath them</b>.</p>
-    <div class="acts">
-      <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn solid">Thought2Build ↗</a>
-      <a href="#s2" class="btn">Selected work</a>
-    </div>
-  </section>
-
-  <div class="caps">
-
-    <section class="cap-sec" id="s0" data-layer="0">
-      <div class="cap-hd"><span class="l">L0 · Input</span><h2>What goes in.</h2></div>
-      <p class="lede">Four things that determine everything downstream.</p>
-      <div class="keys" data-keys="0">
-        <button class="key" data-idx="0"><span class="n">0.0</span><span class="t">AI Engineer &amp; Builder<span class="d">I build the whole path, not one slice of it.</span></span><span class="m">Role</span></button>
-        <button class="key" data-idx="1"><span class="n">0.1</span><span class="t">Kochi, Kerala · India<span class="d">Remote-friendly, and used to it.</span></span><span class="m">Base</span></button>
-        <button class="key" data-idx="2"><span class="n">0.2</span><span class="t">Self-taught<span class="d">I'd rather know why something breaks than watch it pass a demo.</span></span><span class="m">Training</span></button>
-        <button class="key" data-idx="3"><span class="n">0.3</span><span class="t">Shipping thought2build.com<span class="d">A product in the world, with real users.</span></span><span class="m">Live</span></button>
+    <section class="hero">
+      <h1>Research becomes a production endpoint.</h1>
+      <p class="say">I build machine-learning systems that survive contact with production: retrieval, agents, and the infrastructure underneath them.</p>
+      <p class="who">AI engineer in <b>Kochi, India</b>. Self-taught. Currently shipping <b>Thought2Build</b>.</p>
+      <div class="acts">
+        <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn fill">Open Thought2Build</a>
+        <a href="#work" class="btn">See the work</a>
       </div>
+      <p class="hint" id="hint">Drag the galaxy to turn it</p>
     </section>
 
-    <section class="cap-sec" id="s1" data-layer="1">
-      <div class="cap-hd"><span class="l">L1 · Hidden₁ — Weights</span><h2>What shaped the weights.</h2></div>
-      <p class="lede">Five categories of training. Select one, or pick its node in the network.</p>
-      <div class="keys" data-keys="1">
-        <button class="key" data-idx="0"><span class="n">1.0</span><span class="t">Language</span><span class="m">1 tool</span></button>
-        <div class="detail" data-detail="1-0"><p>Everything else here is written on top of this.</p><div class="row"><span>Python</span></div></div>
-        <button class="key" data-idx="1"><span class="n">1.1</span><span class="t">ML / DL</span><span class="m">6 tools</span></button>
-        <div class="detail" data-detail="1-1"><p>Where classical ML meets deep learning — the layer I reach for before an LLM is the answer.</p><div class="row"><span>PyTorch</span><span>scikit-learn</span><span>Hugging Face</span><span>Pandas</span><span>NumPy</span><span>BERT</span></div></div>
-        <button class="key" data-idx="2"><span class="n">1.2</span><span class="t">GenAI / LLM</span><span class="m">6 tools</span></button>
-        <div class="detail" data-detail="1-2"><p>Retrieval, agents, and orchestration — the stack behind <b>Nexus</b> and <b>Thought2Build</b>.</p><div class="row"><span>LangChain</span><span>RAG</span><span>ChromaDB</span><span>LlamaCloud</span><span>Tavily</span><span>GPT-4o-mini</span></div></div>
-        <button class="key" data-idx="3"><span class="n">1.3</span><span class="t">Cloud / MLOps</span><span class="m">6 tools</span></button>
-        <div class="detail" data-detail="1-3"><p>Where a trained model stops being a notebook and becomes infrastructure.</p><div class="row"><span>AWS</span><span>SageMaker</span><span>Lambda</span><span>DynamoDB</span><span>Terraform</span><span>Docker</span></div></div>
-        <button class="key" data-idx="4"><span class="n">1.4</span><span class="t">Serve / Deploy</span><span class="m">6 tools</span></button>
-        <div class="detail" data-detail="1-4"><p>The last mile — the part where a model turns into an endpoint someone can call.</p><div class="row"><span>FastAPI</span><span>Pydantic</span><span>Streamlit</span><span>PySpark</span><span>SQLite</span><span>Git</span></div></div>
-      </div>
-    </section>
+    <section class="plate" id="work" data-group="work">
+      <h2>In production</h2>
+      <p class="lede">Three systems with real users, real uptime, and consequences when they break.</p>
 
-    <section class="cap-sec" id="s2" data-layer="2">
-      <div class="cap-hd"><span class="l">L2 · Hidden₂ — Activations</span><h2>What fired.</h2></div>
-      <p class="lede">Three things that made it to production.</p>
-      <div class="keys" data-keys="2">
-        <button class="key" data-idx="0"><span class="n">2.0</span><span class="t">Thought2Build</span><span class="m">Flagship · Live</span></button>
-        <div class="detail" data-detail="2-0">
-          <span class="flagline"><span class="d"></span>Live · thought2build.com</span>
-          <p>An <b>AI product workspace</b> that closes the gap between "we should build this" and "here's exactly how" — where most product ideas quietly die. Spec → Plan → Harness → Tasks, each behind a review gate.</p>
+      <div class="list">
+        <button class="row gold" data-id="thought2build" aria-expanded="false" aria-controls="b-t2b">
+          <span class="top"><span class="nm">Thought2Build</span><span class="tag">Live</span></span>
+          <span class="sub">An AI product workspace, and the thing I'm building now.</span>
+        </button>
+        <div class="body" id="b-t2b"><div><div class="in">
+          <p>It closes the gap between "we should build this" and "here's exactly how" — the gap where most product ideas quietly die. Spec, then plan, then harness, then tasks, each behind a review gate.</p>
           <ul>
-            <li><b>Harness-first quality</b> — validation assets are generated alongside the plan, not bolted on after.</li>
-            <li><b>Full requirement traceability</b>, with export packages for human teams or AI agents to continue.</li>
-            <li>OAuth-secured · free starter tier · <b>bring-your-own LLM keys</b> (Anthropic · OpenAI · Google).</li>
+            <li><b>Harness-first quality.</b> Validation assets are generated alongside the plan, not bolted on after.</li>
+            <li><b>Full requirement traceability</b>, with export packages a human team or an AI agent can pick up and continue.</li>
+            <li>OAuth-secured, with a free starter tier and <b>bring-your-own LLM keys</b> for Anthropic, OpenAI and Google.</li>
           </ul>
-          <div class="row"><span>GenAI</span><span>LLM Orchestration</span><span>Multi-provider</span><span>Full-stack</span></div>
-          <a class="go" href="https://www.thought2build.com" target="_blank" rel="noopener">Launch app ↗</a>
-        </div>
-        <button class="key" data-idx="1"><span class="n">2.1</span><span class="t">Nexus Research Assistant</span><span class="m">Open source</span></button>
-        <div class="detail" data-detail="2-1">
-          <p>Agentic research assistant that fuses a <b>private knowledge base</b> with <b>real-time web intelligence</b>.</p>
+          <p class="made">Built with GenAI, LLM orchestration, multi-provider routing, full-stack.</p>
+          <a class="go" href="https://www.thought2build.com" target="_blank" rel="noopener">Open thought2build.com</a>
+        </div></div></div>
+
+        <button class="row" data-id="nexus" data-mark="Nexus" aria-expanded="false" aria-controls="b-nexus">
+          <span class="top"><span class="nm">Nexus Research Assistant</span><span class="tag">Open source</span></span>
+          <span class="sub">Agentic research over a private knowledge base and the live web.</span>
+        </button>
+        <div class="body" id="b-nexus"><div><div class="in">
+          <p>An assistant that answers from what you already have and what the web knows right now, and tells you which is which.</p>
           <ul>
-            <li><b>Hybrid retrieval</b> — an intent classifier routes each query to ChromaDB, Tavily, or both.</li>
-            <li><b>Multi-agent</b>: Classifier → Researcher → Synthesizer.</li>
-            <li><b>Dual-source citations</b> plus SQLite caching, for cost and latency.</li>
+            <li><b>Hybrid retrieval.</b> An intent classifier routes each query to ChromaDB, to Tavily, or to both.</li>
+            <li><b>Three agents in sequence:</b> classifier, researcher, synthesizer.</li>
+            <li><b>Dual-source citations</b>, with SQLite caching to hold down cost and latency.</li>
           </ul>
-          <div class="row"><span>LangChain</span><span>GPT-4o-mini</span><span>ChromaDB</span><span>Tavily</span></div>
-          <a class="go" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">View repo ↗</a>
-        </div>
-        <button class="key" data-idx="2"><span class="n">2.2</span><span class="t">Content Moderation</span><span class="m">Serverless · AWS</span></button>
-        <div class="detail" data-detail="2-2">
-          <p>Real-time NLP toxicity detection, <b>serverless and sub-second at scale</b>.</p>
+          <p class="made">Built with LangChain, GPT-4o-mini, ChromaDB, Tavily.</p>
+          <a class="go" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">Read the source</a>
+        </div></div></div>
+
+        <button class="row" data-id="moderation" aria-expanded="false" aria-controls="b-mod">
+          <span class="top"><span class="nm">Content Moderation</span><span class="tag">Serverless</span></span>
+          <span class="sub">Real-time toxicity detection, sub-second at scale.</span>
+        </button>
+        <div class="body" id="b-mod"><div><div class="in">
+          <p>NLP moderation that stays fast when traffic spikes, because there is no server to run out of.</p>
           <ul>
-            <li>Fine-tuned <b>BERT</b> for 6-category toxicity classification.</li>
-            <li><b>Serverless AWS</b> with async audit logging.</li>
+            <li>Fine-tuned <b>BERT</b> across six categories of toxicity.</li>
+            <li><b>Serverless on AWS</b>, with audit logging kept off the request path.</li>
             <li>Auto-scaling deployment targeting <b>99.9% uptime</b>.</li>
           </ul>
-          <div class="row"><span>BERT</span><span>AWS Lambda</span><span>DynamoDB</span></div>
-          <a class="go" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">View repo ↗</a>
-        </div>
+          <p class="made">Built with BERT, AWS Lambda, DynamoDB.</p>
+          <a class="go" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">Read the source</a>
+        </div></div></div>
       </div>
-      <a class="btn" style="margin-top:26px" href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener">More on GitHub ↗</a>
+
+      <p style="margin-top:28px"><a class="btn" href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener">More on GitHub</a></p>
     </section>
 
-    <section class="cap-sec" id="s3" data-layer="3">
-      <div class="cap-hd"><span class="l">L3 · Output</span><h2>What comes out.</h2></div>
-      <p class="lede">Open to AI / ML engineering roles and ambitious collaborations. Three ways to reach me — each one is a node in the output layer.</p>
-      <div class="keys" data-keys="3">
-        <a class="key" data-idx="0" href="mailto:arvindsathyan@gmail.com"><span class="n">3.0</span><span class="t">arvindsathyan@gmail.com</span><span class="m">Email ↗</span></a>
-        <a class="key" data-idx="1" href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener"><span class="n">3.1</span><span class="t">97aravind-s</span><span class="m">LinkedIn ↗</span></a>
-        <a class="key" data-idx="2" href="https://github.com/Arv-ind-s" target="_blank" rel="noopener"><span class="n">3.2</span><span class="t">Arv-ind-s</span><span class="m">GitHub ↗</span></a>
+    <section class="plate" id="instruments" data-group="stack">
+      <h2>Instruments</h2>
+      <p class="lede">Twenty-five tools, in the five groups I actually think in.</p>
+
+      <div class="list">
+        <button class="row" data-id="language" aria-expanded="false" aria-controls="b-lang">
+          <span class="top"><span class="nm">Language</span><span class="tag">1 tool</span></span>
+          <span class="sub">Everything else here is written on top of it.</span>
+        </button>
+        <div class="body" id="b-lang"><div><div class="in"><p class="made">Python.</p></div></div></div>
+
+        <button class="row" data-id="ml" aria-expanded="false" aria-controls="b-ml">
+          <span class="top"><span class="nm">Machine learning</span><span class="tag">6 tools</span></span>
+          <span class="sub">What I reach for before an LLM is the answer.</span>
+        </button>
+        <div class="body" id="b-ml"><div><div class="in"><p class="made">PyTorch, scikit-learn, Hugging Face, Pandas, NumPy, BERT.</p></div></div></div>
+
+        <button class="row" data-id="genai" aria-expanded="false" aria-controls="b-gen">
+          <span class="top"><span class="nm">GenAI and LLMs</span><span class="tag">6 tools</span></span>
+          <span class="sub">Retrieval, agents, and orchestration.</span>
+        </button>
+        <div class="body" id="b-gen"><div><div class="in">
+          <p>The stack behind <b>Nexus</b> and <b>Thought2Build</b>.</p>
+          <p class="made">LangChain, RAG, ChromaDB, LlamaCloud, Tavily, GPT-4o-mini.</p>
+        </div></div></div>
+
+        <button class="row" data-id="cloud" aria-expanded="false" aria-controls="b-cloud">
+          <span class="top"><span class="nm">Cloud and MLOps</span><span class="tag">6 tools</span></span>
+          <span class="sub">Where a trained model stops being a notebook.</span>
+        </button>
+        <div class="body" id="b-cloud"><div><div class="in"><p class="made">AWS, SageMaker, Lambda, DynamoDB, Terraform, Docker.</p></div></div></div>
+
+        <button class="row" data-id="serve" aria-expanded="false" aria-controls="b-serve">
+          <span class="top"><span class="nm">Serving and deployment</span><span class="tag">6 tools</span></span>
+          <span class="sub">The last mile, where a model becomes something you can call.</span>
+        </button>
+        <div class="body" id="b-serve"><div><div class="in"><p class="made">FastAPI, Pydantic, Streamlit, PySpark, SQLite, Git.</p></div></div></div>
       </div>
     </section>
 
-  </div>
+    <section class="plate" id="contact" data-group="signal">
+      <h2>Get in touch</h2>
+      <p class="lede">Open to AI and ML engineering roles, and to ambitious collaborations.</p>
+      <div class="list">
+        <a class="row" data-id="email" data-mark="Email" href="mailto:arvindsathyan@gmail.com">
+          <span class="top"><span class="nm">arvindsathyan@gmail.com</span><span class="tag">Email</span></span>
+        </a>
+        <a class="row" data-id="linkedin" data-mark="LinkedIn" href="https://www.linkedin.com/in/97aravind-s/" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">97aravind-s</span><span class="tag">LinkedIn</span></span>
+        </a>
+        <a class="row" data-id="github" data-mark="GitHub" href="https://github.com/Arv-ind-s" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">Arv-ind-s</span><span class="tag">GitHub</span></span>
+        </a>
+      </div>
+    </section>
 
-  <div class="colophon">
-    <span>© <span id="yr"></span> Aravind S</span>
-    <span>Input → Hidden₁ → Hidden₂ → Output</span>
+    <footer>
+      <span>© <span id="yr"></span> Aravind S</span>
+      <span>Kochi, India</span>
+    </footer>
+
   </div>
 </main>
-
-<div class="readout" aria-hidden="true"><span id="figNote">Fig. 1 — forward pass</span> · <b id="figHint">drag to rotate</b></div>
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
