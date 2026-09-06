@@ -187,14 +187,11 @@
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
     html{scroll-behavior:auto}
-    /* the canvas goes, but .flat stays: the deep field is a still image in CSS,
-       and dropping the body background here would leave ink on browser white */
-    #sky,.veil,.dim,#tethers,#marks,.hint{display:none}
+    /* The galaxy still draws here — once, without movement — so the layout is
+       unchanged and the copy keeps its column beside it. Only the things that
+       move, or that have to track a moving scene, are dropped. */
+    .dim,#tethers,#marks,.hint{display:none}
     main{pointer-events:auto}
-    /* with nothing to sit beside, the copy stops hugging the left edge */
-    .wrap{max-width:860px}
-    section.plate{max-width:none}
-    .hero{min-height:auto;padding-top:calc(var(--bar) + clamp(70px,14vh,130px))}
     /* the disclosures still WORK here — only their animation is removed. Forcing
        them open would contradict the aria-expanded the buttons report. */
   }
@@ -360,7 +357,6 @@
 </main>
 
 <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
-<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
 <script type="module" src="js/site.js"></script>
 </body>
 </html>

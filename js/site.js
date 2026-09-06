@@ -10,11 +10,21 @@
   Nothing here reads layout during a frame. Anchor positions are measured on
   scroll and resize and cached; the per-frame callback only writes.
 */
-import { initUniverse, setGroup, setActive, onHover, onSelect, onFrame, project, OBJECTS }
+import { initUniverse, setGroup, setActive, onHover, onSelect, onFrame, project, onMedia, OBJECTS }
   from './universe.js';
 
 const sky = initUniverse(document.getElementById('sky'));
-const live = !!sky;
+/* a still scene is a backdrop, not something to annotate or track */
+const live = !!sky && !sky.still;
+
+/*
+  <body class="flat"> paints a deep field in pure CSS, and it is the ground
+  everything falls back to: no JavaScript, no WebGL, a scene that failed to
+  build. The canvas clears to transparent, so once a real scene IS drawing that
+  same gradient would show through it and compete with the galaxy — so the
+  fallback is taken away exactly when it stops being the fallback.
+*/
+if (sky) document.body.classList.remove('flat');
 
 /*
   Whether the sky can be ANNOTATED is a question about available layout: below
@@ -152,7 +162,7 @@ function paint() {
 
 addEventListener('scroll', measure, { passive: true });
 addEventListener('resize', measure, { passive: true });
-roomy.addEventListener('change', () => { if (group) tether(pinned[group]); });
+onMedia(roomy, () => { if (group) tether(pinned[group]); });
 
 if (live) {
   onFrame(() => {
@@ -258,7 +268,7 @@ if (live) {
   const kick = () => { if (queued) return; queued = true; requestAnimationFrame(apply); };
   addEventListener('scroll', kick, { passive: true });
   addEventListener('resize', kick, { passive: true });
-  roomy.addEventListener('change', kick);
+  onMedia(roomy, kick);
   apply();
 }
 

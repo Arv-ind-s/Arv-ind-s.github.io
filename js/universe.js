@@ -17,7 +17,7 @@
     matters and there is nothing to sort. Depth is carried by a near/far alpha
     fade in the vertex shader instead of fog.
 */
-import * as THREE from 'three';
+import * as THREE from '../vendor/three/three.module.min.js';
 
 /* ---------------------------------------------------------------- palette */
 
@@ -65,7 +65,7 @@ export const OBJECTS = [
 
 let canvas, renderer, scene, camera;
 let galaxy, dust, bulge, starfield, coreGlow, nebulae = [], namedStars, links, ripple;
-let cheap = false, running = true, alive = false;
+let cheap = false, still = false, running = true, alive = false;
 /* device pixel ratio actually used, and the running check that lowers it */
 let pxCap = 2, watchN = 0, watchSum = 0;
 let group = null, activeId = null, hoverId = null;
@@ -81,6 +81,11 @@ let dragging = false, lastPtr = null, travelled = 0;
 const pointer = { x: -9999, y: -9999, inside: false };
 /* wide enough to turn the object without the copy sitting on top of it */
 const roomy = matchMedia('(min-width: 901px)');
+/* Safari only gained addEventListener on MediaQueryList in 14 */
+export function onMedia(mq, fn) {
+  if (mq.addEventListener) mq.addEventListener('change', fn);
+  else if (mq.addListener) mq.addListener(fn);
+}
 const projected = new Map();               // id -> {x, y, z, on}
 const clock = new THREE.Clock();
 const tmpV = new THREE.Vector3();
@@ -501,7 +506,7 @@ function setupPointer() {
   canvas.addEventListener('pointerdown', (e) => {
     if (!roomy.matches) return;
     dragging = true; lastPtr = { x: e.clientX, y: e.clientY }; travelled = 0;
-    canvas.setPointerCapture?.(e.pointerId);
+    if (canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
   });
 
   addEventListener('pointerup', () => {
@@ -536,8 +541,11 @@ function updateHover() {
   }
 }
 
+let viewRect = null;
+function measureView() { viewRect = canvas.getBoundingClientRect(); }
+
 function projectAll() {
-  const r = canvas.getBoundingClientRect();
+  const r = viewRect || (viewRect = canvas.getBoundingClientRect());
   namedStars.children.forEach((sp) => {
     tmpV.copy(sp.position).project(camera);
     projected.set(sp.userData.id, {
@@ -641,14 +649,17 @@ export function onFrame(cb) { frameCbs.push(cb); }
 
 export function initUniverse(el) {
   canvas = el;
-  if (!canvas || matchMedia('(prefers-reduced-motion: reduce)').matches || !supportsWebGL()) {
+  if (!canvas || !supportsWebGL()) {
     if (canvas) canvas.remove();
     return false;
   }
+  // Reduced motion should cost the reader the movement, not the picture: the
+  // scene is built and drawn exactly once, and then never touched again.
+  still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Phones get the same universe at a fraction of the fill cost. This is a
   // question about the DEVICE, so it is answered once, from device signals —
   // not from a window width that the reader can change at any moment.
-  cheap = matchMedia('(pointer: coarse)').matches || screen.width < 900;
+  cheap = still || matchMedia('(pointer: coarse)').matches || screen.width < 900;
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(46, 1, 0.1, 400);
@@ -656,6 +667,12 @@ export function initUniverse(el) {
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
   } catch (e) { canvas.remove(); return false; }
+  // Opaque, and cleared to the page's own ground. A transparent canvas was
+  // tried so the CSS deep field could show through as a safety net, but every
+  // additive layer also accumulates alpha, and compositing that over the page
+  // darkens it — a soft grey bruise across the top of the scene. The safety net
+  // costs nothing anyway: every path that fails removes the canvas outright,
+  // which uncovers the CSS field properly.
   renderer.setClearColor(0x04050c, 1);
 
   // three passes over one distribution. Separately they are dot scatters;
@@ -706,18 +723,31 @@ export function initUniverse(el) {
       });
   }
 
-  buildNamed();
+  try {
+    buildNamed();
+  } catch (err) {
+    console.error('universe: scene build failed, falling back to the still field', err);
+    canvas.remove();
+    return false;
+  }
   setupPointer();
   resize();          // resize() computes the framing, then places the catalogue
 
-  addEventListener('resize', resize, { passive: true });
+  measureView();
+  addEventListener('resize', () => { measureView(); resize(); }, { passive: true });
+  addEventListener('scroll', measureView, { passive: true });
   document.addEventListener('visibilitychange', () => {
     running = !document.hidden;
     if (running) { clock.getDelta(); requestAnimationFrame(frame); }
   });
 
-  canvas.style.cursor = roomy.matches ? 'grab' : 'default';
   alive = true;
+  if (still) {
+    // one frame, and then the scene is left alone for good
+    renderer.render(scene, camera);
+    return { cheap: cheap, still: true };
+  }
+  canvas.style.cursor = roomy.matches ? 'grab' : 'default';
   requestAnimationFrame(frame);
-  return { cheap: cheap };
+  return { cheap: cheap, still: false };
 }
