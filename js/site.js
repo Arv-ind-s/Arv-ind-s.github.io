@@ -10,7 +10,7 @@
   Nothing here reads layout during a frame. Anchor positions are measured on
   scroll and resize and cached; the per-frame callback only writes.
 */
-import { initUniverse, setGroup, setActive, onHover, onSelect, onFrame, project, onMedia, OBJECTS }
+import { initUniverse, setGroup, setActive, onHover, onSelect, onFrame, project, onMedia, setAnchors, OBJECTS }
   from './universe.js';
 
 const sky = initUniverse(document.getElementById('sky'));
@@ -177,7 +177,18 @@ if (live) {
     });
 
     const p = tethered && project(tethered);
-    if (!p || !p.on || !anchor || !roomy.matches) { svg.classList.remove('on'); return; }
+    if (!p || !p.on || !anchor || !roomy.matches) {
+      svg.classList.remove('on');
+      // the camera has carried this object out of view — don't strand its row
+      // highlighted for a star the reader can no longer find
+      if (tethered && (!p || !p.on)) {
+        const row = rows.get(tethered);
+        if (row) row.classList.remove('hot');
+        const mk = markEls.get(tethered);
+        if (mk) mk.classList.remove('lit');
+      }
+      return;
+    }
     svg.classList.add('on');
     line.setAttribute('x1', anchor.x); line.setAttribute('y1', anchor.y);
     line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
@@ -198,6 +209,25 @@ if (live) {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
 }
+
+/* --------------------------------------------- where the sections are ---
+   The scene places each named object at the camera pose its own section will
+   be read at, so it has to be told where those sections fall along the scroll.
+   Measured on load and resize only: re-measuring when a disclosure opens would
+   move the camera while the reader is doing nothing but reading. */
+
+function anchorSections() {
+  if (!live) return;
+  const span = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+  const map = { hero: 0 };
+  document.querySelectorAll('.plate[data-group]').forEach((el) => {
+    map[el.dataset.group] =
+      Math.min(1, Math.max(0, (el.offsetTop + el.offsetHeight / 2 - innerHeight / 2) / span));
+  });
+  setAnchors(map);
+}
+anchorSections();
+addEventListener('resize', anchorSections, { passive: true });
 
 /* ------------------------------------------------ which section is read */
 

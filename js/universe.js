@@ -3,14 +3,20 @@
 
   Design rules — these were arrived at painfully, don't "improve" them away:
 
-  - ONE camera framing, for the whole page. An earlier version of this site flew
-    the camera between sections and it cost scroll performance and, worse, made
-    the annotation lines impossible to draw: you can't tether a caption to a star
-    that is drifting, clipped, or behind the camera. Section changes are carried
-    by COLOUR and by which objects are named — never by moving the camera.
-  - The galaxy is ambient. The eleven NAMED objects are the content, and they are
-    placed to project into the clear right-hand region of the viewport where no
-    copy sits. Everything else is atmosphere.
+  - The reader TRAVELS: scroll flies the camera along a curve that starts far
+    outside the disc and ends inside the core. An earlier version of this site
+    tried a flythrough and abandoned it for a fixed backdrop because of scroll
+    jank — so note where the work happens here. The scroll handler does NOTHING.
+    rAF reads scrollY (a cheap read, never a forced layout) and eases toward it.
+    Scrolling fast leaves the camera trailing its target, which reads as flight.
+  - Progress is scrollY over a span measured at load and on resize, and NEVER
+    re-measured when a disclosure opens. Dividing by the live document height
+    would mean that opening an entry makes the document taller, the same scrollY
+    maps to a smaller t, and the camera slides backward through the galaxy while
+    the reader is doing nothing but reading.
+  - The eleven NAMED objects are placed ONCE, in world space, at the camera pose
+    of their own section. They are not re-placed per frame: pinning them to the
+    screen would kill the parallax that makes travel feel three-dimensional.
   - Hit-testing is done in screen space, on the projected positions we already
     compute every frame for the tethers. No raycaster, no invisible pick meshes.
   - Everything is additively blended with depthTest off, so draw order never
@@ -23,8 +29,8 @@ import * as THREE from '../vendor/three/three.module.min.js';
 
 const CORE_HOT   = new THREE.Color(0xfff0d2);  // galactic core, near-white gold
 const CORE_GOLD  = new THREE.Color(0xffb45c);  // dust-lane gold
-const ARM_BLUE   = new THREE.Color(0x7ba7ff);  // population-I blue-white
-const ARM_FAR    = new THREE.Color(0x3a4b96);  // cold outer arms
+const ARM_BLUE   = new THREE.Color(0x8ea6ff);  // population-I blue-white
+const ARM_FAR    = new THREE.Color(0x5b3fb0);  // outer arms, toward violet
 
 const STAR_LIT   = new THREE.Color(0xdfe7ff);
 const STAR_DIM   = new THREE.Color(0x2b3358);
@@ -71,12 +77,46 @@ let pxCap = 2, watchN = 0, watchSum = 0;
 let group = null, activeId = null, hoverId = null;
 let hoverCbs = [], selectCbs = [], frameCbs = [];
 
-/* camera: a fixed base orientation plus a small, bounded, springy user offset */
-const BASE_AZ = -0.30, BASE_POL = 1.06;   // polar measured from +Y
+/*
+  The journey. Two curves: where the camera is, and what it is looking at. The
+  descent runs from high outside the disc down into the arms and finally into
+  the core — the model's own latent space collapsing toward a single light.
+*/
+/*
+  Where each section sits along the journey. These are only defaults: the real
+  values come from the document, because an object is placed at the camera pose
+  its section will actually be read at. Guess the two apart and every named
+  object lands somewhere other than where the layout put it.
+*/
+const PATH_T = { hero: 0.0, work: 0.34, stack: 0.70, signal: 1.0 };
+const PATH_POS = [
+  // P0 is the framing the fixed-camera version was tuned to, kept exactly, so
+  // the page still opens on a composition that is known to work
+  [ -6.6, 12.4, 21.3 ],    // outside and above: the whole galaxy in view
+  [ -1.6,  7.0, 13.2 ],    // dropping toward the disc, swinging round
+  [  2.8,  3.9,  8.8 ],    // crossing over the outer arm
+  [  3.6,  1.5,  4.3 ],    // inside the arm, dust streaming past
+  [  1.4,  0.36, 1.6 ],    // arriving at the core
+];
+const PATH_LOOK = [
+  [ 0, 0, 0 ], [ 0, 0, -0.4 ], [ 0, 0, -1.0 ], [ 0, 0, -1.8 ], [ 0, 0, -3.0 ],
+];
+let posCurve, lookCurve;
+
+let tCam = 0, tWant = 0, travelSpan = 1;
 let dragAz = 0, dragPol = 0, targetAz = 0, targetPol = 0;
 let parX = 0, parY = 0, targetParX = 0, targetParY = 0;
-let dist = 27, targetPt = new THREE.Vector3();
 let dragging = false, lastPtr = null, travelled = 0;
+let speed = 0;                              // smoothed camera displacement
+const UP = new THREE.Vector3(0, 1, 0);
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+const prevPos = new THREE.Vector3();
+const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
+/* poseAt's own scratch. It must NOT share the general-purpose temporaries:
+   callers pass their own vectors as its out-params, and placeObjects passed
+   exactly tmpA/tmpB — so the function was overwriting its own output midway
+   and every named object landed in the wrong place. */
+const poseA = new THREE.Vector3(), poseB = new THREE.Vector3(), poseC = new THREE.Vector3();
 
 const pointer = { x: -9999, y: -9999, inside: false };
 /* wide enough to turn the object without the copy sitting on top of it */
@@ -202,8 +242,17 @@ const CLOUD_VERT = /* glsl */`
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     float depth = -mv.z;
     float twinkle = 0.72 + 0.28 * sin(uTime * 1.7 + aPhase);
-    gl_PointSize = uSize * aSize * twinkle * uPixelRatio * (24.0 / max(depth, 0.001));
-    vAlpha = 1.0 - smoothstep(uNear, uFar, depth);
+    // Clamped: the camera now flies INTO the core, and without a ceiling a
+    // grain passing close to the lens covers the screen.
+    gl_PointSize = min(
+      uSize * aSize * twinkle * uPixelRatio * (24.0 / max(depth, 0.001)),
+      12.0 * uPixelRatio
+    );
+    // Fade at BOTH ends. The far fade carries depth; the near one dissolves
+    // grains just in front of the lens, which would otherwise arrive as soft
+    // blobs — and it is also the cheapest thing available, since those are the
+    // fragments that cost the most to fill.
+    vAlpha = (1.0 - smoothstep(uNear, uFar, depth)) * smoothstep(0.0, 1.4, depth);
     gl_Position = projectionMatrix * mv;
   }`;
 
@@ -341,6 +390,58 @@ function buildStarfield(count) {
   return p;
 }
 
+/*
+  Motes — fine grains that stream past the lens.
+
+  They exist for one reason: to make speed legible. They are recycled around the
+  camera rather than placed in the world, so a fixed handful covers the whole
+  journey, and their opacity rides the camera's ACTUAL per-frame displacement.
+  A constant would leave them dotting the view at every section, which is
+  exactly where the reader stops and reads; driven by speed they appear during
+  transit and fade out on arrival.
+*/
+const MOTE_R = 14;
+let motes;
+
+function buildMotes(count) {
+  const pos = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    pos[i * 3]     = (Math.random() - 0.5) * 2 * MOTE_R;
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 2 * MOTE_R;
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 2 * MOTE_R;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  motes = new THREE.Points(geo, new THREE.PointsMaterial({
+    size: 0.09, map: glowTexture([[0, 'rgba(255,255,255,1)'], [0.45, 'rgba(210,225,255,.5)'], [1, 'rgba(190,210,255,0)']]),
+    color: 0xd8e2ff, transparent: true, opacity: 0, depthWrite: false, depthTest: false,
+    blending: THREE.AdditiveBlending, sizeAttenuation: true,
+  }));
+  motes.frustumCulled = false;
+  scene.add(motes);
+}
+
+function updateMotes() {
+  if (!motes) return;
+  // fade in from about walking pace, full by the fastest part of the descent
+  const want = clamp((speed - 1.2) / 16, 0, 1) * 0.75;
+  motes.material.opacity += (want - motes.material.opacity) * 0.12;
+  if (motes.material.opacity < 0.004) return;
+
+  const attr = motes.geometry.attributes.position;
+  const a = attr.array, c = camera.position;
+  for (let i = 0; i < a.length; i += 3) {
+    // wrap anything that falls behind through to the far side, so a small
+    // fixed set of grains covers an arbitrarily long journey
+    for (let j = 0; j < 3; j++) {
+      const d = a[i + j] - (j === 0 ? c.x : j === 1 ? c.y : c.z);
+      if (d > MOTE_R) a[i + j] -= 2 * MOTE_R;
+      else if (d < -MOTE_R) a[i + j] += 2 * MOTE_R;
+    }
+  }
+  attr.needsUpdate = true;
+}
+
 /* ------------------------------------------------------- named objects */
 
 function buildNamed() {
@@ -386,19 +487,16 @@ function buildNamed() {
   resize, because the framing it solves against has moved.
 */
 function placeObjects() {
-  const az = BASE_AZ, pol = BASE_POL;
-  camera.position.set(
-    targetPt.x + dist * Math.sin(pol) * Math.sin(az),
-    targetPt.y + dist * Math.cos(pol),
-    targetPt.z + dist * Math.sin(pol) * Math.cos(az)
-  );
-  camera.lookAt(targetPt);
-  camera.updateMatrixWorld(true);
-
   namedStars.children.forEach((sp) => {
     const o = OBJECTS.find((x) => x.id === sp.userData.id);
+    // the pose the reader will actually be at when this object's section is the
+    // one being read, so on arrival it sits exactly where the layout wants it
+    poseAt(ease(PATH_T[o.group]), tmpA, tmpB);
+    camera.position.copy(tmpA);
+    camera.lookAt(tmpB);
+    camera.updateMatrixWorld(true);
     tmpV.set(o.ndc[0], o.ndc[1], 0.5).unproject(camera).sub(camera.position).normalize();
-    sp.position.copy(camera.position).addScaledVector(tmpV, o.depth);
+    sp.position.copy(camera.position).addScaledVector(tmpV, o.depth * 0.42);
   });
   if (group) wireLinks();
 }
@@ -437,25 +535,46 @@ function paintNamed(dt) {
 /* ------------------------------------------------------------- framing */
 
 /*
-  The one framing, solved once. The galaxy is pushed into the clear right-hand
-  region of the viewport; on narrow viewports there is no clear region, so it
-  centres and the copy sits over it behind a scrim instead.
+  The camera pose at journey position t.
+
+  The lateral shift is what keeps the composition working while the camera is
+  moving: the copy column owns the left of the viewport, so the look-at point is
+  pushed sideways along the camera's own right vector. That slides the galaxy
+  into the clear band without ever rolling the horizon.
+*/
+function poseAt(t, outPos, outLook) {
+  posCurve.getPoint(t, outPos);
+  lookCurve.getPoint(t, outLook);
+  // Wide: the galaxy sits in the clear band right of the copy column.
+  // Narrow: there is no clear band, so it rides high and the copy starts below.
+  const wide = innerWidth >= 1060;
+  const cx = wide ? 0.62 : 0.50;
+  const cy = wide ? 0.50 : 0.30;
+  if (cx === 0.5 && cy === 0.5) return;
+
+  const tan = Math.tan((camera.fov * Math.PI / 180) / 2);
+  const reach = outPos.distanceTo(outLook);
+  poseA.subVectors(outLook, outPos).normalize();        // forward
+  poseB.set(0, 1, 0).cross(poseA).normalize();          // camera-LEFT
+  poseC.crossVectors(poseA, poseB).normalize();         // camera-up
+  // moving the look-at point one way slides the galaxy the other
+  outLook.addScaledVector(poseB, ((cx - 0.5) * 2) * tan * camera.aspect * reach);
+  outLook.addScaledVector(poseC, ((cy - 0.5) * 2) * tan * reach);
+}
+
+/* eased so both ends of the journey settle instead of arriving at full speed */
+const ease = (x) => x * x * (3 - 2 * x);
+
+/*
+  How much scrolling the whole journey costs.
+
+  Measured here and on resize, and deliberately NOT when a disclosure opens.
+  Opening an entry makes the document taller; if this were read live, the same
+  scrollY would map to a smaller t and the camera would slide backwards through
+  the galaxy while the reader sat still and read.
 */
 function frameScene() {
-  const wide = innerWidth >= 1060;
-  const tan = Math.tan((camera.fov * Math.PI / 180) / 2);
-  // Wide: the object sits in the clear band right of the copy column.
-  // Narrow: there is no clear band, so it goes high and centred and the copy
-  // starts below it.
-  const cx = wide ? 0.635 : 0.5;                     // where the core lands, as a fraction of width
-  const cy = wide ? 0.50 : 0.28;                     // ... and of height
-  dist = wide ? 20.5 : 28;
-  // shifting the look-at point is what moves the object on screen
-  targetPt.set(
-    -((cx - 0.5) * 2) * tan * camera.aspect * dist,
-     ((cy - 0.5) * 2) * tan * dist,
-    0
-  );
+  travelSpan = Math.max(1, document.documentElement.scrollHeight - innerHeight);
 }
 
 /*
@@ -587,18 +706,69 @@ function frame() {
   parX += (targetParX - parX) * k;
   parY += (targetParY - parY) * k;
 
-  // a long, slow breath so the scene is never frozen, even untouched
-  const drift = Math.sin(t * 0.045) * 0.055;
+  /*
+    The journey. scrollY is read HERE, in the frame, not in a scroll handler —
+    reading it is cheap and forces no layout, and it means a burst of scroll
+    events can never queue up work. The camera eases toward the target, so
+    scrolling fast leaves it trailing, which is what makes this read as flight
+    rather than as a scrubbed animation.
+  */
+  tWant = clamp(scrollY / travelSpan, 0, 1);
+  tCam += (tWant - tCam) * Math.min(1, dt * 2.0);
 
-  const az = BASE_AZ + dragAz + parX + drift;
-  const pol = clamp(BASE_POL + dragPol + parY, 0.30, Math.PI - 0.30);
-  camera.position.set(
-    targetPt.x + dist * Math.sin(pol) * Math.sin(az),
-    targetPt.y + dist * Math.cos(pol),
-    targetPt.z + dist * Math.sin(pol) * Math.cos(az)
-  );
-  camera.lookAt(targetPt);
+  prevPos.copy(camera.position);
+  poseAt(ease(tCam), camPos, camLook);
 
+  // drag and pointer parallax orbit the look-at point, on top of the journey
+  const yaw = dragAz + parX + Math.sin(t * 0.045) * 0.05;   // a slow breath
+  const pitch = clamp(dragPol + parY, -0.5, 0.5);
+  tmpA.subVectors(camPos, camLook);
+  tmpA.applyAxisAngle(UP, yaw);
+  tmpB.copy(tmpA).cross(UP).normalize();
+  tmpA.applyAxisAngle(tmpB, pitch);
+  camera.position.copy(camLook).add(tmpA);
+  camera.lookAt(camLook);
+  camera.updateMatrixWorld(true);
+
+  // actual displacement, smoothed — this is what the motes ride on
+  const moved = prevPos.distanceTo(camera.position) / Math.max(dt, 0.001);
+  speed += (moved - speed) * Math.min(1, dt * 3.5);
+
+  /*
+    The depth fade and the point size are both tuned in world units, and the
+    camera now travels from 30 units out to inside the core. Left fixed, the
+    arrival would be a flat white bloom of enormous grains, so both sweep with
+    how far the camera actually is from the centre.
+  */
+  const near = camera.position.length();
+  /*
+    The fade band tracks the camera but keeps the WIDTH of the galaxy, so the
+    far half of the disc always falls away into the dark. Scaling the band with
+    distance instead let the far side stay lit, which flattened the depth cue
+    and turned the core into a grey smudge rather than the brightest thing in
+    the frame.
+  */
+  const fogFar = near + GAL_R * 1.1;
+  const fogNear = Math.max(1.2, near - GAL_R * 0.62);
+
+  /*
+    The haze layers — the core's glow sprite and the nebula quads — are painted
+    at a size that reads correctly from outside the galaxy. Fly into them and
+    they become a grey sheet over the whole screen, because you are now inside
+    a billboard that was standing in for distance. So they fade out on approach
+    and hand the job to the bulge stars, which is what should actually be
+    blazing when the reader arrives at the core.
+  */
+  const haze = clamp((near - 3.5) / 11, 0, 1);
+  coreGlow.material.opacity = haze;
+  nebulae.forEach((n) => { n.material.opacity = n.userData.baseOpacity * haze; });
+  [galaxy, dust, bulge].forEach((pc) => {
+    if (!pc) return;
+    pc.material.uniforms.uNear.value = fogNear;
+    pc.material.uniforms.uFar.value = fogFar;
+  });
+
+  updateMotes(dt);
   nebulae.forEach((n, i) => { n.rotation.z = t * (i % 2 ? 0.008 : -0.006) + i; });
 
   if (ripple.visible) {
@@ -640,6 +810,16 @@ export function setActive(id, pulse) {
   ripple.position.copy(sp.position);
   ripple.userData.t = 0;
   ripple.visible = true;
+}
+
+/*
+  Told by the document where its sections fall, as a fraction of the whole
+  scroll. Called on load and on resize only — never when a disclosure opens,
+  for the same reason the travel span is not re-measured then.
+*/
+export function setAnchors(map) {
+  Object.assign(PATH_T, map);
+  if (alive && namedStars) placeObjects();
 }
 
 export function project(id) { return projected.get(id) || null; }
@@ -692,8 +872,8 @@ export function initUniverse(el) {
     scene.add(dust);
   }
 
-  bulge = buildBulge(cheap ? 3000 : 9000, {
-    size: 0.8, px: 3.0, gain: 1.15, spin: 0.016,
+  bulge = buildBulge(cheap ? 3600 : 11000, {
+    size: 0.85, px: 3.2, gain: 1.5, spin: 0.016,
   });
   scene.add(bulge);
 
@@ -705,7 +885,10 @@ export function initUniverse(el) {
                       [0.55, 'rgba(255,150,80,.10)'], [1, 'rgba(255,140,70,0)']]),
     transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
   }));
-  coreGlow.scale.setScalar(13);
+  // Big enough to give the core a warm halo, small enough that it stays a
+  // CORE. Past roughly half the frame it stops reading as a bright centre and
+  // starts reading as haze over everything.
+  coreGlow.scale.setScalar(7.5);
   scene.add(coreGlow);
 
   if (!cheap) {
@@ -719,11 +902,16 @@ export function initUniverse(el) {
           })
         );
         m.position.set(i === 1 ? 2 : -3 + i * 4, i === 2 ? -2 : 1.5, -6 - i * 3);
+        m.userData.baseOpacity = op;
         nebulae.push(m); scene.add(m);
       });
   }
 
+  posCurve = new THREE.CatmullRomCurve3(PATH_POS.map((p) => new THREE.Vector3().fromArray(p)));
+  lookCurve = new THREE.CatmullRomCurve3(PATH_LOOK.map((p) => new THREE.Vector3().fromArray(p)));
+
   try {
+    if (!cheap) buildMotes(500);
     buildNamed();
   } catch (err) {
     console.error('universe: scene build failed, falling back to the still field', err);
@@ -743,7 +931,10 @@ export function initUniverse(el) {
 
   alive = true;
   if (still) {
-    // one frame, and then the scene is left alone for good
+    // one frame at the start of the journey, and then left alone for good
+    poseAt(0, camPos, camLook);
+    camera.position.copy(camPos);
+    camera.lookAt(camLook);
     renderer.render(scene, camera);
     return { cheap: cheap, still: true };
   }
