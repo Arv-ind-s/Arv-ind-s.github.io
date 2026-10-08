@@ -78,7 +78,7 @@ export const OBJECTS = [
 /* ------------------------------------------------------------------ state */
 
 let canvas, renderer, scene, camera;
-let galaxy, dust, bulge, starfield, coreGlow, nebulae = [], namedStars, links, ripple;
+let galaxy, dust, bulge, streams, starfield, coreGlow, nebulae = [], namedStars, links, ripple;
 let cheap = false, still = false, running = true, alive = false;
 /* device pixel ratio actually used, and the running check that lowers it */
 let pxCap = 2, watchN = 0, watchSum = 0;
@@ -238,6 +238,14 @@ function nebulaTexture(seed) {
 const GAL_R = 10.5;
 const ARMS = 2;
 const WIND = 0.62;          // radians of sweep per world unit of radius
+/*
+  The whole disc turns rigidly, about once every three minutes: slow enough to
+  read as majestic, fast enough to SEE. It used to turn at a third of this,
+  which on screen was indistinguishable from frozen. The rate is rigid on
+  purpose: a differential rate winds the arms tighter for as long as the page
+  is open, until they smear into rings.
+*/
+const ROT = 0.035;
 
 /*
   Shared shader for the star cloud. Rotation, twinkle and the depth fade all
@@ -245,25 +253,31 @@ const WIND = 0.62;          // radians of sweep per world unit of radius
   uniform write and nothing else on the CPU.
 */
 const CLOUD_VERT = /* glsl */`
-  uniform float uTime, uSize, uPixelRatio, uNear, uFar;
+  uniform float uTime, uSize, uPixelRatio, uNear, uFar, uRot, uGain;
   attribute float aSize, aPhase, aSpin;
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
-    vColor = color;
-    // differential rotation: the inner disc turns faster, as a real one does.
-    // Kept slow enough that the arms never visibly shear apart.
-    float ang = uTime * aSpin;
+    // Rigid rotation, plus a swirl that only the inner disc feels. The swirl is
+    // a bounded oscillation (aSpin is its weight, highest at the core) rather
+    // than a rate, so it breathes back and forth and never winds the arms up.
+    float ang = uTime * uRot + sin(uTime * 0.09) * 0.16 * aSpin;
     float s = sin(ang), c = cos(ang);
     vec3 p = vec3(position.x * c - position.z * s, position.y, position.x * s + position.z * c);
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     float depth = -mv.z;
     float twinkle = 0.72 + 0.28 * sin(uTime * 1.7 + aPhase);
+    // One star in twenty catches the light now and then: a sharp, brief peak
+    // about every ten seconds, each on its own phase, so somewhere in the field
+    // there is always a glint.
+    float glint = pow(max(0.0, sin(uTime * 0.6 + aPhase * 2.3)), 48.0)
+                * step(0.95, fract(aPhase * 0.618));
+    vColor = color * uGain * (1.0 + 2.2 * glint);
     // Clamped: the camera now flies INTO the core, and without a ceiling a
     // grain passing close to the lens covers the screen.
     gl_PointSize = min(
-      uSize * aSize * twinkle * uPixelRatio * (24.0 / max(depth, 0.001)),
+      uSize * aSize * (twinkle + 1.6 * glint) * uPixelRatio * (24.0 / max(depth, 0.001)),
       12.0 * uPixelRatio
     );
     // Fade at BOTH ends. The far fade carries depth; the near one dissolves
@@ -293,6 +307,7 @@ function cloudMaterial(size) {
       uTime: { value: 0 }, uSize: { value: size },
       uPixelRatio: { value: Math.min(2, devicePixelRatio || 1) },
       uNear: { value: 12 }, uFar: { value: 42 },
+      uRot: { value: ROT }, uGain: { value: 1 },
     },
     vertexShader: CLOUD_VERT, fragmentShader: CLOUD_FRAG,
     transparent: true, depthWrite: false, depthTest: false,
@@ -353,7 +368,7 @@ function buildDisc(count, o) {
     col[i * 3] = tmpC.r; col[i * 3 + 1] = tmpC.g; col[i * 3 + 2] = tmpC.b;
     siz[i] = o.size * (0.4 + Math.random() * Math.random() * 2.2);
     pha[i] = Math.random() * 100;
-    spn[i] = o.spin * (0.5 + 0.5 * (1 - t));
+    spn[i] = (1 - t) * (1 - t);           // inner-swirl weight: 1 at the core, 0 at the rim
   }, cloudMaterial(o.px));
 }
 
@@ -371,8 +386,83 @@ function buildBulge(count, o) {
     col[i * 3] = tmpC.r; col[i * 3 + 1] = tmpC.g; col[i * 3 + 2] = tmpC.b;
     siz[i] = o.size * (0.35 + Math.random() * Math.random() * 1.7);
     pha[i] = Math.random() * 100;
-    spn[i] = o.spin;
+    spn[i] = 1;
   }, cloudMaterial(o.px));
+}
+
+/*
+  Streams — light flowing outward along the arms, in pulses.
+
+  This is what makes the galaxy read as ALIVE rather than as a beautiful still:
+  packets of brighter grains leave the core and travel the length of each arm,
+  warm at the centre and cooling to violet at the rim, like signals moving
+  through a network. Pulses, not an even spray: a uniform flow reads as texture,
+  while packets you can follow with your eye are what hold attention.
+
+  Every position is computed in the vertex shader from the same ARMS, WIND and
+  rotation as the disc. Built any other way, the streams would drift off the
+  arms within seconds of turning.
+*/
+const STREAM_VERT = /* glsl */`
+  uniform float uTime, uRot, uSize, uPixelRatio, uNear, uFar;
+  attribute float aArm, aPh, aSpd, aOff, aY, aSize;
+  varying vec3 vColor;
+  varying float vAlpha;
+  void main() {
+    float u = fract(aPh + uTime * aSpd);                 // 0 at the core .. 1 at the rim
+    float r = 0.7 + u * ${(GAL_R - 0.7).toFixed(2)};
+    float tt = clamp((r - 0.55) / ${GAL_R.toFixed(2)}, 0.0, 1.0);
+    float swirl = sin(uTime * 0.09) * 0.16 * (1.0 - tt) * (1.0 - tt);   // matches the disc
+    float ang = aArm + r * ${WIND.toFixed(3)} + aOff * (0.35 + 0.65 * u) + uTime * uRot + swirl;
+    float thick = 0.85 * exp(-r / 3.2) + 0.09;
+    vec3 p = vec3(cos(ang) * r, aY * thick * 0.6, sin(ang) * r);
+
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
+    float depth = -mv.z;
+    vec3 warm = vec3(1.0, 0.85, 0.58), cool = vec3(0.56, 0.74, 1.0), rim = vec3(0.72, 0.52, 1.0);
+    vColor = mix(mix(warm, cool, smoothstep(0.08, 0.55, u)), rim, smoothstep(0.6, 1.0, u)) * 1.25;
+    gl_PointSize = min(uSize * aSize * uPixelRatio * (24.0 / max(depth, 0.001)), 12.0 * uPixelRatio);
+    // born at the core, fading out before the rim, so a pulse never pops
+    float life = smoothstep(0.0, 0.07, u) * (1.0 - smoothstep(0.72, 1.0, u));
+    vAlpha = life * (1.0 - smoothstep(uNear, uFar, depth)) * smoothstep(0.0, 1.4, depth);
+    gl_Position = projectionMatrix * mv;
+  }`;
+
+function buildStreams(packetsPerArm, perPacket) {
+  const n = ARMS * packetsPerArm * perPacket;
+  const at = { aArm: new Float32Array(n), aPh: new Float32Array(n), aSpd: new Float32Array(n),
+               aOff: new Float32Array(n), aY: new Float32Array(n), aSize: new Float32Array(n) };
+  let i = 0;
+  for (let a = 0; a < ARMS; a++) {
+    for (let k = 0; k < packetsPerArm; k++) {
+      // a packet shares one phase and one speed, so it travels as a single pulse
+      const ph = Math.random(), spd = 0.016 + Math.random() * 0.02;
+      const len = 0.006 + Math.random() * 0.022;
+      for (let j = 0; j < perPacket; j++, i++) {
+        at.aArm[i] = a * (Math.PI * 2 / ARMS);
+        at.aPh[i] = ph + (Math.random() - 0.5) * len;
+        at.aSpd[i] = spd;
+        at.aOff[i] = bell() * 0.22;
+        at.aY[i] = bell();
+        at.aSize[i] = 0.55 + Math.random() * Math.random() * 1.3;
+      }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  // three needs a position attribute to draw; the shader ignores it
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+  Object.entries(at).forEach(([k, v]) => geo.setAttribute(k, new THREE.BufferAttribute(v, 1)));
+  const pts = new THREE.Points(geo, new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 }, uRot: { value: ROT }, uSize: { value: 3.4 },
+      uPixelRatio: { value: Math.min(2, devicePixelRatio || 1) },
+      uNear: { value: 12 }, uFar: { value: 42 },
+    },
+    vertexShader: STREAM_VERT, fragmentShader: CLOUD_FRAG,
+    transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
+  }));
+  pts.frustumCulled = false;
+  return pts;
 }
 
 /* the sky the galaxy hangs in: far, still, and never rotating with the disc */
@@ -393,7 +483,7 @@ function buildStarfield(count) {
     col[i * 3] = tmpC.r; col[i * 3 + 1] = tmpC.g; col[i * 3 + 2] = tmpC.b;
     siz[i] = 0.7 + Math.random() * 1.5;
     pha[i] = Math.random() * 100;
-    spn[i] = 0.0004;
+    spn[i] = 0;
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -403,6 +493,7 @@ function buildStarfield(count) {
   geo.setAttribute('aSpin', new THREE.BufferAttribute(spn, 1));
   const m = cloudMaterial(2.6);
   m.uniforms.uNear.value = 30; m.uniforms.uFar.value = 150;
+  m.uniforms.uRot.value = 0.0006;            // the far sky barely moves
   const p = new THREE.Points(geo, m);
   p.frustumCulled = false;
   return p;
@@ -458,6 +549,127 @@ function updateMotes() {
     }
   }
   attr.needsUpdate = true;
+}
+
+/* --------------------------------------------------------------- bloom */
+
+/*
+  Glow, as a separate layer drawn ON TOP of the scene — not by routing the scene
+  through a render target. In three r169, built-in materials (every sprite, the
+  lines, the motes) write linear values into a target while these shader
+  materials write raw values, so sending the main pass through a target would
+  shift the brightness of every sprite on the page. Instead the main scene draws
+  to the canvas exactly as before, and the star clouds alone are drawn a second
+  time at quarter resolution, thresholded, blurred at two widths and added back.
+
+  Named stars, links, the ripple, the core glow and the nebula quads are kept
+  out of the bloom source on purpose: blooming them puts glare around every
+  label and brings back the grey wash over the core.
+*/
+const BLOOM_LAYER = 1;
+const BLOOM_THR = 0.38;
+let bloomOn = true, rtA, rtB, rtC, rtD, fsScene, fsCam, fsMesh, blurMat, compMat;
+
+const FS_VERT = /* glsl */`
+  varying vec2 vUv;
+  void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+
+/* nine-tap Gaussian in five reads (linear-sampling trick); uThr > 0 thresholds */
+const BLUR_FRAG = /* glsl */`
+  uniform sampler2D tMap;
+  uniform vec2 uDir;
+  uniform float uThr;
+  varying vec2 vUv;
+  vec3 S(vec2 uv) {
+    vec3 c = texture2D(tMap, uv).rgb;
+    return uThr > 0.0 ? max(c - uThr, 0.0) / (1.0 - uThr) : c;
+  }
+  void main() {
+    vec3 c = S(vUv) * 0.2270270;
+    c += (S(vUv + uDir * 1.3846154) + S(vUv - uDir * 1.3846154)) * 0.3162162;
+    c += (S(vUv + uDir * 3.2307692) + S(vUv - uDir * 3.2307692)) * 0.0702703;
+    gl_FragColor = vec4(c, 1.0);
+  }`;
+
+const COMP_FRAG = /* glsl */`
+  uniform sampler2D tNear, tWide;
+  uniform float uNear, uWide;
+  varying vec2 vUv;
+  void main() {
+    vec3 c = texture2D(tNear, vUv).rgb * uNear + texture2D(tWide, vUv).rgb * uWide;
+    gl_FragColor = vec4(c, 1.0);
+  }`;
+
+function buildBloom() {
+  // plain 8-bit RGBA: float targets are where Safari support gets uneven
+  const opts = { depthBuffer: false, stencilBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+  [rtA, rtB, rtC, rtD] = [0, 1, 2, 3].map(() => new THREE.WebGLRenderTarget(1, 1, opts));
+  fsCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  fsMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+  fsMesh.frustumCulled = false;
+  fsScene = new THREE.Scene();
+  fsScene.add(fsMesh);
+  blurMat = new THREE.ShaderMaterial({
+    uniforms: { tMap: { value: null }, uDir: { value: new THREE.Vector2() }, uThr: { value: 0 } },
+    vertexShader: FS_VERT, fragmentShader: BLUR_FRAG, depthTest: false, depthWrite: false,
+  });
+  compMat = new THREE.ShaderMaterial({
+    uniforms: {
+      tNear: { value: rtA.texture }, tWide: { value: rtD.texture },
+      uNear: { value: 0.5 }, uWide: { value: 0.7 },
+    },
+    vertexShader: FS_VERT, fragmentShader: COMP_FRAG,
+    transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
+  });
+}
+
+function sizeBloom() {
+  if (!rtA) return;
+  const w = renderer.domElement.width, h = renderer.domElement.height;
+  rtA.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2));
+  rtB.setSize(Math.max(1, w >> 2), Math.max(1, h >> 2));
+  rtC.setSize(Math.max(1, w >> 3), Math.max(1, h >> 3));
+  rtD.setSize(Math.max(1, w >> 3), Math.max(1, h >> 3));
+}
+
+function pass(mat, target) {
+  fsMesh.material = mat;
+  renderer.setRenderTarget(target);
+  renderer.render(fsScene, fsCam);
+}
+
+/* The one way a frame is drawn, by the loop and by the still render alike. */
+function renderFrame() {
+  renderer.setRenderTarget(null);
+  renderer.render(scene, camera);
+  if (!bloomOn || !rtA) return;
+
+  // The bloom source, at quarter resolution. gl_PointSize is in pixels, so the
+  // clouds' pixel ratio is scaled down with the target — left alone, every
+  // grain would draw four times too large into it.
+  const px = renderer.getPixelRatio();
+  const scale = rtA.width / renderer.domElement.width;
+  const clouds = [galaxy, dust, streams, starfield].filter(Boolean);
+  clouds.forEach((c) => { c.material.uniforms.uPixelRatio.value = px * scale; });
+  camera.layers.set(BLOOM_LAYER);
+  renderer.setClearColor(0x000000, 1);
+  renderer.setRenderTarget(rtA);
+  renderer.render(scene, camera);
+  camera.layers.set(0);
+  renderer.setClearColor(0x04050c, 1);
+  clouds.forEach((c) => { c.material.uniforms.uPixelRatio.value = px; });
+
+  const u = blurMat.uniforms;
+  u.tMap.value = rtA.texture; u.uDir.value.set(1 / rtA.width, 0); u.uThr.value = BLOOM_THR; pass(blurMat, rtB);
+  u.tMap.value = rtB.texture; u.uDir.value.set(0, 1 / rtB.height); u.uThr.value = 0; pass(blurMat, rtA);
+  u.tMap.value = rtA.texture; u.uDir.value.set(2 / rtA.width, 0); pass(blurMat, rtC);
+  u.tMap.value = rtC.texture; u.uDir.value.set(0, 1.5 / rtC.height); pass(blurMat, rtD);
+
+  renderer.setRenderTarget(null);
+  renderer.autoClear = false;
+  fsMesh.material = compMat;
+  renderer.render(fsScene, fsCam);
+  renderer.autoClear = true;
 }
 
 /* ------------------------------------------------------- named objects */
@@ -599,7 +811,7 @@ function applyDepth() {
   */
   const fogFar = near + GAL_R * 1.1;
   const fogNear = Math.max(1.2, near - GAL_R * 0.62);
-  [galaxy, dust, bulge].forEach((pc) => {
+  [galaxy, dust, bulge, streams].forEach((pc) => {
     if (!pc) return;
     pc.material.uniforms.uNear.value = fogNear;
     pc.material.uniforms.uFar.value = fogFar;
@@ -629,7 +841,7 @@ function renderStill() {
   camera.lookAt(camLook);
   camera.updateMatrixWorld(true);
   applyDepth();
-  renderer.render(scene, camera);
+  renderFrame();
 }
 
 /* eased so both ends of the journey settle instead of arriving at full speed */
@@ -657,7 +869,8 @@ function applyPixelRatio() {
   const px = Math.min(cheap ? 1.5 : pxCap, devicePixelRatio || 1);
   renderer.setPixelRatio(px);
   renderer.setSize(canvas.clientWidth || innerWidth, canvas.clientHeight || innerHeight, false);
-  [galaxy, dust, bulge, starfield].forEach((p) => { if (p) p.material.uniforms.uPixelRatio.value = px; });
+  [galaxy, dust, bulge, streams, starfield].forEach((p) => { if (p) p.material.uniforms.uPixelRatio.value = px; });
+  sizeBloom();
 }
 
 function resize() {
@@ -760,10 +973,13 @@ function frame() {
   // afterwards, so a slowdown that arrives later is caught too.
   // Frames at the clamp are stalls, not slowness — a backgrounded or occluded
   // window would otherwise look exactly like a machine that cannot cope.
-  if (pxCap > 1 && dt < 0.045) {
+  if ((pxCap > 1 || bloomOn) && dt < 0.045) {
     watchSum += dt; watchN++;
     if (watchN >= 90) {
-      if (watchSum / watchN > 1 / 40) { pxCap = 1; applyPixelRatio(); }
+      if (watchSum / watchN > 1 / 40) {
+        // first the pixel ratio, and only if that is not enough, the glow
+        if (pxCap > 1) { pxCap = 1; applyPixelRatio(); } else bloomOn = false;
+      }
       watchN = 0; watchSum = 0;
     }
   }
@@ -771,6 +987,7 @@ function frame() {
   galaxy.material.uniforms.uTime.value = t;
   if (dust) dust.material.uniforms.uTime.value = t;
   bulge.material.uniforms.uTime.value = t;
+  streams.material.uniforms.uTime.value = t;
   starfield.material.uniforms.uTime.value = t;
 
   const k = Math.min(1, dt * 4.2);
@@ -815,6 +1032,11 @@ function frame() {
   */
   applyDepth();
 
+  // the core breathes: a slow swell in the glow and in the bulge's light
+  const beat = Math.sin(t * 0.9);
+  coreGlow.scale.setScalar(7.5 * (1 + 0.07 * beat));
+  bulge.material.uniforms.uGain.value = 1 + 0.12 * Math.sin(t * 0.9 + 0.5);
+
   updateMotes(dt);
   nebulae.forEach((n, i) => { n.rotation.z = t * (i % 2 ? 0.008 : -0.006) + i; });
 
@@ -834,7 +1056,7 @@ function frame() {
   paintNamed(dt);
   links.material.opacity += ((group && roomy.matches ? 0.30 : 0) - links.material.opacity) * k;
 
-  renderer.render(scene, camera);
+  renderFrame();
   frameCbs.forEach((cb) => cb());
   requestAnimationFrame(frame);
 }
@@ -921,10 +1143,15 @@ export function initUniverse(el) {
     scene.add(dust);
   }
 
+  // Gain was 1.5 when the core had to look hot on its own. With bloom on top
+  // that boost is counted twice and the core saturates into a flat white disc.
   bulge = buildBulge(cheap ? 3600 : 11000, {
-    size: 0.85, px: 3.2, gain: 1.5, spin: 0.016,
+    size: 0.85, px: 3.0, gain: 0.95, spin: 0.016,
   });
   scene.add(bulge);
+
+  streams = cheap ? buildStreams(16, 55) : buildStreams(26, 85);
+  scene.add(streams);
 
   starfield = buildStarfield(cheap ? 700 : 2200);
   scene.add(starfield);
@@ -958,6 +1185,12 @@ export function initUniverse(el) {
 
   posCurve = new THREE.CatmullRomCurve3(PATH_POS.map((p) => new THREE.Vector3().fromArray(p)));
   lookCurve = new THREE.CatmullRomCurve3(PATH_LOOK.map((p) => new THREE.Vector3().fromArray(p)));
+
+  // The bulge stays out: it is already the densest light in the frame, and
+  // blooming it only widens a saturated white plateau where the core's detail
+  // should be. The core has its own warm halo sprite for that job.
+  [galaxy, dust, streams, starfield].forEach((o) => { if (o) o.layers.enable(BLOOM_LAYER); });
+  buildBloom();
 
   try {
     if (!cheap) buildMotes(500);
