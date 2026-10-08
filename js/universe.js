@@ -107,6 +107,14 @@ const PATH_T = { hero: 0.0, work: 0.34, stack: 0.70, signal: 1.0 };
   read this one value so they cannot drift apart again.
 */
 const NEAR = 0.42;
+
+/*
+  The lens every placement is solved against. The live camera widens past this
+  while travelling fast (see warp), so anything that SOLVES a position — the
+  lateral framing, the catalogue placement — must use this constant, never
+  camera.fov. Solved against a stretched lens, every label would land wrong.
+*/
+const BASE_FOV = 46;
 const PATH_POS = [
   // P0 is the framing the fixed-camera version was tuned to, kept exactly, so
   // the page still opens on a composition that is known to work
@@ -125,10 +133,14 @@ let tCam = 0, tWant = 0, travelSpan = 1;
 let dragAz = 0, dragPol = 0, targetAz = 0, targetPol = 0;
 let parX = 0, parY = 0, targetParX = 0, targetParY = 0;
 let dragging = false, lastPtr = null, travelled = 0;
-let speed = 0;                              // smoothed camera displacement
+/* journey velocity, and the effects that ride it */
+let tVel = 0, warp = 0, roll = 0;
+const pathVel = new THREE.Vector3(), prevPath = new THREE.Vector3();
+/* the arrival: the page opens far out in space and flies in to the first view */
+const INTRO_S = 3.2;
+let introT = 0;
 const UP = new THREE.Vector3(0, 1, 0);
 const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
-const prevPos = new THREE.Vector3();
 const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
 /* poseAt's own scratch. It must NOT share the general-purpose temporaries:
    callers pass their own vectors as its out-params, and placeObjects passed
@@ -382,7 +394,9 @@ function buildBulge(count, o) {
     pos[i * 3]     = r * s * Math.cos(th);
     pos[i * 3 + 1] = r * u * 0.62;
     pos[i * 3 + 2] = r * s * Math.sin(th);
-    tint(Math.min(1, r / GAL_R) * 0.7).multiplyScalar(o.gain);
+    // nudged toward gold, as real bulges are: up close a near-white bulge
+    // dims into grey smoke, where a warm one still reads as glowing gas
+    tint(Math.min(1, r / GAL_R) * 0.7).lerp(CORE_GOLD, 0.32).multiplyScalar(o.gain);
     col[i * 3] = tmpC.r; col[i * 3 + 1] = tmpC.g; col[i * 3 + 2] = tmpC.b;
     siz[i] = o.size * (0.35 + Math.random() * Math.random() * 1.7);
     pha[i] = Math.random() * 100;
@@ -510,21 +524,29 @@ function buildStarfield(count) {
   transit and fade out on arrival.
 */
 const MOTE_R = 14;
-let motes;
+let motes, moteHeads;
 
+/*
+  Each mote is a short line segment, not a dot: head at the grain, tail
+  stretched along the direction of travel. A stationary grain the camera is
+  rushing past was, a moment ago, further along that direction — so the tail
+  points back toward where the camera is heading, and at speed the whole field
+  streams outward from it. Head bright, tail fading to nothing.
+*/
 function buildMotes(count) {
-  const pos = new Float32Array(count * 3);
+  moteHeads = new Float32Array(count * 3);
+  for (let i = 0; i < count * 3; i++) moteHeads[i] = (Math.random() - 0.5) * 2 * MOTE_R;
+  const pos = new Float32Array(count * 6), col = new Float32Array(count * 6);
   for (let i = 0; i < count; i++) {
-    pos[i * 3]     = (Math.random() - 0.5) * 2 * MOTE_R;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 2 * MOTE_R;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 2 * MOTE_R;
+    const b = 0.55 + Math.random() * 0.45;
+    col.set([0.86 * b, 0.9 * b, 1.0 * b, 0, 0, 0], i * 6);
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  motes = new THREE.Points(geo, new THREE.PointsMaterial({
-    size: 0.09, map: glowTexture([[0, 'rgba(255,255,255,1)'], [0.45, 'rgba(210,225,255,.5)'], [1, 'rgba(190,210,255,0)']]),
-    color: 0xd8e2ff, transparent: true, opacity: 0, depthWrite: false, depthTest: false,
-    blending: THREE.AdditiveBlending, sizeAttenuation: true,
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  motes = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+    vertexColors: true, transparent: true, opacity: 0,
+    depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
   }));
   motes.frustumCulled = false;
   scene.add(motes);
@@ -532,23 +554,24 @@ function buildMotes(count) {
 
 function updateMotes() {
   if (!motes) return;
-  // fade in from about walking pace, full by the fastest part of the descent
-  const want = clamp((speed - 1.2) / 16, 0, 1) * 0.75;
-  motes.material.opacity += (want - motes.material.opacity) * 0.12;
+  motes.material.opacity += (warp * 0.95 - motes.material.opacity) * 0.15;
   if (motes.material.opacity < 0.004) return;
 
-  const attr = motes.geometry.attributes.position;
-  const a = attr.array, c = camera.position;
-  for (let i = 0; i < a.length; i += 3) {
+  const len = clamp(pathVel.length() * 0.075, 0.05, 3.4);
+  tmpA.copy(pathVel).normalize();
+  const h = moteHeads, a = motes.geometry.attributes.position.array, c = camera.position;
+  for (let i = 0, k = 0; i < h.length; i += 3, k += 6) {
     // wrap anything that falls behind through to the far side, so a small
     // fixed set of grains covers an arbitrarily long journey
     for (let j = 0; j < 3; j++) {
-      const d = a[i + j] - (j === 0 ? c.x : j === 1 ? c.y : c.z);
-      if (d > MOTE_R) a[i + j] -= 2 * MOTE_R;
-      else if (d < -MOTE_R) a[i + j] += 2 * MOTE_R;
+      const d = h[i + j] - (j === 0 ? c.x : j === 1 ? c.y : c.z);
+      if (d > MOTE_R) h[i + j] -= 2 * MOTE_R;
+      else if (d < -MOTE_R) h[i + j] += 2 * MOTE_R;
     }
+    a[k] = h[i]; a[k + 1] = h[i + 1]; a[k + 2] = h[i + 2];
+    a[k + 3] = h[i] + tmpA.x * len; a[k + 4] = h[i + 1] + tmpA.y * len; a[k + 5] = h[i + 2] + tmpA.z * len;
   }
-  attr.needsUpdate = true;
+  motes.geometry.attributes.position.needsUpdate = true;
 }
 
 /* --------------------------------------------------------------- bloom */
@@ -591,12 +614,35 @@ const BLUR_FRAG = /* glsl */`
     gl_FragColor = vec4(c, 1.0);
   }`;
 
+/*
+  At rest: the two glow widths, added. In transit, the wide glow is also smeared
+  along lines radiating from the point the camera is heading toward (uCenter),
+  with red and blue sampled slightly apart — light streaking past, with a hint of
+  spectral split at the edges. All of it scales with warp, and the loop is
+  skipped entirely at rest, so standing still costs nothing extra.
+*/
 const COMP_FRAG = /* glsl */`
   uniform sampler2D tNear, tWide;
-  uniform float uNear, uWide;
+  uniform float uNear, uWide, uWarp;
+  uniform vec2 uCenter;
   varying vec2 vUv;
   void main() {
-    vec3 c = texture2D(tNear, vUv).rgb * uNear + texture2D(tWide, vUv).rgb * uWide;
+    vec3 c = (texture2D(tNear, vUv).rgb * uNear + texture2D(tWide, vUv).rgb * uWide) * (1.0 + 0.35 * uWarp);
+    if (uWarp > 0.01) {
+      vec2 d = vUv - uCenter;
+      vec3 acc = vec3(0.0);
+      float ws = 0.0;
+      for (int i = 1; i <= 10; i++) {
+        float k = float(i) / 10.0;
+        vec2 uv = vUv - d * k * 0.3 * uWarp;
+        float w = 1.0 - k;
+        acc.r += texture2D(tWide, uv - d * 0.022 * uWarp).r * w;
+        acc.g += texture2D(tWide, uv).g * w;
+        acc.b += texture2D(tWide, uv + d * 0.022 * uWarp).b * w;
+        ws += w;
+      }
+      c += acc / ws * uWarp * 1.15;
+    }
     gl_FragColor = vec4(c, 1.0);
   }`;
 
@@ -617,6 +663,7 @@ function buildBloom() {
     uniforms: {
       tNear: { value: rtA.texture }, tWide: { value: rtD.texture },
       uNear: { value: 0.5 }, uWide: { value: 0.7 },
+      uWarp: { value: 0 }, uCenter: { value: new THREE.Vector2(0.5, 0.5) },
     },
     vertexShader: FS_VERT, fragmentShader: COMP_FRAG,
     transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
@@ -717,6 +764,10 @@ function buildNamed() {
   resize, because the framing it solves against has moved.
 */
 function placeObjects() {
+  // solve against the base lens, whatever the live one is doing right now
+  const liveFov = camera.fov;
+  camera.fov = BASE_FOV;
+  camera.updateProjectionMatrix();
   namedStars.children.forEach((sp) => {
     const o = OBJECTS.find((x) => x.id === sp.userData.id);
     // the pose the reader will actually be at when this object's section is the
@@ -728,6 +779,8 @@ function placeObjects() {
     tmpV.set(o.ndc[0], o.ndc[1], 0.5).unproject(camera).sub(camera.position).normalize();
     sp.position.copy(camera.position).addScaledVector(tmpV, o.depth * NEAR);
   });
+  camera.fov = liveFov;
+  camera.updateProjectionMatrix();
   if (group) wireLinks();
 }
 
@@ -785,7 +838,7 @@ function poseAt(t, outPos, outLook) {
   const cy = wide ? 0.50 : 0.30;
   if (cx === 0.5 && cy === 0.5) return;
 
-  const tan = Math.tan((camera.fov * Math.PI / 180) / 2);
+  const tan = Math.tan((BASE_FOV * Math.PI / 180) / 2);
   const reach = outPos.distanceTo(outLook);
   poseA.subVectors(outLook, outPos).normalize();        // forward
   poseB.set(0, 1, 0).cross(poseA).normalize();          // camera-LEFT
@@ -1004,10 +1057,40 @@ function frame() {
     rather than as a scrubbed animation.
   */
   tWant = clamp(scrollY / travelSpan, 0, 1);
-  tCam += (tWant - tCam) * Math.min(1, dt * 2.0);
+  /*
+    A critically damped spring, not a lerp. A lerp starts at full speed and
+    decays, which reads as the page being scrubbed. A spring accelerates out of
+    rest and glides back into it, which reads as flight. Critically damped
+    specifically: any overshoot would carry the camera past a section and land
+    every label beyond its authored spot.
+  */
+  const W = 2.4;
+  tVel += (W * W * (tWant - tCam) - 2 * W * tVel) * dt;
+  tCam = clamp(tCam + tVel * dt, 0, 1);
 
-  prevPos.copy(camera.position);
+  prevPath.copy(camPos);
   poseAt(ease(tCam), camPos, camLook);
+
+  // The arrival: pull the camera back along its own line of sight, easing to
+  // nothing over the first few seconds, so every visit opens with a flight in.
+  if (introT < INTRO_S) {
+    introT += dt;
+    const k = 1 - Math.min(1, introT / INTRO_S);
+    const pull = k * k * k * 46;                      // ease-out cubic
+    tmpA.subVectors(camPos, camLook).normalize();
+    camPos.addScaledVector(tmpA, pull);
+  }
+
+  /*
+    Warp follows the JOURNEY's speed only — how fast the path is being
+    travelled — never the drag orbit below it, or turning the galaxy by hand
+    would kick it into hyperspace. A single-frame jump (a resize re-solving the
+    framing) is a teleport, not speed, and is ignored.
+  */
+  pathVel.subVectors(camPos, prevPath).divideScalar(Math.max(dt, 1e-3));
+  if (prevPath.distanceTo(camPos) > 4) pathVel.set(0, 0, 0);
+  const warpWant = clamp((pathVel.length() - 1.5) / 14, 0, 1);
+  warp += (warpWant - warp) * Math.min(1, dt * 4);
 
   // drag and pointer parallax orbit the look-at point, on top of the journey
   const yaw = dragAz + parX + Math.sin(t * 0.045) * 0.05;   // a slow breath
@@ -1018,11 +1101,19 @@ function frame() {
   tmpA.applyAxisAngle(tmpB, pitch);
   camera.position.copy(camLook).add(tmpA);
   camera.lookAt(camLook);
-  camera.updateMatrixWorld(true);
 
-  // actual displacement, smoothed — this is what the motes ride on
-  const moved = prevPos.distanceTo(camera.position) / Math.max(dt, 0.001);
-  speed += (moved - speed) * Math.min(1, dt * 3.5);
+  // Banking: lean into lateral motion the way a craft does through a turn,
+  // and level out at rest. Roll is only ever applied on top of lookAt, so it
+  // returns exactly to zero once the camera stops.
+  tmpB.set(1, 0, 0).applyQuaternion(camera.quaternion);
+  const rollWant = clamp(-pathVel.dot(tmpB) * 0.011, -0.09, 0.09);
+  roll += (rollWant - roll) * Math.min(1, dt * 3);
+  camera.rotateZ(roll);
+
+  // The lens widens with speed: the classic stretch of going very fast.
+  const fov = BASE_FOV + 19 * warp * warp;
+  if (Math.abs(fov - camera.fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  camera.updateMatrixWorld(true);
 
   /*
     The depth fade and the point size are both tuned in world units, and the
@@ -1035,7 +1126,11 @@ function frame() {
   // the core breathes: a slow swell in the glow and in the bulge's light
   const beat = Math.sin(t * 0.9);
   coreGlow.scale.setScalar(7.5 * (1 + 0.07 * beat));
-  bulge.material.uniforms.uGain.value = 1 + 0.12 * Math.sin(t * 0.9 + 0.5);
+  // From inside, the bulge fills much of the frame and its grains stack into one
+  // pale saturated patch. Dimmed with proximity, it reads as individual stars
+  // again — the same treatment the haze sprites get, for the same reason.
+  const inside = clamp((camera.position.length() - 2) / 8, 0.35, 1);
+  bulge.material.uniforms.uGain.value = (1 + 0.12 * Math.sin(t * 0.9 + 0.5)) * inside;
 
   updateMotes(dt);
   nebulae.forEach((n, i) => { n.rotation.z = t * (i % 2 ? 0.008 : -0.006) + i; });
@@ -1055,6 +1150,17 @@ function frame() {
   updateHover();
   paintNamed(dt);
   links.material.opacity += ((group && roomy.matches ? 0.30 : 0) - links.material.opacity) * k;
+
+  // where the camera is heading, on screen — the point the streaks radiate
+  // from. Flying backwards (scrolling up), that point is behind the lens, so
+  // the opposite direction is used: the field then converges on it instead.
+  compMat.uniforms.uWarp.value = warp;
+  if (warp > 0.01) {
+    tmpA.copy(pathVel).normalize();
+    tmpB.set(0, 0, -1).applyQuaternion(camera.quaternion);
+    tmpV.copy(camera.position).addScaledVector(tmpA, tmpA.dot(tmpB) >= 0 ? 10 : -10).project(camera);
+    compMat.uniforms.uCenter.value.set(clamp(tmpV.x * 0.5 + 0.5, -0.5, 1.5), clamp(tmpV.y * 0.5 + 0.5, -0.5, 1.5));
+  }
 
   renderFrame();
   frameCbs.forEach((cb) => cb());
@@ -1113,7 +1219,7 @@ export function initUniverse(el) {
   cheap = still || matchMedia('(pointer: coarse)').matches || screen.width < 900;
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(46, 1, 0.1, 400);
+  camera = new THREE.PerspectiveCamera(BASE_FOV, 1, 0.1, 400);
 
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
@@ -1193,7 +1299,10 @@ export function initUniverse(el) {
   buildBloom();
 
   try {
-    if (!cheap) buildMotes(500);
+    if (!still) {
+      buildMotes(cheap ? 320 : 700);
+      motes.layers.enable(BLOOM_LAYER);
+    }
     buildNamed();
   } catch (err) {
     console.error('universe: scene build failed, falling back to the still field', err);
