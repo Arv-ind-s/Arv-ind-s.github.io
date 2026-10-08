@@ -177,16 +177,22 @@ if (live) {
     });
 
     const p = tethered && project(tethered);
+    /*
+      The camera carries objects in and out of view, so the highlight on the
+      tethered row and its star's name follows visibility every frame, in BOTH
+      directions. Only ever clearing it stranded the return trip: fly away from
+      a section and back, and the line pointed at its star while the row it
+      belonged to had lost its highlight for good.
+    */
+    if (tethered) {
+      const seen = !!(p && p.on);
+      const row = rows.get(tethered);
+      if (row) row.classList.toggle('hot', seen);
+      const mk = markEls.get(tethered);
+      if (mk) mk.classList.toggle('lit', seen);
+    }
     if (!p || !p.on || !anchor || !roomy.matches) {
       svg.classList.remove('on');
-      // the camera has carried this object out of view — don't strand its row
-      // highlighted for a star the reader can no longer find
-      if (tethered && (!p || !p.on)) {
-        const row = rows.get(tethered);
-        if (row) row.classList.remove('hot');
-        const mk = markEls.get(tethered);
-        if (mk) mk.classList.remove('lit');
-      }
       return;
     }
     svg.classList.add('on');
@@ -228,6 +234,17 @@ function anchorSections() {
 }
 anchorSections();
 addEventListener('resize', anchorSections, { passive: true });
+/*
+  The faces load with display=swap, so on a cold load this module can measure the
+  sections while fallback fonts are still in place. When Bodoni and Sora arrive,
+  line heights change, every section moves, and each star would sit at the pose
+  of a section that is no longer there. Fonts finishing is a one-time event, so
+  re-measuring here does not break the rule against moving the camera when a
+  disclosure opens.
+*/
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => { anchorSections(); measure(); });
+}
 
 /* ------------------------------------------------ which section is read */
 

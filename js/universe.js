@@ -56,14 +56,22 @@ export const OBJECTS = [
   { id: 'nexus',         group: 'work',   ndc: [ 0.48,  0.10 ], depth: 21.0 },
   { id: 'moderation',    group: 'work',   ndc: [ 0.20, -0.36 ], depth: 17.5 },
 
-  { id: 'language',      group: 'stack',  ndc: [ 0.18,  0.60 ], depth: 16.5 },
-  { id: 'ml',            group: 'stack',  ndc: [ 0.44,  0.33 ], depth: 20.0 },
-  { id: 'genai',         group: 'stack',  ndc: [ 0.52, -0.04 ], depth: 22.5 },
-  { id: 'cloud',         group: 'stack',  ndc: [ 0.34, -0.38 ], depth: 19.0 },
-  { id: 'serve',         group: 'stack',  ndc: [ 0.13, -0.64 ], depth: 15.5 },
+  /*
+    By the time the reader reaches these two groups the camera is inside the
+    disc and sees it nearly edge-on: a bright band crossing the frame at about
+    41-59% of its height. A name placed in that band is unreadable, so these
+    objects sit above or below it. The camera's field of view is vertical, so
+    the band holds that screen height at every width. Each group keeps its
+    top-to-bottom order, so the leader lines from the list never cross.
+  */
+  { id: 'language',      group: 'stack',  ndc: [ 0.18,  0.64 ], depth: 16.5 },
+  { id: 'ml',            group: 'stack',  ndc: [ 0.44,  0.40 ], depth: 20.0 },
+  { id: 'genai',         group: 'stack',  ndc: [ 0.52, -0.24 ], depth: 22.5 },
+  { id: 'cloud',         group: 'stack',  ndc: [ 0.34, -0.48 ], depth: 19.0 },
+  { id: 'serve',         group: 'stack',  ndc: [ 0.13, -0.72 ], depth: 15.5 },
 
-  { id: 'email',         group: 'signal', ndc: [ 0.23,  0.44 ], depth: 17.0 },
-  { id: 'linkedin',      group: 'signal', ndc: [ 0.49,  0.04 ], depth: 21.0 },
+  { id: 'email',         group: 'signal', ndc: [ 0.23,  0.56 ], depth: 17.0 },
+  { id: 'linkedin',      group: 'signal', ndc: [ 0.47,  0.26 ], depth: 21.0 },
   { id: 'github',        group: 'signal', ndc: [ 0.19, -0.42 ], depth: 17.5 },
 ];
 
@@ -89,6 +97,16 @@ let hoverCbs = [], selectCbs = [], frameCbs = [];
   object lands somewhere other than where the layout put it.
 */
 const PATH_T = { hero: 0.0, work: 0.34, stack: 0.70, signal: 1.0 };
+
+/*
+  How close to the camera the named objects sit, as a fraction of their authored
+  depth — and therefore how large they draw. The sprite and ripple sizes were
+  tuned when these objects sat at their full depth; once the journey pulled them
+  in, they rendered about 2.5x too big, glare discs smearing into each other and
+  each label sitting on its own star's flare. Placement, sprite and ripple all
+  read this one value so they cannot drift apart again.
+*/
+const NEAR = 0.42;
 const PATH_POS = [
   // P0 is the framing the fixed-camera version was tuned to, kept exactly, so
   // the page still opens on a composition that is known to work
@@ -496,7 +514,7 @@ function placeObjects() {
     camera.lookAt(tmpB);
     camera.updateMatrixWorld(true);
     tmpV.set(o.ndc[0], o.ndc[1], 0.5).unproject(camera).sub(camera.position).normalize();
-    sp.position.copy(camera.position).addScaledVector(tmpV, o.depth * 0.42);
+    sp.position.copy(camera.position).addScaledVector(tmpV, o.depth * NEAR);
   });
   if (group) wireLinks();
 }
@@ -528,7 +546,7 @@ function paintNamed(dt) {
     tmpC.copy(STAR_DIM).lerp(isHot ? STAR_HOT : base, d.lit);
     sp.material.color.copy(tmpC);
     sp.material.opacity = 0.34 + d.lit * 0.66;
-    sp.scale.setScalar(2.4 + d.lit * 2.6);
+    sp.scale.setScalar((2.4 + d.lit * 2.6) * NEAR);
   });
 }
 
@@ -547,7 +565,10 @@ function poseAt(t, outPos, outLook) {
   lookCurve.getPoint(t, outLook);
   // Wide: the galaxy sits in the clear band right of the copy column.
   // Narrow: there is no clear band, so it rides high and the copy starts below.
-  const wide = innerWidth >= 1060;
+  // "Wide" is the same query that turns the annotation layer on. It used to be
+  // a separate, larger breakpoint, so between 901 and 1059px the labels were on
+  // but the galaxy was framed for a phone: centred, with its core behind the copy.
+  const wide = roomy.matches;
   const cx = wide ? 0.62 : 0.50;
   const cy = wide ? 0.50 : 0.30;
   if (cx === 0.5 && cy === 0.5) return;
@@ -560,6 +581,55 @@ function poseAt(t, outPos, outLook) {
   // moving the look-at point one way slides the galaxy the other
   outLook.addScaledVector(poseB, ((cx - 0.5) * 2) * tan * camera.aspect * reach);
   outLook.addScaledVector(poseC, ((cy - 0.5) * 2) * tan * reach);
+}
+
+/*
+  Depth cues for wherever the camera currently is. Shared by the animation loop
+  and the still render: a still frame that skipped this kept the shader defaults,
+  which are tuned for a different camera distance entirely.
+*/
+function applyDepth() {
+  const near = camera.position.length();
+  /*
+    The fade band tracks the camera but keeps the WIDTH of the galaxy, so the
+    far half of the disc always falls away into the dark. Scaling the band with
+    distance instead let the far side stay lit, which flattened the depth cue
+    and turned the core into a grey smudge rather than the brightest thing in
+    the frame.
+  */
+  const fogFar = near + GAL_R * 1.1;
+  const fogNear = Math.max(1.2, near - GAL_R * 0.62);
+  [galaxy, dust, bulge].forEach((pc) => {
+    if (!pc) return;
+    pc.material.uniforms.uNear.value = fogNear;
+    pc.material.uniforms.uFar.value = fogFar;
+  });
+  /*
+    The haze layers — the core's glow sprite and the nebula quads — are painted
+    at a size that reads correctly from outside the galaxy. Fly into them and
+    they become a grey sheet over the whole screen, because you are now inside
+    a billboard that was standing in for distance. So they fade out on approach
+    and hand the job to the bulge stars, which is what should actually be
+    blazing when the reader arrives at the core.
+  */
+  const haze = clamp((near - 3.5) / 11, 0, 1);
+  coreGlow.material.opacity = haze;
+  nebulae.forEach((n) => { n.material.opacity = n.userData.baseOpacity * haze; });
+}
+
+/*
+  The still frame, for reduced motion. Always re-posed from scratch: resize()
+  runs placeObjects(), which walks the camera through every section's pose and
+  leaves it parked at the last one — the core. Rendering without re-posing would
+  draw the still frame from inside the galaxy.
+*/
+function renderStill() {
+  poseAt(0, camPos, camLook);
+  camera.position.copy(camPos);
+  camera.lookAt(camLook);
+  camera.updateMatrixWorld(true);
+  applyDepth();
+  renderer.render(scene, camera);
 }
 
 /* eased so both ends of the journey settle instead of arriving at full speed */
@@ -598,6 +668,9 @@ function resize() {
   camera.updateProjectionMatrix();
   frameScene();
   if (namedStars) placeObjects();
+  // setSize() has just cleared the drawing buffer, and a still scene has no
+  // loop to paint it again
+  if (still && alive) renderStill();
 }
 
 /* --------------------------------------------------------- interaction */
@@ -740,33 +813,7 @@ function frame() {
     arrival would be a flat white bloom of enormous grains, so both sweep with
     how far the camera actually is from the centre.
   */
-  const near = camera.position.length();
-  /*
-    The fade band tracks the camera but keeps the WIDTH of the galaxy, so the
-    far half of the disc always falls away into the dark. Scaling the band with
-    distance instead let the far side stay lit, which flattened the depth cue
-    and turned the core into a grey smudge rather than the brightest thing in
-    the frame.
-  */
-  const fogFar = near + GAL_R * 1.1;
-  const fogNear = Math.max(1.2, near - GAL_R * 0.62);
-
-  /*
-    The haze layers — the core's glow sprite and the nebula quads — are painted
-    at a size that reads correctly from outside the galaxy. Fly into them and
-    they become a grey sheet over the whole screen, because you are now inside
-    a billboard that was standing in for distance. So they fade out on approach
-    and hand the job to the bulge stars, which is what should actually be
-    blazing when the reader arrives at the core.
-  */
-  const haze = clamp((near - 3.5) / 11, 0, 1);
-  coreGlow.material.opacity = haze;
-  nebulae.forEach((n) => { n.material.opacity = n.userData.baseOpacity * haze; });
-  [galaxy, dust, bulge].forEach((pc) => {
-    if (!pc) return;
-    pc.material.uniforms.uNear.value = fogNear;
-    pc.material.uniforms.uFar.value = fogFar;
-  });
+  applyDepth();
 
   updateMotes(dt);
   nebulae.forEach((n, i) => { n.rotation.z = t * (i % 2 ? 0.008 : -0.006) + i; });
@@ -776,7 +823,7 @@ function frame() {
     const p = ripple.userData.t / 1.1;
     if (p >= 1) ripple.visible = false;
     else {
-      ripple.scale.setScalar(0.4 + p * 3.4);
+      ripple.scale.setScalar((0.4 + p * 3.4) * NEAR);
       ripple.material.opacity = (1 - p) * 0.55;
       ripple.quaternion.copy(camera.quaternion);
     }
@@ -819,6 +866,8 @@ export function setActive(id, pulse) {
 */
 export function setAnchors(map) {
   Object.assign(PATH_T, map);
+  // the travel span comes from the same layout, so it is re-read alongside
+  frameScene();
   if (alive && namedStars) placeObjects();
 }
 
@@ -923,19 +972,21 @@ export function initUniverse(el) {
 
   measureView();
   addEventListener('resize', () => { measureView(); resize(); }, { passive: true });
-  addEventListener('scroll', measureView, { passive: true });
   document.addEventListener('visibilitychange', () => {
+    if (still) return;          // there is no loop to resume, by design
     running = !document.hidden;
     if (running) { clock.getDelta(); requestAnimationFrame(frame); }
   });
 
   alive = true;
   if (still) {
+    // The catalogue only means something with its names beside it, and names
+    // are off here — left in, the eleven stars are unexplained blue blobs.
+    namedStars.visible = false;
+    links.visible = false;
+    ripple.visible = false;
     // one frame at the start of the journey, and then left alone for good
-    poseAt(0, camPos, camLook);
-    camera.position.copy(camPos);
-    camera.lookAt(camLook);
-    renderer.render(scene, camera);
+    renderStill();
     return { cheap: cheap, still: true };
   }
   canvas.style.cursor = roomy.matches ? 'grab' : 'default';

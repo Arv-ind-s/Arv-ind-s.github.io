@@ -83,13 +83,22 @@
   /* ---------------------------------------------------------- masthead */
   .bar{position:fixed;top:0;left:0;right:0;height:var(--bar);z-index:40;
     display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 var(--gut);
-    background:rgba(4,5,12,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--rule)}
+    /* Solid. Copy scrolls up under this bar; translucent, the line passing
+       beneath collided with the name (Safari's engine let it through even at
+       95%). A blur bought nothing at that opacity, and blurring over a canvas
+       that repaints every frame made the browser recompute it every frame. */
+    background:var(--void);border-bottom:1px solid var(--rule)}
   .bar .who{font-family:var(--display);font-weight:500;font-size:1.06rem;letter-spacing:.005em}
   .bar nav{display:flex;align-items:center;gap:26px}
   .bar nav a{font-size:.82rem;font-weight:300;color:var(--ink-far);transition:color .25s}
   .bar nav a:hover,.bar nav a.cur{color:var(--ink)}
   .bar nav a.cur{box-shadow:0 6px 0 -5px var(--blue)}
-  @media(max-width:780px){.bar nav a:not(.out){display:none}}
+  /* phones used to keep only "GitHub", leaving no way to reach the sections;
+     keep the two that matter most and drop the longest label */
+  @media(max-width:780px){
+    .bar nav{gap:18px}
+    .bar nav a[data-nav="stack"]{display:none}
+  }
 
   /* ---------------------------------------------------------- document */
   /* transparent to the pointer so the sky behind stays draggable; the content
