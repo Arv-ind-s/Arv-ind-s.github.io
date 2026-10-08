@@ -632,8 +632,8 @@ const COMP_FRAG = /* glsl */`
       vec2 d = vUv - uCenter;
       vec3 acc = vec3(0.0);
       float ws = 0.0;
-      for (int i = 1; i <= 10; i++) {
-        float k = float(i) / 10.0;
+      for (int i = 1; i <= STREAK_N; i++) {
+        float k = float(i) / float(STREAK_N);
         vec2 uv = vUv - d * k * 0.3 * uWarp;
         float w = 1.0 - k;
         acc.r += texture2D(tWide, uv - d * 0.022 * uWarp).r * w;
@@ -665,6 +665,9 @@ function buildBloom() {
       uNear: { value: 0.5 }, uWide: { value: 0.7 },
       uWarp: { value: 0 }, uCenter: { value: new THREE.Vector2(0.5, 0.5) },
     },
+    // the streak loop is the heaviest thing on screen, at full resolution, and
+    // the arrival runs it at maximum on every visit; phones get half the taps
+    defines: { STREAK_N: cheap ? 5 : 10 },
     vertexShader: FS_VERT, fragmentShader: COMP_FRAG,
     transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false,
   });
@@ -919,7 +922,10 @@ function frameScene() {
   than thinning the star count, which is what the picture is made of.
 */
 function applyPixelRatio() {
-  const px = Math.min(cheap ? 1.5 : pxCap, devicePixelRatio || 1);
+  // The cap applies on phones too. It used to be ignored there (always 1.5),
+  // so the guard's first step did nothing and a struggling phone stuttered on
+  // until the glow was finally dropped.
+  const px = Math.min(cheap ? Math.min(1.5, pxCap) : pxCap, devicePixelRatio || 1);
   renderer.setPixelRatio(px);
   renderer.setSize(canvas.clientWidth || innerWidth, canvas.clientHeight || innerHeight, false);
   [galaxy, dust, bulge, streams, starfield].forEach((p) => { if (p) p.material.uniforms.uPixelRatio.value = px; });
