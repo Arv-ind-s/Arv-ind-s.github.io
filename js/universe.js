@@ -67,10 +67,10 @@ export const OBJECTS = [
   { id: 'tcs',           groups: ['exp'],              dest: true },
 
   // Skills is a right-panel chapter: its constellation sits on the left half
-  { id: 'llm',           groups: ['stack'],  ndc: [ -0.22,  0.62 ], depth: 17.0 },
+  { id: 'llm',           groups: ['stack'],  ndc: [ -0.30,  0.62 ], depth: 17.0 },
   { id: 'ml',            groups: ['stack'],  ndc: [ -0.48,  0.32 ], depth: 20.0 },
   { id: 'backend',       groups: ['stack'],  ndc: [ -0.44, -0.30 ], depth: 20.5 },
-  { id: 'cloud',         groups: ['stack'],  ndc: [ -0.18, -0.62 ], depth: 17.0 },
+  { id: 'cloud',         groups: ['stack'],  ndc: [ -0.26, -0.62 ], depth: 17.0 },
 
   { id: 'claude',        groups: ['creds'],  ndc: [ 0.24,  0.66 ], depth: 17.0 },
   { id: 'awsml',         groups: ['creds'],  ndc: [ 0.48,  0.36 ], depth: 20.0 },
@@ -203,6 +203,22 @@ const NEAR = 0.42;
   camera.fov. Solved against a stretched lens, every label would land wrong.
 */
 const BASE_FOV = 46;
+
+/*
+  The lens actually used for solving, on a given window. Every composition here
+  was laid out at a 16:10 desktop window. On a squarer one — half a 1920
+  monitor is about 960x1000 — a fixed VERTICAL field of view narrows the view
+  sideways, and the whole layout spreads toward the edges: stars slid under the
+  panels and labels ran off the right side. So on desktop windows squarer than
+  the design, the HORIZONTAL field of view is held at the design's instead,
+  and the extra room goes vertically. Phones keep their own framing.
+*/
+const DESIGN_ASPECT = 1.6;
+function lensFov() {
+  if (!roomy.matches || camera.aspect >= DESIGN_ASPECT) return BASE_FOV;
+  const t = Math.tan(BASE_FOV * Math.PI / 360) * DESIGN_ASPECT / camera.aspect;
+  return Math.atan(t) * 360 / Math.PI;
+}
 let posCurve, lookCurve;
 
 let tCam = 0, tWant = 0, travelSpan = 1;
@@ -845,7 +861,7 @@ function buildNamed() {
 function placeObjects() {
   // solve against the base lens, whatever the live one is doing right now
   const liveFov = camera.fov;
-  camera.fov = BASE_FOV;
+  camera.fov = lensFov();
   camera.updateProjectionMatrix();
   namedStars.children.forEach((sp) => {
     const o = OBJECTS.find((x) => x.id === sp.userData.id);
@@ -924,7 +940,7 @@ function poseAt(u, outPos, outLook) {
   const cy = wide ? 0.50 : (innerHeight < 700 ? 0.22 : 0.30);
   if (cx === 0.5 && cy === 0.5) return;
 
-  const tan = Math.tan((BASE_FOV * Math.PI / 180) / 2);
+  const tan = Math.tan((lensFov() * Math.PI / 180) / 2);
   const reach = outPos.distanceTo(outLook);
   poseA.subVectors(outLook, outPos).normalize();        // forward
   poseB.set(0, 1, 0).cross(poseA).normalize();          // camera-LEFT
@@ -1018,6 +1034,7 @@ function resize() {
   if (!w || !h) return;
   applyPixelRatio();
   camera.aspect = w / h;
+  camera.fov = lensFov();
   camera.updateProjectionMatrix();
   frameScene();
   if (namedStars) placeObjects();
@@ -1198,7 +1215,7 @@ function frame() {
   camera.rotateZ(roll);
 
   // The lens widens with speed: the classic stretch of going very fast.
-  const fov = BASE_FOV + 19 * warp * warp;
+  const fov = lensFov() + 19 * warp * warp;
   if (Math.abs(fov - camera.fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
   camera.updateMatrixWorld(true);
 

@@ -38,7 +38,9 @@
     --sans:'Sora',system-ui,-apple-system,'Segoe UI',sans-serif;
     --ease:cubic-bezier(.22,1,.36,1);
     --bar:58px; --gut:clamp(22px,5vw,72px);
-    --panel:min(100%,34.5rem);
+    /* capped by width too: the framing leaves the panel about 40% of the
+       screen, and a fixed 552px filled 57% of a half-width 960px window */
+    --panel:min(100%,34.5rem,42vw);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
