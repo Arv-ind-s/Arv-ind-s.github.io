@@ -38,7 +38,7 @@ const roomy = matchMedia('(min-width: 901px)');
 const rows = new Map();                // id -> row element
 document.querySelectorAll('.row[data-id]').forEach((el) => rows.set(el.dataset.id, el));
 
-const groupOf = (id) => OBJECTS.find((o) => o.id === id).group;
+const groupOf = (id) => (OBJECTS.find((o) => o.id === id) || {}).group;
 const first = {};                      // group -> id of its first object
 OBJECTS.forEach((o) => { if (!(o.group in first)) first[o.group] = o.id; });
 
@@ -85,15 +85,21 @@ const markEls = new Map();
 if (live) {
   OBJECTS.forEach((o) => {
     const row = rows.get(o.id);
+    // a catalogue entry with no row on the page gets no name in the sky, rather
+    // than taking the whole annotation layer down with it
+    if (!row) return;
     const el = document.createElement('div');
     el.className = 'mark' + (o.tone === 'gold' ? ' gold' : '');
     const name = document.createElement('b');
     name.textContent = row.dataset.mark || row.querySelector('.nm').textContent;
     el.appendChild(name);
+    // the line under the name: an explicit data-sub, else the row's tag — unless
+    // the name already IS the tag (contact rows), where it would just repeat
     const tag = row.querySelector('.tag');
-    if (tag && !row.dataset.mark) {
+    const sub = row.dataset.sub ?? (tag && !row.dataset.mark ? tag.textContent : '');
+    if (sub) {
       const i = document.createElement('i');
-      i.textContent = tag.textContent;
+      i.textContent = sub;
       el.appendChild(i);
     }
     marks.appendChild(el);
@@ -170,6 +176,7 @@ if (live) {
     if (performance.now() < settleUntil) measure();
     OBJECTS.forEach((o) => {
       const el = markEls.get(o.id);
+      if (!el) return;
       const p = project(o.id);
       const on = p && p.on && o.group === group;
       el.classList.toggle('on', !!on);
@@ -262,7 +269,7 @@ function enter(name) {
   tether(pinned[name]);
 }
 
-const plates = [...document.querySelectorAll('.plate[data-group]')];
+const plates = [...document.querySelectorAll('.plate')];
 const seen = new Set();
 
 function settle() {
@@ -274,7 +281,7 @@ function settle() {
     const d = Math.abs(r.top + r.height / 2 - mid);
     if (d < bestD) { bestD = d; best = el; }
   });
-  enter(best.dataset.group);
+  enter(best.dataset.group || null);
 }
 
 const io = new IntersectionObserver((entries) => {

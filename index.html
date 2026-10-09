@@ -8,10 +8,10 @@
   if (!location.hash) window.scrollTo(0, 0);
   addEventListener('pageshow', function(e){ if(e.persisted && !location.hash) window.scrollTo(0, 0); });
 </script>
-<title>Aravind S — AI Engineer &amp; Builder</title>
-<meta name="description" content="Aravind S — AI Engineer & Builder. I take machine-learning models from research to a live production endpoint. Creator of thought2build.com." />
-<meta property="og:title" content="Aravind S — AI Engineer & Builder" />
-<meta property="og:description" content="Research becomes a production endpoint. GenAI · RAG · LLM agents · AWS MLOps. Creator of thought2build.com." />
+<title>Aravind S — AI Engineer: Generative AI, Agentic AI, AWS</title>
+<meta name="description" content="Aravind S, AI engineer in Kochi, India, building auditable LLM systems across generative AI, agentic AI and AWS. Creator of thought2build.com, TCS Kochi AI Hackathon winner, Claude Certified Architect – Professional, 2× AWS Certified." />
+<meta property="og:title" content="Aravind S — AI Engineer: Generative AI, Agentic AI, AWS" />
+<meta property="og:description" content="Auditable LLM systems: deterministic guardrails, evaluation gates, recorded model calls. Creator of thought2build.com and TCS Kochi AI Hackathon winner." />
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#04050c" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2304050c'/%3E%3Cg fill='none' stroke='%237ba7ff' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M50 22a28 28 0 0 1 24 34'/%3E%3Cpath d='M50 78a28 28 0 0 1-24-34'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='11' fill='%23ffb45c'/%3E%3C/svg%3E" />
@@ -76,6 +76,12 @@
   .mark.on{opacity:1}
   .mark b{display:block;font-weight:400;font-size:.84rem;letter-spacing:.01em;
     color:var(--ink-dim);transition:color .3s var(--ease)}
+  /* The galaxy turns, so its arms sweep under every label sooner or later; only
+     the core and the edge-on band hold still, and placement dodges those. For
+     the rest, each name carries a soft plate of night: a dark, feathered
+     backing that keeps it readable as the light passes beneath. */
+  .mark b,.mark i{width:fit-content;border-radius:4px;background:rgba(4,5,12,.5);
+    box-shadow:0 0 10px 5px rgba(4,5,12,.5);padding:0 3px;margin-left:-3px}
   .mark i{font-style:normal;font-size:.68rem;letter-spacing:.1em;color:var(--ink-far)}
   .mark.lit b{color:#ffffff}
   .mark.gold.lit b{color:var(--gold)}
@@ -97,7 +103,7 @@
      keep the two that matter most and drop the longest label */
   @media(max-width:780px){
     .bar nav{gap:18px}
-    .bar nav a[data-nav="stack"]{display:none}
+    .bar nav a:is([data-nav="exp"],[data-nav="stack"],[data-nav="creds"]){display:none}
   }
 
   /* ---------------------------------------------------------- document */
@@ -113,9 +119,19 @@
     padding-bottom:clamp(56px,11vh,120px);padding-top:calc(var(--bar) + 80px)}
   .hero h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,5.9vw,5.5rem);
     line-height:.99;letter-spacing:-.018em;max-width:13ch;text-wrap:balance}
-  .hero .say{color:var(--ink-dim);font-size:clamp(1rem,1.4vw,1.12rem);max-width:44ch;
+  .hero .say{color:var(--ink-dim);font-size:clamp(1rem,1.4vw,1.12rem);max-width:52ch;
     margin-top:clamp(22px,3.4vh,34px)}
-  .hero .who{color:var(--ink-far);font-size:.88rem;max-width:44ch;margin-top:16px}
+  .hero .who{color:var(--ink-far);font-size:.88rem;max-width:60ch;margin-top:16px}
+  /* Short laptop screens: the identity and proof lines made the hero taller, and
+     at 1280x720 the buttons fell below the fold. Size by height here, so the
+     taller screens keep the composition they already have. */
+  @media(min-width:901px) and (max-height:820px){
+    .hero{padding-top:calc(var(--bar) + 36px);padding-bottom:40px}
+    .hero h1{font-size:clamp(2.6rem,8.4vh,5.5rem)}
+    .hero .say{margin-top:18px}
+    .acts{margin-top:22px}
+    .hint{margin-top:18px}
+  }
   .hero .who b{color:var(--ink-dim);font-weight:400}
   .acts{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
   .btn{display:inline-flex;align-items:center;padding:13px 22px;font-size:.86rem;font-weight:400;
@@ -163,9 +179,22 @@
     border-bottom:1px solid var(--rule-2);padding-bottom:3px;transition:border-color .25s}
   .body .go:hover{border-color:var(--blue)}
 
-  /* contact rows are links, not disclosures */
+  /* Experience and Skills are read, not opened: everything is on the page,
+     because a recruiter scanning for a skill or a date should never have to
+     click to find it. They still light their star on hover. */
+  .row.static{cursor:default}
+  .row .kit{display:block;margin-top:10px;color:var(--ink);font-size:.93rem;line-height:1.65;max-width:44ch}
+  .row .pts{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:9px}
+  .row .pts li{position:relative;padding-left:20px;color:var(--ink-dim);font-size:.92rem;max-width:42ch}
+  .row .pts li::before{content:'';position:absolute;left:2px;top:.62em;width:5px;height:5px;
+    border-radius:50%;background:var(--rule-2)}
+  .row .pts li b{color:var(--ink);font-weight:400}
+  .plate h3{font-family:var(--display);font-weight:400;font-size:1.5rem;letter-spacing:-.01em;margin-top:48px}
+  .plate h3 + .list{margin-top:16px}
+
+  /* links rather than disclosures: credentials and contact */
   a.row .top{align-items:center}
-  a.row .nm{font-family:var(--display);font-size:1.24rem}
+  #contact a.row .nm{font-family:var(--display);font-size:1.24rem}
 
   footer{padding:clamp(40px,7vh,74px) 0 44px;border-top:1px solid var(--rule);
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;
@@ -227,7 +256,9 @@
   <a href="#top" class="who">Aravind S</a>
   <nav>
     <a href="#work" data-nav="work">Work</a>
-    <a href="#instruments" data-nav="stack">Instruments</a>
+    <a href="#experience" data-nav="exp">Experience</a>
+    <a href="#skills" data-nav="stack">Skills</a>
+    <a href="#credentials" data-nav="creds">Credentials</a>
     <a href="#contact" data-nav="signal">Contact</a>
     <a href="https://github.com/Arv-ind-s" target="_blank" rel="noopener" class="out">GitHub</a>
   </nav>
@@ -238,8 +269,8 @@
 
     <section class="hero">
       <h1>Research becomes a production endpoint.</h1>
-      <p class="say">I build machine-learning systems that survive contact with production: retrieval, agents, and the infrastructure underneath them.</p>
-      <p class="who">AI engineer in <b>Kochi, India</b>. Self-taught. Currently shipping <b>Thought2Build</b>.</p>
+      <p class="say">I&rsquo;m Aravind, an AI engineer working across generative AI, agentic AI and AWS. I build auditable LLM systems: deterministic guardrails, evaluation gates, and a recorded trail of every model call.</p>
+      <p class="who">More than five years of production systems at <b>TCS</b>. Winner of the <b>TCS Kochi AI Hackathon</b> and a national finalist. <b>Claude Certified Architect</b>, twice AWS certified. Based in Kochi, India, and currently shipping <b>Thought2Build</b>.</p>
       <div class="acts">
         <a href="https://www.thought2build.com" target="_blank" rel="noopener" class="btn fill">Open Thought2Build</a>
         <a href="#work" class="btn">See the work</a>
@@ -248,52 +279,76 @@
     </section>
 
     <section class="plate" id="work" data-group="work">
-      <h2>In production</h2>
-      <p class="lede">Three systems with real users, real uptime, and consequences when they break.</p>
+      <h2>Selected work</h2>
+      <p class="lede">A live product, a hackathon win, a national final, and two open-source systems.</p>
 
       <div class="list">
         <button class="row gold" data-id="thought2build" aria-expanded="false" aria-controls="b-t2b">
           <span class="top"><span class="nm">Thought2Build</span><span class="tag">Live</span></span>
-          <span class="sub">An AI product workspace, and the thing I'm building now.</span>
+          <span class="sub">A GenAI workspace that turns rough product ideas into build-ready plans.</span>
         </button>
         <div class="body" id="b-t2b"><div><div class="in">
-          <p>It closes the gap between "we should build this" and "here's exactly how" — the gap where most product ideas quietly die. Spec, then plan, then harness, then tasks, each behind a review gate.</p>
+          <p>A FastAPI workspace that takes an idea through four stages, each behind a review gate, and hands back four build-ready artifacts: <b>spec, plan, harness and tasks</b>.</p>
           <ul>
-            <li><b>Harness-first quality.</b> Validation assets are generated alongside the plan, not bolted on after.</li>
-            <li><b>Full requirement traceability</b>, with export packages a human team or an AI agent can pick up and continue.</li>
-            <li>OAuth-secured, with a free starter tier and <b>bring-your-own LLM keys</b> for Anthropic, OpenAI and Google.</li>
+            <li><b>Multi-provider LLM routing</b> across Anthropic, OpenAI and Google, with bring-your-own-key credentials, OAuth sign-in and a credit-metered free tier.</li>
+            <li><b>Harness-first generation.</b> Validation assets are produced before code, and every task traces back to a requirement, so the output can drive AI coding agents directly.</li>
           </ul>
-          <p class="made">Built with GenAI, LLM orchestration, multi-provider routing, full-stack.</p>
+          <p class="made">Built with FastAPI, multi-provider LLM routing and OAuth.</p>
           <a class="go" href="https://www.thought2build.com" target="_blank" rel="noopener">Open thought2build.com</a>
         </div></div></div>
 
+        <button class="row" data-id="sentineliq" aria-expanded="false" aria-controls="b-sentinel">
+          <span class="top"><span class="nm">SentinelIQ</span><span class="tag">Hackathon winner</span></span>
+          <span class="sub">Predictive maintenance and fault diagnosis. Winner of the TCS Kochi AI Hackathon.</span>
+        </button>
+        <div class="body" id="b-sentinel"><div><div class="in">
+          <p>A platform modelled on a 15-machine plant with replayed telemetry, where <b>41 versioned features</b> feed scikit-learn predictors for failure probability, fault mode, remaining useful life and fused risk.</p>
+          <ul>
+            <li><b>An agent workflow</b> of coordinator, guardrail, diagnosis and approval stages across four role-based personas, with planner sign-off required before any immutable ERP write.</li>
+            <li><b>Numbers stay off the LLM path.</b> Optional Gemini narration is circuit-broken with a deterministic template fallback, and releases gate on balanced-accuracy and downtime KPI thresholds.</li>
+          </ul>
+          <p class="made">Built with scikit-learn, an agent workflow, role-based access control and Google Gemini.</p>
+          <a class="go" href="https://github.com/Arv-ind-s/sentineliq" target="_blank" rel="noopener">Read the source</a>
+        </div></div></div>
+
+        <button class="row" data-id="covenant" aria-expanded="false" aria-controls="b-covenant">
+          <span class="top"><span class="nm">Covenant Radar</span><span class="tag">National finalist</span></span>
+          <span class="sub">Credit-risk early warning for commercial loans. Finalist in the TCS National Hackathon.</span>
+        </button>
+        <div class="body" id="b-covenant"><div><div class="in">
+          <p>Forecasts commercial loan covenant breaches at <b>30, 60 and 90 days</b>, keeping deterministic covenant arithmetic separate from behavioural risk signals.</p>
+          <ul>
+            <li><b>A single guarded LLM call site:</b> input masking, provider-registry checks, token-budget ceilings, prompt-hash versioning and an append-only record of every attempt and refusal.</li>
+            <li><b>A six-step nightly pipeline</b> with eight-role access control, maker-checker approvals and a hash-chained audit trail, released behind an evaluation harness with per-category score floors.</li>
+          </ul>
+          <p class="made">Built with a guarded LLM call site, an evaluation harness and a hash-chained audit trail.</p>
+          <a class="go" href="https://github.com/Arv-ind-s/CovenantRadar" target="_blank" rel="noopener">Read the source</a>
+        </div></div></div>
+
         <button class="row" data-id="nexus" data-mark="Nexus" aria-expanded="false" aria-controls="b-nexus">
-          <span class="top"><span class="nm">Nexus Research Assistant</span><span class="tag">Open source</span></span>
-          <span class="sub">Agentic research over a private knowledge base and the live web.</span>
+          <span class="top"><span class="nm">Nexus Research Assistant</span><span class="tag">Agentic RAG</span></span>
+          <span class="sub">Multi-agent research over a private knowledge base and the live web.</span>
         </button>
         <div class="body" id="b-nexus"><div><div class="in">
-          <p>An assistant that answers from what you already have and what the web knows right now, and tells you which is which.</p>
+          <p>A LangChain system of three agents (<b>classifier, researcher and synthesizer</b>) with hybrid retrieval that routes each query to a private ChromaDB knowledge base, live Tavily search, or both.</p>
           <ul>
-            <li><b>Hybrid retrieval.</b> An intent classifier routes each query to ChromaDB, to Tavily, or to both.</li>
-            <li><b>Three agents in sequence:</b> classifier, researcher, synthesizer.</li>
-            <li><b>Dual-source citations</b>, with SQLite caching to hold down cost and latency.</li>
+            <li><b>A SQLite cache</b> cuts API latency and cost.</li>
           </ul>
-          <p class="made">Built with LangChain, GPT-4o-mini, ChromaDB, Tavily.</p>
+          <p class="made">Built with LangChain, ChromaDB, Tavily and SQLite.</p>
           <a class="go" href="https://github.com/Arv-ind-s/Nexus-Research-Assistant" target="_blank" rel="noopener">Read the source</a>
         </div></div></div>
 
-        <button class="row" data-id="moderation" aria-expanded="false" aria-controls="b-mod">
-          <span class="top"><span class="nm">Content Moderation</span><span class="tag">Serverless</span></span>
-          <span class="sub">Real-time toxicity detection, sub-second at scale.</span>
+        <button class="row" data-id="moderation" data-mark="Content Moderation" aria-expanded="false" aria-controls="b-mod">
+          <span class="top"><span class="nm">Real-Time Content Moderation</span><span class="tag">Serverless AWS</span></span>
+          <span class="sub">Multi-label toxicity classification, served serverless on AWS.</span>
         </button>
         <div class="body" id="b-mod"><div><div class="in">
-          <p>NLP moderation that stays fast when traffic spikes, because there is no server to run out of.</p>
+          <p><b>DistilBERT</b>, fine-tuned for six-category multi-label toxicity classification on the Jigsaw dataset of <b>159,571 comments</b>.</p>
           <ul>
-            <li>Fine-tuned <b>BERT</b> across six categories of toxicity.</li>
-            <li><b>Serverless on AWS</b>, with audit logging kept off the request path.</li>
-            <li>Auto-scaling deployment targeting <b>99.9% uptime</b>.</li>
+            <li><b>Per-category confidence scores</b> served through FastAPI on a Terraform-provisioned path: API Gateway, a Dockerised Lambda on ECR and an S3 model store.</li>
+            <li><b>Asynchronous DynamoDB audit logging</b> keeps inference non-blocking.</li>
           </ul>
-          <p class="made">Built with BERT, AWS Lambda, DynamoDB.</p>
+          <p class="made">Built with DistilBERT, FastAPI, Terraform and AWS Lambda.</p>
           <a class="go" href="https://github.com/Arv-ind-s/content-moderation-system" target="_blank" rel="noopener">Read the source</a>
         </div></div></div>
       </div>
@@ -301,43 +356,84 @@
       <p style="margin-top:28px"><a class="btn" href="https://github.com/Arv-ind-s?tab=repositories" target="_blank" rel="noopener">More on GitHub</a></p>
     </section>
 
-    <section class="plate" id="instruments" data-group="stack">
-      <h2>Instruments</h2>
-      <p class="lede">Twenty-five tools, in the five groups I actually think in.</p>
+    <section class="plate" id="experience" data-group="exp">
+      <h2>Experience</h2>
+      <p class="lede">More than five years of production backend and systems engineering.</p>
 
       <div class="list">
-        <button class="row" data-id="language" aria-expanded="false" aria-controls="b-lang">
-          <span class="top"><span class="nm">Language</span><span class="tag">1 tool</span></span>
-          <span class="sub">Everything else here is written on top of it.</span>
-        </button>
-        <div class="body" id="b-lang"><div><div class="in"><p class="made">Python.</p></div></div></div>
+        <div class="row static" data-id="tcs" data-mark="TCS" data-sub="2021 – present">
+          <span class="top"><span class="nm">Tata Consultancy Services</span><span class="tag">Feb 2021 – present</span></span>
+          <span class="sub">Systems Engineer, TCS Digital, since Feb 2023. Previously Assistant Systems Engineer. Kochi, India.</span>
+          <ul class="pts">
+            <li>Operate and maintain <b>24/7 high-availability enterprise backend applications</b> for global, business-critical workloads.</li>
+            <li>Hold technical ownership of production systems, prioritising <b>data integrity and infrastructure security</b>.</li>
+            <li>Ship upgrades with cross-functional teams <b>without service disruption</b>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-        <button class="row" data-id="ml" aria-expanded="false" aria-controls="b-ml">
-          <span class="top"><span class="nm">Machine learning</span><span class="tag">6 tools</span></span>
+    <section class="plate" id="skills" data-group="stack">
+      <h2>Skills</h2>
+      <p class="lede">What I build with, in the four groups I actually think in.</p>
+
+      <div class="list">
+        <div class="row static" data-id="llm" data-mark="LLMs and agents">
+          <span class="top"><span class="nm">LLMs and agents</span></span>
+          <span class="sub">Retrieval, agents and orchestration, with the guardrails and evaluations that keep them honest.</span>
+          <span class="kit">LLM APIs (Anthropic Claude, OpenAI, Google Gemini), LangChain, Model Context Protocol (MCP), RAG, ChromaDB, multi-agent orchestration, evaluation harnesses, guardrails.</span>
+        </div>
+        <div class="row static" data-id="ml" data-mark="Machine learning">
+          <span class="top"><span class="nm">Machine learning</span></span>
           <span class="sub">What I reach for before an LLM is the answer.</span>
-        </button>
-        <div class="body" id="b-ml"><div><div class="in"><p class="made">PyTorch, scikit-learn, Hugging Face, Pandas, NumPy, BERT.</p></div></div></div>
-
-        <button class="row" data-id="genai" aria-expanded="false" aria-controls="b-gen">
-          <span class="top"><span class="nm">GenAI and LLMs</span><span class="tag">6 tools</span></span>
-          <span class="sub">Retrieval, agents, and orchestration.</span>
-        </button>
-        <div class="body" id="b-gen"><div><div class="in">
-          <p>The stack behind <b>Nexus</b> and <b>Thought2Build</b>.</p>
-          <p class="made">LangChain, RAG, ChromaDB, LlamaCloud, Tavily, GPT-4o-mini.</p>
-        </div></div></div>
-
-        <button class="row" data-id="cloud" aria-expanded="false" aria-controls="b-cloud">
-          <span class="top"><span class="nm">Cloud and MLOps</span><span class="tag">6 tools</span></span>
-          <span class="sub">Where a trained model stops being a notebook.</span>
-        </button>
-        <div class="body" id="b-cloud"><div><div class="in"><p class="made">AWS, SageMaker, Lambda, DynamoDB, Terraform, Docker.</p></div></div></div>
-
-        <button class="row" data-id="serve" aria-expanded="false" aria-controls="b-serve">
-          <span class="top"><span class="nm">Serving and deployment</span><span class="tag">6 tools</span></span>
+          <span class="kit">PyTorch, Hugging Face Transformers (BERT, DistilBERT fine-tuning), scikit-learn, pandas, NumPy.</span>
+        </div>
+        <div class="row static" data-id="backend" data-mark="Backend and data">
+          <span class="top"><span class="nm">Backend and data</span></span>
           <span class="sub">The last mile, where a model becomes something you can call.</span>
-        </button>
-        <div class="body" id="b-serve"><div><div class="in"><p class="made">FastAPI, Pydantic, Streamlit, PySpark, SQLite, Git.</p></div></div></div>
+          <span class="kit">Python, FastAPI, Pydantic, SQLAlchemy, async REST APIs, SQLite.</span>
+        </div>
+        <div class="row static" data-id="cloud" data-mark="Cloud">
+          <span class="top"><span class="nm">Cloud</span></span>
+          <span class="sub">Where a trained model stops being a notebook.</span>
+          <span class="kit">AWS: Lambda, API Gateway, S3, ECR, IAM, DynamoDB, SageMaker.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="plate" id="credentials" data-group="creds">
+      <h2>Credentials</h2>
+      <p class="lede">Where there&rsquo;s a badge, it links to its record on Credly.</p>
+
+      <div class="list">
+        <a class="row" data-id="claude" data-mark="Claude Certified Architect" data-sub="Anthropic" href="https://www.credly.com/badges/b0240041-d8fd-4114-824c-9674461d83a9/public_url" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">Claude Certified Architect – Professional</span><span class="tag">Anthropic</span></span>
+          <span class="sub">Professional certification</span>
+        </a>
+        <a class="row" data-id="awsml" data-mark="AWS ML Engineer" data-sub="Associate" href="https://www.credly.com/badges/f7dc1527-e9e5-4c5e-8f7b-27dd19f3c2f2/public_url" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">AWS Certified Machine Learning Engineer – Associate</span><span class="tag">AWS</span></span>
+          <span class="sub">Associate certification</span>
+        </a>
+        <a class="row" data-id="awsdev" data-mark="AWS Developer" data-sub="Associate" href="https://www.credly.com/badges/d663cbc2-c434-4006-9d53-ed924d0a89d4/public_url" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">AWS Certified Developer – Associate</span><span class="tag">AWS</span></span>
+          <span class="sub">Associate certification</span>
+        </a>
+        <a class="row" data-id="agentic" data-mark="Agentic AI Essentials" data-sub="Training badge" href="https://www.credly.com/badges/9e0e60bb-4461-4c14-ad44-fc228fc4c2b3/public_url" target="_blank" rel="noopener">
+          <span class="top"><span class="nm">AWS Partner: Agentic AI Essentials</span><span class="tag">AWS</span></span>
+          <span class="sub">Training badge</span>
+        </a>
+        <div class="row static" data-id="tcscert" data-mark="Cloud Analytics and AI" data-sub="TCS">
+          <span class="top"><span class="nm">TCS Digital Certification: Cloud Analytics and AI</span><span class="tag">TCS</span></span>
+          <span class="sub">TCS certification</span>
+        </div>
+      </div>
+
+      <h3>Education</h3>
+      <div class="list">
+        <div class="row static">
+          <span class="top"><span class="nm">B.Tech, Electrical and Electronics Engineering</span><span class="tag">2016 – 2020</span></span>
+          <span class="sub">Adi Shankara Institute of Engineering and Technology</span>
+        </div>
       </div>
     </section>
 

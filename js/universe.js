@@ -52,23 +52,33 @@ const STAR_HOT   = new THREE.Color(0xffffff);
   `tone: 'gold'` is reserved for the one thing that is live in the world.
 */
 export const OBJECTS = [
-  { id: 'thought2build', group: 'work',   ndc: [ 0.24,  0.50 ], depth: 16.0, tone: 'gold' },
-  { id: 'nexus',         group: 'work',   ndc: [ 0.48,  0.10 ], depth: 21.0 },
-  { id: 'moderation',    group: 'work',   ndc: [ 0.20, -0.36 ], depth: 17.5 },
+  // In each group, the order here is the order of the rows on the page: the
+  // first object is the one each section opens tethered to, and keeping the
+  // vertical order means the leader lines from the list never cross.
+  { id: 'thought2build', group: 'work',   ndc: [ 0.24,  0.62 ], depth: 16.0, tone: 'gold' },
+  { id: 'sentineliq',    group: 'work',   ndc: [ 0.47,  0.34 ], depth: 20.0 },
+  { id: 'covenant',      group: 'work',   ndc: [ 0.58,  0.02 ], depth: 19.0 },   // right of the core, not on it
+  { id: 'nexus',         group: 'work',   ndc: [ 0.50, -0.28 ], depth: 21.0 },
+  { id: 'moderation',    group: 'work',   ndc: [ 0.20, -0.62 ], depth: 17.0 },
+
+  { id: 'tcs',           group: 'exp',    ndc: [ 0.34,  0.22 ], depth: 18.0 },
 
   /*
-    By the time the reader reaches these two groups the camera is inside the
-    disc and sees it nearly edge-on: a bright band crossing the frame at about
-    41-59% of its height. A name placed in that band is unreadable, so these
-    objects sit above or below it. The camera's field of view is vertical, so
-    the band holds that screen height at every width. Each group keeps its
-    top-to-bottom order, so the leader lines from the list never cross.
+    From here on the camera is inside the disc and sees it close to edge-on: a
+    bright band crossing the frame at roughly 41-59% of its height. A name in
+    that band is unreadable, so these objects sit above or below it. The field
+    of view is vertical, so the band holds that height at every width.
   */
-  { id: 'language',      group: 'stack',  ndc: [ 0.18,  0.64 ], depth: 16.5 },
-  { id: 'ml',            group: 'stack',  ndc: [ 0.44,  0.40 ], depth: 20.0 },
-  { id: 'genai',         group: 'stack',  ndc: [ 0.52, -0.24 ], depth: 22.5 },
-  { id: 'cloud',         group: 'stack',  ndc: [ 0.34, -0.48 ], depth: 19.0 },
-  { id: 'serve',         group: 'stack',  ndc: [ 0.13, -0.72 ], depth: 15.5 },
+  { id: 'llm',           group: 'stack',  ndc: [ 0.20,  0.62 ], depth: 16.5 },
+  { id: 'ml',            group: 'stack',  ndc: [ 0.46,  0.36 ], depth: 20.0 },
+  { id: 'backend',       group: 'stack',  ndc: [ 0.44, -0.30 ], depth: 21.0 },
+  { id: 'cloud',         group: 'stack',  ndc: [ 0.16, -0.62 ], depth: 16.0 },
+
+  { id: 'claude',        group: 'creds',  ndc: [ 0.22,  0.70 ], depth: 16.5 },
+  { id: 'awsml',         group: 'creds',  ndc: [ 0.46,  0.42 ], depth: 20.0 },
+  { id: 'awsdev',        group: 'creds',  ndc: [ 0.50, -0.36 ], depth: 21.0 },
+  { id: 'agentic',       group: 'creds',  ndc: [ 0.30, -0.56 ], depth: 18.5 },
+  { id: 'tcscert',       group: 'creds',  ndc: [ 0.14, -0.76 ], depth: 16.0 },
 
   { id: 'email',         group: 'signal', ndc: [ 0.23,  0.56 ], depth: 17.0 },
   { id: 'linkedin',      group: 'signal', ndc: [ 0.47,  0.26 ], depth: 21.0 },
@@ -96,7 +106,10 @@ let hoverCbs = [], selectCbs = [], frameCbs = [];
   its section will actually be read at. Guess the two apart and every named
   object lands somewhere other than where the layout put it.
 */
-const PATH_T = { hero: 0.0, work: 0.34, stack: 0.70, signal: 1.0 };
+// A default for EVERY group: placeObjects first runs inside resize() during
+// init, before the document has reported where its sections are, and a group
+// missing here would solve to a NaN pose and silently lose all its stars.
+const PATH_T = { hero: 0.0, work: 0.22, exp: 0.4, stack: 0.56, creds: 0.76, signal: 1.0 };
 
 /*
   How close to the camera the named objects sit, as a fraction of their authored
