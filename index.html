@@ -224,7 +224,14 @@
     .chapter,.chapter[data-side="right"]{min-height:100svh;align-items:flex-end;justify-content:flex-start;
       padding:calc(var(--bar) + 32vh) 0 34px}
     .panel{width:100%}
-    .chapter:not(.hero) .panel{background:rgba(4,5,12,.78);padding:24px 20px 26px;margin:0 -8px;width:calc(100% + 16px)}
+    /* full-bleed, and fading in from the galaxy band rather than a hard box */
+    .chapter:not(.hero) .panel{margin:0 calc(-1 * var(--gut));width:calc(100% + 2 * var(--gut));
+      padding:56px var(--gut) 28px;
+      background:linear-gradient(180deg,rgba(4,5,12,0),rgba(4,5,12,.8) 56px,rgba(4,5,12,.86))}
+    .flow{font-size:.78rem}
+    .flow li + li::before{width:16px;margin:0 7px}
+    .flow.gated li + li::before{width:24px}
+    .flow.gated li + li::after{left:19px}
     .hero{padding-top:calc(var(--bar) + 30vh)}
     .hero h1{font-size:clamp(3rem,14vw,4.6rem)}
   }
@@ -338,7 +345,7 @@
     </section>
 
     <!-- 3. SentinelIQ -->
-    <section class="chapter" id="sentineliq" data-group="sentinel" data-nav-as="work" data-side="left">
+    <section class="chapter" id="sentineliq" data-group="sentinel" data-nav-as="work" data-side="right">
       <article class="panel">
         <header class="row static head" data-id="sentineliq">
           <h2>SentinelIQ</h2>
@@ -377,7 +384,7 @@
     </section>
 
     <!-- 5. two more systems -->
-    <section class="chapter" id="systems" data-group="systems" data-nav-as="work" data-side="left">
+    <section class="chapter" id="systems" data-group="systems" data-nav-as="work" data-side="right">
       <div class="panel">
         <h2>Two more systems</h2>
         <div class="list">
@@ -424,7 +431,7 @@
     </section>
 
     <!-- 7. Skills -->
-    <section class="chapter" id="skills" data-group="stack" data-side="left">
+    <section class="chapter" id="skills" data-group="stack" data-side="right">
       <div class="panel">
         <h2>Skills</h2>
         <p class="lede">What I build with, in the four groups I actually think in.</p>

@@ -200,8 +200,14 @@ function anchorChapters() {
   const span = Math.max(1, document.documentElement.scrollHeight - innerHeight);
   const map = {};
   chapters.forEach((el) => {
+    // On a wide screen a chapter arrives when it is centred, the way it is read.
+    // On a phone, where most chapters are taller than the screen, it arrives
+    // when its TOP reaches the top of the screen: that is when its clear band —
+    // where the destination shows — is in view. Centring it there would land
+    // the camera with the panel covering the star.
+    const h = roomy.matches ? el.offsetHeight : Math.min(el.offsetHeight, innerHeight);
     map[el.dataset.group] =
-      Math.min(1, Math.max(0, (el.offsetTop + el.offsetHeight / 2 - innerHeight / 2) / span));
+      Math.min(1, Math.max(0, (el.offsetTop + (h - innerHeight) / 2) / span));
   });
   setAnchors(map);
 }

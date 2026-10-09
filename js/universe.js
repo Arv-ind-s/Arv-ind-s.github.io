@@ -53,29 +53,30 @@ const STAR_HOT   = new THREE.Color(0xffffff);
 */
 export const OBJECTS = [
   /*
-    `groups` are the chapters an object is named in. A project's star belongs to
-    the index ('work') and to its own chapter. `at` is the chapter whose camera
-    pose its screen position (ndc) is authored against; it defaults to the first
-    group. Within each chapter, order here follows the entries on the page.
+    `groups` are the chapters an object is named in: a project's star is named in
+    the index ('work') and again at its own destination. `dest` objects sit AT
+    their destination in world space (see DEST); the rest are authored on screen
+    (ndc) at the camera pose of their chapter. Within each chapter, order here
+    follows the entries on the page.
   */
-  { id: 'thought2build', groups: ['work', 't2b'],      ndc: [ 0.24,  0.62 ], depth: 16.0, tone: 'gold' },
-  { id: 'sentineliq',    groups: ['work', 'sentinel'], ndc: [ 0.47,  0.34 ], depth: 20.0 },
-  { id: 'covenant',      groups: ['work', 'covenant'], ndc: [ 0.58,  0.02 ], depth: 19.0 },
-  { id: 'nexus',         groups: ['work', 'systems'],  ndc: [ 0.50, -0.28 ], depth: 21.0 },
-  { id: 'moderation',    groups: ['work', 'systems'],  ndc: [ 0.20, -0.62 ], depth: 17.0 },
+  { id: 'thought2build', groups: ['work', 't2b'],      dest: true, tone: 'gold' },
+  { id: 'sentineliq',    groups: ['work', 'sentinel'], dest: true },
+  { id: 'covenant',      groups: ['work', 'covenant'], dest: true },
+  { id: 'nexus',         groups: ['work', 'systems'],  dest: true },
+  { id: 'moderation',    groups: ['work', 'systems'],  dest: true },
+  { id: 'tcs',           groups: ['exp'],              dest: true },
 
-  { id: 'tcs',           groups: ['exp'],    ndc: [ 0.34,  0.22 ], depth: 18.0 },
+  // Skills is a right-panel chapter: its constellation sits on the left half
+  { id: 'llm',           groups: ['stack'],  ndc: [ -0.22,  0.62 ], depth: 17.0 },
+  { id: 'ml',            groups: ['stack'],  ndc: [ -0.48,  0.32 ], depth: 20.0 },
+  { id: 'backend',       groups: ['stack'],  ndc: [ -0.44, -0.30 ], depth: 20.5 },
+  { id: 'cloud',         groups: ['stack'],  ndc: [ -0.18, -0.62 ], depth: 17.0 },
 
-  { id: 'llm',           groups: ['stack'],  ndc: [ 0.20,  0.62 ], depth: 16.5 },
-  { id: 'ml',            groups: ['stack'],  ndc: [ 0.46,  0.36 ], depth: 20.0 },
-  { id: 'backend',       groups: ['stack'],  ndc: [ 0.44, -0.30 ], depth: 21.0 },
-  { id: 'cloud',         groups: ['stack'],  ndc: [ 0.16, -0.62 ], depth: 16.0 },
-
-  { id: 'claude',        groups: ['creds'],  ndc: [ 0.22,  0.70 ], depth: 16.5 },
-  { id: 'awsml',         groups: ['creds'],  ndc: [ 0.46,  0.42 ], depth: 20.0 },
-  { id: 'awsdev',        groups: ['creds'],  ndc: [ 0.50, -0.36 ], depth: 21.0 },
-  { id: 'agentic',       groups: ['creds'],  ndc: [ 0.30, -0.56 ], depth: 18.5 },
-  { id: 'tcscert',       groups: ['creds'],  ndc: [ 0.14, -0.76 ], depth: 16.0 },
+  { id: 'claude',        groups: ['creds'],  ndc: [ 0.24,  0.66 ], depth: 17.0 },
+  { id: 'awsml',         groups: ['creds'],  ndc: [ 0.48,  0.36 ], depth: 20.0 },
+  { id: 'awsdev',        groups: ['creds'],  ndc: [ 0.52,  0.00 ], depth: 21.0 },
+  { id: 'agentic',       groups: ['creds'],  ndc: [ 0.36, -0.36 ], depth: 19.0 },
+  { id: 'tcscert',       groups: ['creds'],  ndc: [ 0.16, -0.66 ], depth: 16.5 },
 
   { id: 'email',         groups: ['signal'], ndc: [ 0.23,  0.56 ], depth: 17.0 },
   { id: 'linkedin',      groups: ['signal'], ndc: [ 0.47,  0.26 ], depth: 21.0 },
@@ -98,18 +99,92 @@ let hoverCbs = [], selectCbs = [], frameCbs = [];
   the core — the model's own latent space collapsing toward a single light.
 */
 /*
-  Where each section sits along the journey. These are only defaults: the real
-  values come from the document, because an object is placed at the camera pose
-  its section will actually be read at. Guess the two apart and every named
-  object lands somewhere other than where the layout put it.
+  The voyage. Each chapter of the page is a camera pose; the camera flies from
+  one to the next along a spline through all of them.
+
+  Destinations sit on an arc of the galaxy chosen so that, seen from the opening
+  camera, they stack top-to-bottom on the right in the same order as the index
+  lists them — the index chapter shows all five at once, beside their entries.
+  The tour then circles the galaxy from that arc and finally dives into the core.
+
+  az is measured like the camera's azimuth (0 = +z); r is radius; h is height.
 */
-// A default for EVERY group: placeObjects first runs inside resize() during
-// init, before the document has reported where its sections are, and a group
-// missing here would solve to a NaN pose and silently lose all its stars.
-const PATH_T = {
-  hero: 0.0, work: 0.12, t2b: 0.22, sentinel: 0.33, covenant: 0.44, systems: 0.55,
-  exp: 0.66, stack: 0.77, creds: 0.88, signal: 1.0,
+const DEST = {
+  thought2build: { az:  2.55, r: 7.2, h: 1.6 },
+  sentineliq:    { az:  2.00, r: 7.0, h: 1.4 },
+  covenant:      { az:  1.40, r: 7.4, h: 1.6 },
+  nexus:         { az:  0.85, r: 6.8, h: 1.3 },
+  moderation:    { az:  0.40, r: 7.8, h: 1.5 },
+  tcs:           { az: -0.45, r: 6.4, h: 1.6 },
+  skills:        { az: -1.35, r: 6.0, h: 2.0 },   // where the skills constellation gathers
+  creds:         { az: -2.25, r: 6.2, h: 2.0 },   // and the credentials
 };
+
+/*
+  One entry per chapter, in page order. Explicit poses (cam/look) or a view of a
+  destination: seen from a yaw in the destination's own frame (0 = from outside,
+  +/-pi/2 = along the tangent), an elevation and a distance. Tangential views
+  keep the bright core out of the middle of the frame — it glows at the edge on
+  the star's side. cx is where the target lands across the screen: 0.66 when its
+  panel is on the left, 0.34 when on the right. The page's data-side must agree.
+*/
+const CHAPTERS = [
+  { group: 'hero',     cam: [-6.6, 12.4, 21.3], look: [0, 0, 0],     cx: 0.62 },
+  { group: 'work',     cam: [-6.4, 17.0, 13.0], look: [1.0, 0, 0.4], cx: 0.57 },
+  { group: 't2b',      at: 'thought2build',           yaw:  0.85, elev: 0.42, dist: 5.4, cx: 0.66 },
+  { group: 'sentinel', at: 'sentineliq',              yaw: -0.85, elev: 0.42, dist: 5.4, cx: 0.34 },
+  { group: 'covenant', at: 'covenant',                yaw:  0.85, elev: 0.42, dist: 5.4, cx: 0.66 },
+  { group: 'systems',  at: ['nexus', 'moderation'],   yaw: -0.95, elev: 0.50, dist: 7.0, cx: 0.34 },
+  { group: 'exp',      at: 'tcs',                     yaw:  0.85, elev: 0.42, dist: 5.4, cx: 0.66 },
+  { group: 'stack',    at: 'skills',                  yaw: -0.85, elev: 0.50, dist: 8.5, cx: 0.34 },
+  { group: 'creds',    at: 'creds',                   yaw:  1.05, elev: 0.50, dist: 8.5, cx: 0.66 },
+  { group: 'signal',   cam: [1.4, 0.36, 1.6], look: [0, 0, -3.0],    cx: 0.62 },
+];
+const LAST = CHAPTERS.length - 1;
+const chapterIndex = (g) => CHAPTERS.findIndex((c) => c.group === g);
+/* which chapter each destination is the destination OF */
+const DEST_CHAPTER = {};
+CHAPTERS.forEach((c) => { if (c.at) [].concat(c.at).forEach((id) => { DEST_CHAPTER[id] = c.group; }); });
+
+function destPoint(id, out = new THREE.Vector3()) {
+  const d = DEST[id];
+  return out.set(Math.sin(d.az) * d.r, d.h, Math.cos(d.az) * d.r);
+}
+
+/* chapter i's camera position and look-at, before any on-screen framing */
+function chapterPose(c) {
+  if (c.cam) return { cam: new THREE.Vector3().fromArray(c.cam), look: new THREE.Vector3().fromArray(c.look) };
+  const ids = [].concat(c.at);
+  const target = ids.reduce((acc, id) => acc.add(destPoint(id, new THREE.Vector3())), new THREE.Vector3()).multiplyScalar(1 / ids.length);
+  const az = ids.reduce((sum, id) => sum + DEST[id].az, 0) / ids.length;
+  const R = new THREE.Vector3(Math.sin(az), 0, Math.cos(az));
+  const T = new THREE.Vector3(Math.cos(az), 0, -Math.sin(az));
+  const dir = R.multiplyScalar(Math.cos(c.elev) * Math.cos(c.yaw))
+    .addScaledVector(T, Math.cos(c.elev) * Math.sin(c.yaw))
+    .add(new THREE.Vector3(0, Math.sin(c.elev), 0));
+  return { cam: target.clone().addScaledVector(dir, c.dist), look: target };
+}
+
+/*
+  Where each chapter falls along the scroll, as a fraction. Defaults are even;
+  the document reports the real ones (setAnchors). A default for EVERY chapter:
+  placement first runs during init, before the document has reported anything.
+*/
+let anchors = CHAPTERS.map((_, i) => i / LAST);
+
+/*
+  Scroll fraction -> position along the spline. Piecewise linear through the
+  anchors, so that at each chapter's anchor the camera is EXACTLY at that
+  chapter's pose; pinned to the first pose before the first anchor and to the
+  last after the last (Contact's anchor is below 1).
+*/
+function uOf(t) {
+  if (t <= anchors[0]) return 0;
+  if (t >= anchors[LAST]) return 1;
+  let k = 0;
+  while (k < LAST - 1 && t >= anchors[k + 1]) k++;
+  return (k + (t - anchors[k]) / (anchors[k + 1] - anchors[k])) / LAST;
+}
 
 /*
   How close to the camera the named objects sit, as a fraction of their authored
@@ -128,18 +203,6 @@ const NEAR = 0.42;
   camera.fov. Solved against a stretched lens, every label would land wrong.
 */
 const BASE_FOV = 46;
-const PATH_POS = [
-  // P0 is the framing the fixed-camera version was tuned to, kept exactly, so
-  // the page still opens on a composition that is known to work
-  [ -6.6, 12.4, 21.3 ],    // outside and above: the whole galaxy in view
-  [ -1.6,  7.0, 13.2 ],    // dropping toward the disc, swinging round
-  [  2.8,  3.9,  8.8 ],    // crossing over the outer arm
-  [  3.6,  1.5,  4.3 ],    // inside the arm, dust streaming past
-  [  1.4,  0.36, 1.6 ],    // arriving at the core
-];
-const PATH_LOOK = [
-  [ 0, 0, 0 ], [ 0, 0, -0.4 ], [ 0, 0, -1.0 ], [ 0, 0, -1.8 ], [ 0, 0, -3.0 ],
-];
 let posCurve, lookCurve;
 
 let tCam = 0, tWant = 0, travelSpan = 1;
@@ -788,7 +851,8 @@ function placeObjects() {
     const o = OBJECTS.find((x) => x.id === sp.userData.id);
     // the pose the reader will actually be at when this object's section is the
     // one being read, so on arrival it sits exactly where the layout wants it
-    poseAt(ease(PATH_T[o.at || o.groups[0]]), tmpA, tmpB);
+    if (o.dest) { destPoint(o.id, sp.position); return; }
+    poseAt(chapterIndex(o.at || o.groups[0]) / LAST, tmpA, tmpB);
     camera.position.copy(tmpA);
     camera.lookAt(tmpB);
     camera.updateMatrixWorld(true);
@@ -827,7 +891,12 @@ function paintNamed(dt) {
     tmpC.copy(STAR_DIM).lerp(isHot ? STAR_HOT : base, d.lit);
     sp.material.color.copy(tmpC);
     sp.material.opacity = 0.34 + d.lit * 0.66;
-    sp.scale.setScalar((2.4 + d.lit * 2.6) * NEAR);
+    // Constant apparent size: the camera now meets stars from across the galaxy
+    // and from a few units away, so a world-space size would read as a speck in
+    // one chapter and a blot in the next. At its own destination a star is the
+    // subject of the chapter, and draws half as large again.
+    const dist = camera.position.distanceTo(sp.position);
+    sp.scale.setScalar((2.4 + d.lit * 2.6) * 0.05 * dist * (DEST_CHAPTER[d.id] === group ? 1.5 : 1));
   });
 }
 
@@ -841,16 +910,16 @@ function paintNamed(dt) {
   pushed sideways along the camera's own right vector. That slides the galaxy
   into the clear band without ever rolling the horizon.
 */
-function poseAt(t, outPos, outLook) {
-  posCurve.getPoint(t, outPos);
-  lookCurve.getPoint(t, outLook);
-  // Wide: the galaxy sits in the clear band right of the copy column.
-  // Narrow: there is no clear band, so it rides high and the copy starts below.
-  // "Wide" is the same query that turns the annotation layer on. It used to be
-  // a separate, larger breakpoint, so between 901 and 1059px the labels were on
-  // but the galaxy was framed for a phone: centred, with its core behind the copy.
+function poseAt(u, outPos, outLook) {
+  posCurve.getPoint(u, outPos);
+  lookCurve.getPoint(u, outLook);
+  // Wide: the target sits on the side opposite its chapter's panel, and the
+  // side swings smoothly between chapters as the camera flies.
+  // Narrow: there is no clear side, so it rides high and the copy starts below.
   const wide = roomy.matches;
-  const cx = wide ? 0.62 : 0.50;
+  const f = u * LAST, k = Math.min(LAST - 1, Math.floor(f)), w = f - k;
+  const sw = w * w * (3 - 2 * w);
+  const cx = wide ? CHAPTERS[k].cx + (CHAPTERS[k + 1].cx - CHAPTERS[k].cx) * sw : 0.50;
   // on short phones the hero's clear band is narrower, so the galaxy rides higher
   const cy = wide ? 0.50 : (innerHeight < 700 ? 0.22 : 0.30);
   if (cx === 0.5 && cy === 0.5) return;
@@ -914,8 +983,6 @@ function renderStill() {
   renderFrame();
 }
 
-/* eased so both ends of the journey settle instead of arriving at full speed */
-const ease = (x) => x * x * (3 - 2 * x);
 
 /*
   How much scrolling the whole journey costs.
@@ -1089,7 +1156,7 @@ function frame() {
   tCam = clamp(tCam + tVel * dt, 0, 1);
 
   prevPath.copy(camPos);
-  poseAt(ease(tCam), camPos, camLook);
+  poseAt(uOf(tCam), camPos, camLook);
 
   // The arrival: pull the camera back along its own line of sight, easing to
   // nothing over the first few seconds, so every visit opens with a flight in.
@@ -1160,7 +1227,7 @@ function frame() {
     const p = ripple.userData.t / 1.1;
     if (p >= 1) ripple.visible = false;
     else {
-      ripple.scale.setScalar((0.4 + p * 3.4) * NEAR);
+      ripple.scale.setScalar((0.4 + p * 3.4) * 0.05 * camera.position.distanceTo(ripple.position));
       ripple.material.opacity = (1 - p) * 0.55;
       ripple.quaternion.copy(camera.quaternion);
     }
@@ -1213,7 +1280,9 @@ export function setActive(id, pulse) {
   for the same reason the travel span is not re-measured then.
 */
 export function setAnchors(map) {
-  Object.assign(PATH_T, map);
+  // strictly increasing, or two chapters at one anchor divide by zero in uOf
+  anchors = CHAPTERS.map((c, i) => (c.group in map ? map[c.group] : i / LAST));
+  for (let i = 1; i <= LAST; i++) anchors[i] = Math.max(anchors[i], anchors[i - 1] + 1e-4);
   // the travel span comes from the same layout, so it is re-read alongside
   frameScene();
   if (alive && namedStars) placeObjects();
@@ -1309,8 +1378,10 @@ export function initUniverse(el) {
       });
   }
 
-  posCurve = new THREE.CatmullRomCurve3(PATH_POS.map((p) => new THREE.Vector3().fromArray(p)));
-  lookCurve = new THREE.CatmullRomCurve3(PATH_LOOK.map((p) => new THREE.Vector3().fromArray(p)));
+  // centripetal: it cannot overshoot or loop between unevenly spaced stops
+  const poses = CHAPTERS.map(chapterPose);
+  posCurve = new THREE.CatmullRomCurve3(poses.map((p) => p.cam), false, 'centripetal');
+  lookCurve = new THREE.CatmullRomCurve3(poses.map((p) => p.look), false, 'centripetal');
 
   // The bulge stays out: it is already the densest light in the frame, and
   // blooming it only widens a saturated white plateau where the core's detail
