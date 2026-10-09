@@ -52,37 +52,34 @@ const STAR_HOT   = new THREE.Color(0xffffff);
   `tone: 'gold'` is reserved for the one thing that is live in the world.
 */
 export const OBJECTS = [
-  // In each group, the order here is the order of the rows on the page: the
-  // first object is the one each section opens tethered to, and keeping the
-  // vertical order means the leader lines from the list never cross.
-  { id: 'thought2build', group: 'work',   ndc: [ 0.24,  0.62 ], depth: 16.0, tone: 'gold' },
-  { id: 'sentineliq',    group: 'work',   ndc: [ 0.47,  0.34 ], depth: 20.0 },
-  { id: 'covenant',      group: 'work',   ndc: [ 0.58,  0.02 ], depth: 19.0 },   // right of the core, not on it
-  { id: 'nexus',         group: 'work',   ndc: [ 0.50, -0.28 ], depth: 21.0 },
-  { id: 'moderation',    group: 'work',   ndc: [ 0.20, -0.62 ], depth: 17.0 },
-
-  { id: 'tcs',           group: 'exp',    ndc: [ 0.34,  0.22 ], depth: 18.0 },
-
   /*
-    From here on the camera is inside the disc and sees it close to edge-on: a
-    bright band crossing the frame at roughly 41-59% of its height. A name in
-    that band is unreadable, so these objects sit above or below it. The field
-    of view is vertical, so the band holds that height at every width.
+    `groups` are the chapters an object is named in. A project's star belongs to
+    the index ('work') and to its own chapter. `at` is the chapter whose camera
+    pose its screen position (ndc) is authored against; it defaults to the first
+    group. Within each chapter, order here follows the entries on the page.
   */
-  { id: 'llm',           group: 'stack',  ndc: [ 0.20,  0.62 ], depth: 16.5 },
-  { id: 'ml',            group: 'stack',  ndc: [ 0.46,  0.36 ], depth: 20.0 },
-  { id: 'backend',       group: 'stack',  ndc: [ 0.44, -0.30 ], depth: 21.0 },
-  { id: 'cloud',         group: 'stack',  ndc: [ 0.16, -0.62 ], depth: 16.0 },
+  { id: 'thought2build', groups: ['work', 't2b'],      ndc: [ 0.24,  0.62 ], depth: 16.0, tone: 'gold' },
+  { id: 'sentineliq',    groups: ['work', 'sentinel'], ndc: [ 0.47,  0.34 ], depth: 20.0 },
+  { id: 'covenant',      groups: ['work', 'covenant'], ndc: [ 0.58,  0.02 ], depth: 19.0 },
+  { id: 'nexus',         groups: ['work', 'systems'],  ndc: [ 0.50, -0.28 ], depth: 21.0 },
+  { id: 'moderation',    groups: ['work', 'systems'],  ndc: [ 0.20, -0.62 ], depth: 17.0 },
 
-  { id: 'claude',        group: 'creds',  ndc: [ 0.22,  0.70 ], depth: 16.5 },
-  { id: 'awsml',         group: 'creds',  ndc: [ 0.46,  0.42 ], depth: 20.0 },
-  { id: 'awsdev',        group: 'creds',  ndc: [ 0.50, -0.36 ], depth: 21.0 },
-  { id: 'agentic',       group: 'creds',  ndc: [ 0.30, -0.56 ], depth: 18.5 },
-  { id: 'tcscert',       group: 'creds',  ndc: [ 0.14, -0.76 ], depth: 16.0 },
+  { id: 'tcs',           groups: ['exp'],    ndc: [ 0.34,  0.22 ], depth: 18.0 },
 
-  { id: 'email',         group: 'signal', ndc: [ 0.23,  0.56 ], depth: 17.0 },
-  { id: 'linkedin',      group: 'signal', ndc: [ 0.47,  0.26 ], depth: 21.0 },
-  { id: 'github',        group: 'signal', ndc: [ 0.19, -0.42 ], depth: 17.5 },
+  { id: 'llm',           groups: ['stack'],  ndc: [ 0.20,  0.62 ], depth: 16.5 },
+  { id: 'ml',            groups: ['stack'],  ndc: [ 0.46,  0.36 ], depth: 20.0 },
+  { id: 'backend',       groups: ['stack'],  ndc: [ 0.44, -0.30 ], depth: 21.0 },
+  { id: 'cloud',         groups: ['stack'],  ndc: [ 0.16, -0.62 ], depth: 16.0 },
+
+  { id: 'claude',        groups: ['creds'],  ndc: [ 0.22,  0.70 ], depth: 16.5 },
+  { id: 'awsml',         groups: ['creds'],  ndc: [ 0.46,  0.42 ], depth: 20.0 },
+  { id: 'awsdev',        groups: ['creds'],  ndc: [ 0.50, -0.36 ], depth: 21.0 },
+  { id: 'agentic',       groups: ['creds'],  ndc: [ 0.30, -0.56 ], depth: 18.5 },
+  { id: 'tcscert',       groups: ['creds'],  ndc: [ 0.14, -0.76 ], depth: 16.0 },
+
+  { id: 'email',         groups: ['signal'], ndc: [ 0.23,  0.56 ], depth: 17.0 },
+  { id: 'linkedin',      groups: ['signal'], ndc: [ 0.47,  0.26 ], depth: 21.0 },
+  { id: 'github',        groups: ['signal'], ndc: [ 0.19, -0.42 ], depth: 17.5 },
 ];
 
 /* ------------------------------------------------------------------ state */
@@ -109,7 +106,10 @@ let hoverCbs = [], selectCbs = [], frameCbs = [];
 // A default for EVERY group: placeObjects first runs inside resize() during
 // init, before the document has reported where its sections are, and a group
 // missing here would solve to a NaN pose and silently lose all its stars.
-const PATH_T = { hero: 0.0, work: 0.22, exp: 0.4, stack: 0.56, creds: 0.76, signal: 1.0 };
+const PATH_T = {
+  hero: 0.0, work: 0.12, t2b: 0.22, sentinel: 0.33, covenant: 0.44, systems: 0.55,
+  exp: 0.66, stack: 0.77, creds: 0.88, signal: 1.0,
+};
 
 /*
   How close to the camera the named objects sit, as a fraction of their authored
@@ -788,7 +788,7 @@ function placeObjects() {
     const o = OBJECTS.find((x) => x.id === sp.userData.id);
     // the pose the reader will actually be at when this object's section is the
     // one being read, so on arrival it sits exactly where the layout wants it
-    poseAt(ease(PATH_T[o.group]), tmpA, tmpB);
+    poseAt(ease(PATH_T[o.at || o.groups[0]]), tmpA, tmpB);
     camera.position.copy(tmpA);
     camera.lookAt(tmpB);
     camera.updateMatrixWorld(true);
@@ -801,7 +801,7 @@ function placeObjects() {
 }
 
 function wireLinks() {
-  const inGroup = OBJECTS.filter((o) => o.group === group);
+  const inGroup = OBJECTS.filter((o) => o.groups.includes(group));
   const attr = links.geometry.attributes.position;
   let v = 0;
   const at = (o) => namedStars.children.find((s) => s.userData.id === o.id).position;
@@ -817,7 +817,7 @@ function wireLinks() {
 function paintNamed(dt) {
   namedStars.children.forEach((sp) => {
     const d = sp.userData;
-    const isGroup = group && OBJECTS.find((o) => o.id === d.id).group === group;
+    const isGroup = group && OBJECTS.find((o) => o.id === d.id).groups.includes(group);
     const isHot = hoverId === d.id;
     const isSel = activeId === d.id;
     d.want = isHot ? 1 : isSel ? 0.92 : isGroup ? 0.55 : 0.10;
@@ -1007,7 +1007,7 @@ function updateHover() {
   let best = null, bestD = 34 * 34;
   if (pointer.inside && !dragging && group) {
     projected.forEach((p, id) => {
-      if (!p.on || OBJECTS.find((o) => o.id === id).group !== group) return;
+      if (!p.on || !OBJECTS.find((o) => o.id === id).groups.includes(group)) return;
       const dx = p.x - pointer.x, dy = p.y - pointer.y, d = dx * dx + dy * dy;
       if (d < bestD) { bestD = d; best = id; }
     });
