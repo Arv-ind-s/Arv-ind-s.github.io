@@ -851,7 +851,8 @@ function poseAt(t, outPos, outLook) {
   // but the galaxy was framed for a phone: centred, with its core behind the copy.
   const wide = roomy.matches;
   const cx = wide ? 0.62 : 0.50;
-  const cy = wide ? 0.50 : 0.30;
+  // on short phones the hero's clear band is narrower, so the galaxy rides higher
+  const cy = wide ? 0.50 : (innerHeight < 700 ? 0.22 : 0.30);
   if (cx === 0.5 && cy === 0.5) return;
 
   const tan = Math.tan((BASE_FOV * Math.PI / 180) / 2);

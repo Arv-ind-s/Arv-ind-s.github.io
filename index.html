@@ -222,6 +222,17 @@
     .hero h1{font-size:clamp(2.35rem,9.6vw,3.2rem)}
     .hero .say{margin-top:20px}
   }
+  /* Short phones (SE-sized): the clear band for the galaxy plus the identity and
+     proof lines pushed the buttons well below the fold. The band narrows here,
+     and the galaxy rides higher to match (universe.js), so the headline still
+     starts below the core rather than on top of it. */
+  @media(max-width:900px) and (max-height:700px){
+    .hero{padding-top:calc(var(--bar) + 19vh)}
+    .hero h1{font-size:clamp(2.1rem,8.8vw,2.8rem)}
+    .hero .say{margin-top:14px;font-size:.98rem}
+    .hero .who{margin-top:12px}
+    .acts{margin-top:22px}
+  }
   @media(prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
     html{scroll-behavior:auto}
@@ -280,7 +291,7 @@
 
     <section class="plate" id="work" data-group="work">
       <h2>Selected work</h2>
-      <p class="lede">A live product, a hackathon win, a national final, and two open-source systems.</p>
+      <p class="lede">A live product, a hackathon win, a national final, and the systems I built along the way.</p>
 
       <div class="list">
         <button class="row gold" data-id="thought2build" aria-expanded="false" aria-controls="b-t2b">
