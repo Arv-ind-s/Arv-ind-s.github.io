@@ -79,3 +79,240 @@ if (copy && navigator.clipboard && window.isSecureContext) {
     setTimeout(() => (copy.textContent = "Copy email"), 2500);
   });
 }
+
+// Motion enhances visible content; nothing depends on animation to be readable.
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const activeAnimations = new Set();
+function animateOnce(element, frames, options) {
+  if (reducedMotion.matches || !element.animate) return;
+  const animation = element.animate(frames, options);
+  activeAnimations.add(animation);
+  animation.finished
+    .catch(() => {})
+    .finally(() => activeAnimations.delete(animation));
+}
+reducedMotion.addEventListener("change", () => {
+  if (reducedMotion.matches)
+    activeAnimations.forEach((animation) => animation.cancel());
+});
+if ("IntersectionObserver" in window) {
+  const reveals = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateOnce(
+          entry.target,
+          [
+            { opacity: 0.85, transform: "translateY(24px)" },
+            { opacity: 1, transform: "translateY(0)" },
+          ],
+          { duration: 750, easing: "cubic-bezier(.2,.7,.2,1)" },
+        );
+        reveals.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.12 },
+  );
+  document
+    .querySelectorAll(
+      ".section-heading,.project-copy,.about-grid>div,.credentials-title,.credential-list,.contact-heading,.case-body section",
+    )
+    .forEach((el) => reveals.observe(el));
+}
+const heroTitle = document.querySelector(".hero h1");
+if (heroTitle)
+  animateOnce(
+    heroTitle,
+    [
+      { opacity: 0.85, transform: "translateY(20px)" },
+      { opacity: 1, transform: "translateY(0)" },
+    ],
+    { duration: 1000, easing: "cubic-bezier(.2,.7,.2,1)" },
+  );
+
+document.querySelectorAll(".project-art").forEach((art) => {
+  let frame = 0;
+  art.addEventListener("pointermove", (event) => {
+    if (
+      reducedMotion.matches ||
+      event.pointerType !== "mouse" ||
+      !matchMedia("(min-width:761px)").matches
+    )
+      return;
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      const rect = art.getBoundingClientRect();
+      art.style.setProperty(
+        "--tilt-x",
+        `${(0.5 - (event.clientY - rect.top) / rect.height) * 5}deg`,
+      );
+      art.style.setProperty(
+        "--tilt-y",
+        `${((event.clientX - rect.left) / rect.width - 0.5) * 7}deg`,
+      );
+      art.classList.add("is-tilting");
+    });
+  });
+  function resetTilt() {
+    cancelAnimationFrame(frame);
+    art.classList.remove("is-tilting");
+    art.style.removeProperty("--tilt-x");
+    art.style.removeProperty("--tilt-y");
+  }
+  art.addEventListener("pointerleave", resetTilt);
+  reducedMotion.addEventListener("change", resetTilt);
+});
+document.querySelectorAll("[data-stage]").forEach((button) =>
+  button.addEventListener("click", () => {
+    const paper = button.closest(".thought-art").querySelector(".spec-paper");
+    animateOnce(
+      paper,
+      [
+        {
+          opacity: 0.65,
+          transform: "translateY(7px) rotate(-3deg) rotateY(-12deg)",
+        },
+        { opacity: 1, transform: "translateY(0) rotate(-3deg) rotateY(0deg)" },
+      ],
+      { duration: 480, easing: "cubic-bezier(.2,.7,.2,1)" },
+    );
+  }),
+);
+
+const scene = document.querySelector(".system-scene");
+if (scene) {
+  const assembly = scene.querySelector(".system-assembly"),
+    handle = scene.querySelector(".scene-handle");
+  const controls = document.querySelector(".scene-controls"),
+    expand = controls.querySelector(".expand-system");
+  handle.hidden = false;
+  controls.hidden = false;
+  let rotation = -30,
+    drag = null;
+  function render() {
+    assembly.style.transform = `rotateX(57deg) rotateZ(${rotation}deg)`;
+    handle.setAttribute("aria-valuenow", String(Math.round(rotation)));
+    handle.setAttribute("aria-valuetext", `${Math.round(rotation)} degrees`);
+  }
+  handle.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
+    drag = { x: event.clientX, rotation };
+    handle.setPointerCapture(event.pointerId);
+    scene.classList.add("dragging");
+  });
+  handle.addEventListener("pointermove", (event) => {
+    if (!drag) return;
+    rotation = Math.max(
+      -75,
+      Math.min(15, drag.rotation + (event.clientX - drag.x) * 0.35),
+    );
+    render();
+  });
+  function endDrag() {
+    drag = null;
+    scene.classList.remove("dragging");
+  }
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
+  handle.addEventListener("lostpointercapture", endDrag);
+  handle.addEventListener("keydown", (event) => {
+    if (
+      ![
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ].includes(event.key)
+    )
+      return;
+    event.preventDefault();
+    rotation =
+      event.key === "Home"
+        ? -75
+        : event.key === "End"
+          ? 15
+          : Math.max(
+              -75,
+              Math.min(
+                15,
+                rotation +
+                  (["ArrowLeft", "ArrowDown"].includes(event.key) ? -5 : 5),
+              ),
+            );
+    render();
+  });
+  expand.addEventListener("click", () => {
+    const open = scene.classList.toggle("expanded");
+    expand.setAttribute("aria-pressed", String(open));
+    expand.textContent = open ? "Bring together ↙" : "Expand layers ↗";
+  });
+  controls.querySelector(".reset-system").addEventListener("click", () => {
+    rotation = -30;
+    render();
+    scene.classList.remove("expanded");
+    expand.setAttribute("aria-pressed", "false");
+    expand.textContent = "Expand layers ↗";
+  });
+}
+
+document.querySelectorAll(".sentinel-art").forEach((art) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "trace-control";
+  button.textContent = "Trace a maintenance decision →";
+  const description = document.createElement("p");
+  description.className = "trace-description";
+  description.setAttribute("aria-live", "polite");
+  description.textContent =
+    "An illustrated workflow, not live plant telemetry.";
+  art.append(button, description);
+  const steps = [
+    "Sensor evidence → 41 versioned features.",
+    "Deterministic models → failure risk and remaining life.",
+    "Grounded diagnosis → evidence and guardrail checks.",
+    "Planner approval → immutable mock ERP work order.",
+  ];
+  let step = -1;
+  button.addEventListener("click", () => {
+    step = (step + 1) % steps.length;
+    description.textContent = steps[step];
+    button.textContent =
+      step === 3 ? "Replay the workflow ↺" : `Next step (${step + 1}/4) →`;
+    art.classList.remove("trace-active");
+    void art.offsetWidth;
+    art.classList.add("trace-active");
+  });
+});
+document.querySelectorAll(".covenant-art").forEach((art) => {
+  const description = document.createElement("p");
+  description.className = "horizon-description";
+  description.setAttribute("aria-live", "polite");
+  description.textContent =
+    "Select a forecast horizon to explore the review window.";
+  art.querySelector(".horizons").after(description);
+  const notes = {
+    30: "30 days · Review the nearest forecast window.",
+    60: "60 days · Extend the review into the medium-term window.",
+    90: "90 days · Explore the furthest forecast window.",
+  };
+  art.querySelectorAll(".horizons>div").forEach((cell, i) => {
+    const days = [30, 60, 90][i],
+      button = document.createElement("button");
+    button.type = "button";
+    button.className = "horizon-button";
+    button.setAttribute("aria-label", `${days}-day forecast horizon`);
+    button.setAttribute("aria-pressed", "false");
+    while (cell.firstChild) button.append(cell.firstChild);
+    cell.append(button);
+    button.addEventListener("click", () => {
+      art
+        .querySelectorAll(".horizon-button")
+        .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+      art.dataset.horizon = days;
+      description.textContent =
+        notes[days] + " Illustrative curve, not measured performance.";
+    });
+  });
+});
