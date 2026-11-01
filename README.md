@@ -18,7 +18,7 @@ All essential content and navigation work without JavaScript. Project illustrati
 
 ## Deployment
 
-GitHub Pages serves the root of `main`. No build step is needed. `.nojekyll` prevents processing. Check the Pages deployment after publishing a commit.
+GitHub Pages is published by `.github/workflows/pages.yml` from `main`. The workflow stages only the static site files and writes `release.json` with the exact deployed commit. Releases run one at a time. No framework build or runtime dependencies are required.
 
 ## Portfolio hierarchy
 

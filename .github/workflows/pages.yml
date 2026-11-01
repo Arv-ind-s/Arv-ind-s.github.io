@@ -1,0 +1,40 @@
+name: Publish portfolio
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Prepare static site and release marker
+        run: |
+          python3 - <<'PY'
+          import json, os, shutil
+          from pathlib import Path
+          site = Path('_site')
+          site.mkdir()
+          for name in ['index.html', '404.html', 'style.css', 'site.js', 'robots.txt', 'sitemap.xml', '.nojekyll']:
+              shutil.copy2(name, site / name)
+          for name in ['assets', 'work']:
+              shutil.copytree(name, site / name)
+          (site / 'release.json').write_text(json.dumps({'commit': os.environ['GITHUB_SHA']}))
+          PY
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v5
