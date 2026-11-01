@@ -30,8 +30,8 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="/style.css?v=motion-1" />
-    <script src="/site.js?v=motion-1" defer></script>
+    <link rel="stylesheet" href="/style.css?v=meaning-1" />
+    <script src="/site.js?v=meaning-1" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -65,54 +65,106 @@
               >Explore selected work <span>↓</span></a
             >
           </div>
-          <figure>
+          <figure class="approach-study" aria-labelledby="approach-heading">
+            <div class="approach-heading">
+              <p class="eyebrow mono">HOW I WORK</p>
+              <h3 id="approach-heading">From an idea to something useful.</h3>
+              <p>Three responsibilities I build into an AI product.</p>
+            </div>
             <div
               class="system-scene"
-              role="group"
-              aria-label="Interactive three-dimensional AI system diagram"
+              data-focus="define"
+              role="img"
+              aria-label="Three engineering responsibilities: define the work, verify the behavior, deliver a usable system."
             >
               <div class="scene-orbit" aria-hidden="true"></div>
               <div class="system-assembly" aria-hidden="true">
                 <div class="system-deck deck-input">
-                  <span class="deck-label">01 / INPUT</span>
-                  <div class="data-tracks">
-                    <i></i><i></i><i></i><i></i><i></i>
+                  <span class="deck-label">01 / DEFINE</span>
+                  <div class="layer-artifact">
+                    <span>SPEC</span><span>PLAN</span>
                   </div>
-                  <span class="deck-corner">↗</span>
+                  <span class="deck-corner">01</span>
                 </div>
                 <div class="system-deck deck-model">
-                  <span class="deck-label">02 / MODEL</span>
-                  <div class="model-chip"><span>AI</span><i></i></div>
-                  <span class="deck-corner">↗</span>
+                  <span class="deck-label">02 / VERIFY</span>
+                  <div class="layer-artifact">
+                    <span>CHECKS</span><span>EVALS</span>
+                  </div>
+                  <span class="deck-corner">02</span>
                 </div>
                 <div class="system-deck deck-verify">
-                  <span class="deck-label">03 / VERIFY</span>
-                  <div class="verification-mark">✓</div>
-                  <span class="deck-corner">↗</span>
+                  <span class="deck-label">03 / DELIVER</span>
+                  <div class="layer-artifact">
+                    <span>REVIEW</span><span>RELEASE</span>
+                  </div>
+                  <span class="deck-corner">03</span>
                 </div>
               </div>
-              <div
-                class="scene-handle"
-                hidden
-                role="slider"
-                tabindex="0"
-                aria-label="Rotate the 3D system. Drag horizontally or use arrow keys."
-                aria-valuemin="-75"
-                aria-valuemax="15"
-                aria-valuenow="-30"
-                aria-valuetext="-30 degrees"
-                aria-orientation="horizontal"
-              ></div>
-              <span class="scene-note mono">INPUT / MODEL / VERIFICATION</span>
             </div>
-            <div class="scene-controls" hidden>
-              <span class="mono">Drag to rotate</span
-              ><button type="button" class="expand-system" aria-pressed="false">
-                Expand layers ↗</button
-              ><button type="button" class="reset-system">Reset ↺</button>
+            <div
+              class="approach-controls"
+              role="group"
+              aria-label="Explore my engineering approach"
+              hidden
+            >
+              <button type="button" data-approach="define" aria-pressed="true">
+                01 <span>Define</span>
+              </button>
+              <button type="button" data-approach="verify" aria-pressed="false">
+                02 <span>Verify</span>
+              </button>
+              <button
+                type="button"
+                data-approach="deliver"
+                aria-pressed="false"
+              >
+                03 <span>Deliver</span>
+              </button>
             </div>
-            <figcaption class="mono">
-              <span>Fig. 01</span> A model is one part of the system.
+            <div class="approach-details" aria-live="polite" aria-atomic="true">
+              <section data-approach-panel="define">
+                <h4>Agree on what success means.</h4>
+                <p>
+                  Turn a vague idea into requirements, architecture decisions,
+                  and acceptance criteria before implementation.
+                </p>
+                <p class="approach-evidence">
+                  <span class="mono">IN THE WORK</span> Thought2Build creates
+                  reviewed specs and plans that give engineers and coding agents
+                  an explicit brief.
+                </p>
+              </section>
+              <section data-approach-panel="verify">
+                <h4>Make the behavior testable.</h4>
+                <p>
+                  Define how the result will be checked, so the team can
+                  evaluate the system against its requirements.
+                </p>
+                <p class="approach-evidence">
+                  <span class="mono">IN THE WORK</span> Thought2Build generates
+                  a validation harness before coding. SentinelIQ keeps numerical
+                  predictions deterministic.
+                </p>
+              </section>
+              <section data-approach-panel="deliver">
+                <h4>Make the next action clear.</h4>
+                <p>
+                  Build a usable path from output to action, with review
+                  boundaries and a handoff another person can follow.
+                </p>
+                <p class="approach-evidence">
+                  <span class="mono">IN THE WORK</span> Thought2Build delivers
+                  traceable tasks in a live workspace. Covenant Radar records
+                  the evidence behind decisions.
+                </p>
+              </section>
+            </div>
+            <figcaption>
+              <a href="/work/thought2build.html"
+                >See this approach in Thought2Build
+                <span aria-hidden="true">↗</span></a
+              ><span class="mono">Live product · Featured work</span>
             </figcaption>
           </figure>
         </div>
@@ -132,7 +184,11 @@
             different constraints.
           </p>
         </div>
-        <article class="project" id="thought2build">
+        <article class="project featured-project" id="thought2build">
+          <div class="featured-banner">
+            <span class="eyebrow mono">FEATURED PROJECT / LIVE PRODUCT</span
+            ><span>Built, shipped, and running.</span>
+          </div>
           <div class="project-art thought-art">
             <div class="art-top mono">
               <span>01 / Thought2Build</span><span>Idea → execution</span>
@@ -203,10 +259,10 @@
               <li>OAuth</li>
             </ul>
             <div class="project-links">
-              <a class="text-link" href="/work/thought2build.html"
-                >Inside the build <span>↗</span></a
-              ><a class="quiet-link" href="https://www.thought2build.com"
-                >Visit product ↗</a
+              <a class="text-link" href="https://thought2build.com/"
+                >Try Thought2Build <span>↗</span></a
+              ><a class="quiet-link" href="/work/thought2build.html"
+                >Inside the build ↗</a
               >
             </div>
           </div>

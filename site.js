@@ -179,82 +179,31 @@ document.querySelectorAll("[data-stage]").forEach((button) =>
   }),
 );
 
-const scene = document.querySelector(".system-scene");
-if (scene) {
-  const assembly = scene.querySelector(".system-assembly"),
-    handle = scene.querySelector(".scene-handle");
-  const controls = document.querySelector(".scene-controls"),
-    expand = controls.querySelector(".expand-system");
-  handle.hidden = false;
+// Each spatial layer corresponds to a responsibility explained in readable text.
+const approach = document.querySelector(".approach-study");
+if (approach) {
+  const scene = approach.querySelector(".system-scene");
+  const controls = approach.querySelector(".approach-controls");
+  const panels = [...approach.querySelectorAll("[data-approach-panel]")];
   controls.hidden = false;
-  let rotation = -30,
-    drag = null;
-  function render() {
-    assembly.style.transform = `rotateX(57deg) rotateZ(${rotation}deg)`;
-    handle.setAttribute("aria-valuenow", String(Math.round(rotation)));
-    handle.setAttribute("aria-valuetext", `${Math.round(rotation)} degrees`);
-  }
-  handle.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0) return;
-    drag = { x: event.clientX, rotation };
-    handle.setPointerCapture(event.pointerId);
-    scene.classList.add("dragging");
-  });
-  handle.addEventListener("pointermove", (event) => {
-    if (!drag) return;
-    rotation = Math.max(
-      -75,
-      Math.min(15, drag.rotation + (event.clientX - drag.x) * 0.35),
+  function selectApproach(key) {
+    scene.dataset.focus = key;
+    controls.querySelectorAll("[data-approach]").forEach((button) => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.approach === key),
+      );
+    });
+    panels.forEach(
+      (panel) => (panel.hidden = panel.dataset.approachPanel !== key),
     );
-    render();
-  });
-  function endDrag() {
-    drag = null;
-    scene.classList.remove("dragging");
   }
-  handle.addEventListener("pointerup", endDrag);
-  handle.addEventListener("pointercancel", endDrag);
-  handle.addEventListener("lostpointercapture", endDrag);
-  handle.addEventListener("keydown", (event) => {
-    if (
-      ![
-        "ArrowLeft",
-        "ArrowRight",
-        "ArrowUp",
-        "ArrowDown",
-        "Home",
-        "End",
-      ].includes(event.key)
-    )
-      return;
-    event.preventDefault();
-    rotation =
-      event.key === "Home"
-        ? -75
-        : event.key === "End"
-          ? 15
-          : Math.max(
-              -75,
-              Math.min(
-                15,
-                rotation +
-                  (["ArrowLeft", "ArrowDown"].includes(event.key) ? -5 : 5),
-              ),
-            );
-    render();
+  controls.querySelectorAll("[data-approach]").forEach((button) => {
+    button.addEventListener("click", () =>
+      selectApproach(button.dataset.approach),
+    );
   });
-  expand.addEventListener("click", () => {
-    const open = scene.classList.toggle("expanded");
-    expand.setAttribute("aria-pressed", String(open));
-    expand.textContent = open ? "Bring together ↙" : "Expand layers ↗";
-  });
-  controls.querySelector(".reset-system").addEventListener("click", () => {
-    rotation = -30;
-    render();
-    scene.classList.remove("expanded");
-    expand.setAttribute("aria-pressed", "false");
-    expand.textContent = "Expand layers ↗";
-  });
+  selectApproach("define");
 }
 
 document.querySelectorAll(".sentinel-art").forEach((art) => {
