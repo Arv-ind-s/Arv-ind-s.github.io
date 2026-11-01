@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://arv-ind-s.github.io/sitemap.xml

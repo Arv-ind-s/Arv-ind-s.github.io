@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SentinelIQ — Aravind S</title>
+    <meta
+      name="description"
+      content="Predictive maintenance with evidence, boundaries, and a human in the loop."
+    />
+    <meta name="theme-color" content="#f3f1e9" />
+    <link
+      rel="canonical"
+      href="https://arv-ind-s.github.io/work/sentineliq.html"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SentinelIQ — Aravind S" />
+    <meta
+      property="og:description"
+      content="Predictive maintenance with evidence, boundaries, and a human in the loop."
+    />
+    <meta
+      property="og:url"
+      content="https://arv-ind-s.github.io/work/sentineliq.html"
+    />
+    <meta
+      property="og:image"
+      content="https://arv-ind-s.github.io/assets/social.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link
+      rel="preload"
+      href="/assets/manrope-bold.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href="/" aria-label="Aravind S, home"
+        >a<span class="wordmark-dot">.</span>s</a
+      ><span class="header-note mono"
+        >Independent work. <br />Production mindset.</span
+      >
+      <nav aria-label="Main navigation">
+        <a href="/#work">Work <sup>05</sup></a
+        ><a href="/#about">About</a
+        ><a href="/#contact">Contact <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main" class="wrap">
+      <header class="case-hero" id="top">
+        <a class="breadcrumb" href="/#work">← All selected work</a>
+        <p class="eyebrow mono">TCS KOCHI AI HACKATHON / WINNER</p>
+        <h1>SentinelIQ</h1>
+        <p class="case-subtitle">
+          Predictive maintenance with evidence, boundaries, and a human in the
+          loop.
+        </p>
+        <dl class="case-meta">
+          <div>
+            <dt>PROJECT</dt>
+            <dd>Simulated plant demonstrator</dd>
+          </div>
+          <div>
+            <dt>ENGINEERING</dt>
+            <dd>scikit-learn · FastAPI · React · Gemini</dd>
+          </div>
+        </dl>
+      </header>
+      <div class="case-visual">
+        <div class="project-art sentinel-art">
+          <div class="art-top mono">
+            <span>02 / SentinelIQ</span><span>System schematic</span>
+          </div>
+          <div class="plant-top">
+            <span class="mono">SIMULATED PLANT</span
+            ><span class="plant-count">15<span>machines</span></span>
+          </div>
+          <div class="machine-grid" aria-hidden="true">
+            <i class=""><span>01</span><b></b></i
+            ><i class=""><span>02</span><b></b></i
+            ><i class=""><span>03</span><b></b></i
+            ><i class=""><span>04</span><b></b></i
+            ><i class=""><span>05</span><b></b></i
+            ><i class=""><span>06</span><b></b></i
+            ><i class="alert"><span>07</span><b></b></i
+            ><i class=""><span>08</span><b></b></i
+            ><i class=""><span>09</span><b></b></i
+            ><i class=""><span>10</span><b></b></i
+            ><i class=""><span>11</span><b></b></i
+            ><i class=""><span>12</span><b></b></i
+            ><i class=""><span>13</span><b></b></i
+            ><i class=""><span>14</span><b></b></i
+            ><i class=""><span>15</span><b></b></i>
+          </div>
+          <div class="signal">
+            <span class="mono">TELEMETRY → FEATURES → PREDICTION</span
+            ><svg
+              viewBox="0 0 480 65"
+              role="img"
+              aria-label="Illustrative sensor waveform, not measured data"
+            >
+              <path
+                d="M0 48H480M0 20H480"
+                stroke="#b6c4ac"
+                fill="none"
+                stroke-dasharray="3 5"
+              />
+              <path
+                d="m0 43 20-1 9-12 8 24 9-17 22 4 21-3 8-13 8 27 11-16 25 4 20-1 10-22 8 32 9-15 24 3 16-2 12-29 8 48 11-28 19 7 18-4 12-31 8 56 12-35 20 9 20-2 10-22 8 38 10-20 20 3 15-7 10 12 12-5"
+                stroke="#315648"
+                stroke-width="2"
+                fill="none"
+              />
+            </svg>
+          </div>
+          <div class="approval mono">
+            <span class="approval-dot"></span>Human approval<span
+              >→ ERP write</span
+            >
+          </div>
+          <p class="art-caption mono">
+            Numerical predictions stay deterministic.
+          </p>
+        </div>
+      </div>
+      <div class="case-body">
+        <section>
+          <h2>The problem</h2>
+          <div>
+            <p>
+              A maintenance prediction has to lead to a decision. What is likely
+              to fail? What evidence supports the diagnosis? Who can authorize
+              the action?
+            </p>
+            <p>
+              SentinelIQ connects those steps in a simulated 15-machine plant,
+              using replayable telemetry and a mock ERP integration.
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>The build</h2>
+          <div>
+            <p>
+              Sensor streams are cleaned and transformed into
+              <strong>41 versioned features</strong>. scikit-learn models
+              predict failure probability, fault mode, and remaining useful
+              life. Deterministic fusion combines the signals into a risk
+              assessment.
+            </p>
+            <p>
+              Sensor and maintenance-log agents collect evidence. A coordinator
+              assembles a diagnosis, guardrails check the response, and an
+              approval boundary controls the ERP action.
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>The decision</h2>
+          <div>
+            <p>
+              <strong>The model narrates; it does not own the numbers.</strong>
+              Numerical predictions, guardrails, approvals, and ERP
+              authorization remain deterministic.
+            </p>
+            <p>
+              Gemini can improve the explanation, but the system falls back to a
+              deterministic template when there is no API key, the network is
+              unavailable, or the circuit breaker opens. The demo can run
+              offline.
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>The boundary</h2>
+          <div>
+            <p>
+              A planner must approve an immutable work-order payload before an
+              A0 action writes to the mock ERP. A1 routing requires technician
+              acknowledgement and does not write to ERP.
+            </p>
+            <p>
+              Role-based access, idempotent work-order creation, evidence
+              citations, and an audit hash chain make the route from signal to
+              action inspectable.
+            </p>
+          </div>
+        </section>
+        <section>
+          <h2>Scope & evidence</h2>
+          <div>
+            <p>
+              This is a
+              <strong
+                >decision-support demonstrator, not a deployed plant safety
+                controller</strong
+              >. The telemetry is simulated, and the ERP is a mock service. The
+              repository includes deterministic scenarios, evaluation reports,
+              and a repeatable demo workflow.
+            </p>
+            <a class="text-link" href="https://github.com/Arv-ind-s/sentineliq"
+              >Explore the repository <span>↗</span></a
+            >
+          </div>
+        </section>
+      </div>
+      <a class="next-case" href="/work/covenant-radar.html"
+        ><div>
+          <p class="eyebrow mono">NEXT PROJECT</p>
+          <h2>Covenant Radar</h2>
+        </div>
+        <span aria-hidden="true">↗</span></a
+      >
+    </main>
+    <footer class="footer wrap">
+      <span>© <span data-year>2026</span> Aravind S</span
+      ><span class="mono">Made with intent. Kochi, India.</span
+      ><a href="#top">Back to top ↑</a>
+    </footer>
+  </body>
+</html>
