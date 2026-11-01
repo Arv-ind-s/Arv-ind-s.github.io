@@ -22,7 +22,7 @@ jobs:
       - name: Prepare static site and release marker
         run: |
           python3 - <<'PY'
-          import json, os, shutil
+          import hashlib, json, os, re, shutil
           from pathlib import Path
           site = Path('_site')
           site.mkdir()
@@ -30,7 +30,19 @@ jobs:
               shutil.copy2(name, site / name)
           for name in ['assets', 'work']:
               shutil.copytree(name, site / name)
-          (site / 'release.json').write_text(json.dumps({'commit': os.environ['GITHUB_SHA']}))
+          assets = {}
+          for name in ['style.css', 'site.js']:
+              content = (site / name).read_bytes()
+              digest = hashlib.sha256(content).hexdigest()[:12]
+              target = f'assets/portfolio-{digest}{Path(name).suffix}'
+              (site / target).write_bytes(content)
+              assets[name] = target
+          for page in site.rglob('*.html'):
+              content = page.read_text()
+              for name, target in assets.items():
+                  content = re.sub('/' + re.escape(name) + r'(?:\?[^"\s<>]*)?', '/' + target, content)
+              page.write_text(content)
+          (site / 'release.json').write_text(json.dumps({'commit': os.environ['GITHUB_SHA'], 'assets': assets}))
           PY
       - uses: actions/upload-pages-artifact@v3
         with:
