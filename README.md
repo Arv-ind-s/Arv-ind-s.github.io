@@ -10,7 +10,7 @@ Run `python3 -m http.server 8000` from this directory. Open http://localhost:800
 
 - `index.html`: concise introduction, featured Thought2Build product, supporting builds, engineering approach, experience, compact credentials, and contact.
 - `work/`: three case studies with confirmed solo ownership, decisions, tradeoffs, scope, and evidence.
-- `assets/Aravind-S-Resume.pdf`: a one-page public resume based on verified profile details.
+- `assets/Aravind_S_AI_Engineer_Resume_v2.pdf`: the user-supplied resume, published unchanged. `assets/Aravind-S-Resume.pdf` is an identical compatibility copy for existing links.
 - `assets/thought2build-live.webp`: capture of the public product page. The caption distinguishes its marketing preview from a private workspace.
 - `assets/onboarding-worked-example.md`: manually authored teaching example used by the four-stage artifact explorer. It is not generated output or customer data.
 - `style.css`: responsive typography, sticky navigation, 3D responsibility layers, print and reduced-motion styles.
