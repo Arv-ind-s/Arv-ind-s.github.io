@@ -1,25 +1,25 @@
-# Aravind S — portfolio
+# Aravind S - portfolio
 
-A buildless, self-hosted portfolio for GitHub Pages. HTML, CSS, and a small progressive-enhancement script. No runtime dependencies or tracking.
+A static, buildless portfolio for GitHub Pages. HTML, CSS, a small enhancement script, self-hosted fonts, and no trackers or runtime dependencies.
 
 ## Preview
 
-Run `python3 -m http.server 8000` from this directory and open http://localhost:8000. URLs are root-relative, matching the user GitHub Pages domain.
+Run `python3 -m http.server 8000` from this directory. Open http://localhost:8000.
 
-## Content
+## Content and hierarchy
 
-- `index.html`: introduction, five projects, experience, credentials, contact.
-- `work/`: three project write-ups.
-- `style.css`: responsive layout, reduced-motion and print styles.
-- `site.js`: project workflow controls, the Define / Verify / Deliver approach explorer, Kochi clock, and copy email.
-- `assets/`: self-hosted Manrope fonts (OFL license), favicon, social preview.
+- `index.html`: concise introduction, featured Thought2Build product, supporting builds, engineering approach, experience, compact credentials, and contact.
+- `work/`: three case studies with confirmed solo ownership, decisions, tradeoffs, scope, and evidence.
+- `assets/Aravind-S-Resume.pdf`: a one-page public resume based on verified profile details.
+- `assets/thought2build-live.webp`: capture of the public product page. The caption distinguishes its marketing preview from a private workspace.
+- `assets/onboarding-worked-example.md`: manually authored teaching example used by the four-stage artifact explorer. It is not generated output or customer data.
+- `style.css`: responsive typography, sticky navigation, 3D responsibility layers, print and reduced-motion styles.
+- `site.js`: artifact and approach controls, finite motion, copy email. All essential content and navigation work without JavaScript.
 
-All essential content and navigation work without JavaScript. Project illustrations are explanatory, not product screenshots or measured metrics. The legacy WebGL site and Three.js dependencies have been removed; they remain recoverable in Git history.
+Thought2Build has priority as the fully working, deployed product. SentinelIQ and Covenant Radar are solo hackathon demonstrators with public source code. Their scope and evaluation context must stay explicit. Do not add unsupported launch dates, usage figures, testimonials, or claims of enterprise deployment.
 
-## Deployment
+The SentinelIQ figures refer to the repository evaluation report generated 10 August 2026 on simulated data with templated narration and the LLM disabled. They must not be presented as live-plant performance.
 
-GitHub Pages is published by `.github/workflows/pages.yml` from `main`. The workflow stages only the static site files and writes `release.json` with the exact deployed commit. Releases run one at a time. No framework build or runtime dependencies are required.
+## Publishing
 
-## Portfolio hierarchy
-
-Thought2Build is the featured live product and takes precedence over the other projects. The hero introduces Aravind’s engineering approach, with project evidence attached to each responsibility. The three spatial layers are Define, Verify, and Deliver; their purpose is explained in adjacent readable content. Without JavaScript, all three explanations remain available.
+`.github/workflows/pages.yml` stages only website files, publishes CSS/JS under content-hashed filenames, and writes `release.json` with the exact commit and asset map. One release runs at a time. `main` is the publication branch. Confirm the public release marker and browser behavior before reporting a release live.

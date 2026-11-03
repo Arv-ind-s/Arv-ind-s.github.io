@@ -6,7 +6,7 @@
     <title>Thought2Build — Aravind S</title>
     <meta
       name="description"
-      content="Turning a rough idea into a build-ready handoff."
+      content="From a rough product idea to a reviewed, build-ready handoff."
     />
     <meta name="theme-color" content="#f3f1e9" />
     <link
@@ -17,7 +17,7 @@
     <meta property="og:title" content="Thought2Build — Aravind S" />
     <meta
       property="og:description"
-      content="Turning a rough idea into a build-ready handoff."
+      content="From a rough product idea to a reviewed, build-ready handoff."
     />
     <meta
       property="og:url"
@@ -28,7 +28,7 @@
       content="https://arv-ind-s.github.io/assets/social.png"
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="icon" href="/assets/favicon.svg" />
     <link
       rel="preload"
       href="/assets/manrope-bold.ttf"
@@ -36,187 +36,343 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="/style.css?v=meaning-1" />
-    <script src="/site.js?v=meaning-1" defer></script>
+    <link rel="stylesheet" href="/style.css?v=proof-1" />
+    <script src="/site.js?v=proof-1" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header wrap">
-      <a class="wordmark" href="/" aria-label="Aravind S, home"
-        >a<span class="wordmark-dot">.</span>s</a
-      ><span class="header-note mono"
-        >Independent work. <br />Production mindset.</span
-      >
-      <nav aria-label="Main navigation">
-        <a href="/#work">Work <sup>05</sup></a
-        ><a href="/#about">About</a
-        ><a href="/#contact">Contact <span aria-hidden="true">↗</span></a>
-      </nav>
+    <header class="site-header">
+      <div class="wrap nav-inner">
+        <a class="wordmark" href="/" aria-label="Aravind S, home"
+          >a<span>.</span>s</a
+        ><span class="header-note"
+          >Aravind S <span class="mono">AI ENGINEER</span></span
+        >
+        <nav aria-label="Main navigation">
+          <a href="/#work">Work</a><a href="/#about">About</a
+          ><a href="/#contact">Contact</a
+          ><a class="nav-resume" href="/assets/Aravind-S-Resume.pdf" download
+            >Résumé <span aria-hidden="true">↓</span></a
+          >
+        </nav>
+      </div>
     </header>
-    <main id="main" class="wrap">
-      <header class="case-hero" id="top">
-        <a class="breadcrumb" href="/#work">← All selected work</a>
-        <p class="eyebrow mono">LIVE PRODUCT / GENERATIVE AI</p>
+    <main id="main" tabindex="-1">
+      <header class="case-hero wrap" id="top">
+        <a class="breadcrumb" href="/#work">← Selected work</a>
+        <p class="eyebrow mono">LIVE PRODUCT</p>
         <h1>Thought2Build</h1>
         <p class="case-subtitle">
-          Turning a rough idea into a build-ready handoff.
+          From a rough product idea to a reviewed, build-ready handoff.
         </p>
+        <div class="case-actions">
+          <a class="button primary" href="https://thought2build.com/"
+            >Try Thought2Build ↗</a
+          ><a class="quiet-link" href="/assets/onboarding-worked-example.md"
+            >Download the teaching example ↓</a
+          >
+        </div>
         <dl class="case-meta">
           <div>
-            <dt>PROJECT</dt>
-            <dd>Live web product</dd>
+            <dt>MY ROLE & SCOPE</dt>
+            <dd>Solo creator · Built end to end</dd>
           </div>
           <div>
-            <dt>ENGINEERING</dt>
-            <dd>FastAPI · LLM routing · OAuth</dd>
+            <dt>CORE ENGINEERING</dt>
+            <dd>FastAPI · Multi-provider LLMs · OAuth</dd>
           </div>
         </dl>
       </header>
-      <div class="case-visual">
-        <div class="project-art thought-art">
-          <div class="art-top mono">
-            <span>01 / Thought2Build</span><span>Idea → execution</span>
-          </div>
-          <div class="paper-stack">
-            <div class="paper-back back-two"></div>
-            <div class="paper-back back-one"></div>
-            <div class="spec-paper">
-              <div class="paper-header mono">
-                <span data-file>SPEC.md</span><span>↗</span>
+      <div class="case-layout wrap">
+        <div class="case-visual">
+          <figure class="product-capture">
+            <a
+              href="https://thought2build.com/"
+              aria-label="Open the live Thought2Build product"
+              ><div class="browser-bar">
+                <span class="browser-dots" aria-hidden="true">● ● ●</span
+                ><span class="mono">thought2build.com</span
+                ><span aria-hidden="true">↗</span>
               </div>
-              <p class="paper-caption mono" data-stage-caption>
-                01 — DEFINE THE PROBLEM
-              </p>
-              <h4 data-stage-title>A clear brief. <br />A better build.</h4>
-              <div class="paper-lines" aria-hidden="true">
-                <i></i><i></i><i></i>
-              </div>
-              <div class="paper-check">
-                <span aria-hidden="true">✓</span
-                ><span data-stage-note>Requirements & acceptance criteria</span>
-              </div>
-              <div class="paper-bottom mono">
-                Human review before the next stage <span>↳</span>
-              </div>
-            </div>
-          </div>
-          <div
-            class="stage-controls"
-            hidden
-            role="group"
-            aria-label="Explore Thought2Build stages"
-          >
-            <button type="button" data-stage="0" aria-pressed="true">
-              01 <span>Spec</span></button
-            ><button type="button" data-stage="1" aria-pressed="false">
-              02 <span>Plan</span></button
-            ><button type="button" data-stage="2" aria-pressed="false">
-              03 <span>Harness</span></button
-            ><button type="button" data-stage="3" aria-pressed="false">
-              04 <span>Tasks</span>
-            </button>
-          </div>
-          <p class="art-caption mono">
-            Workflow illustration · Four reviewed stages
-          </p>
-          <span class="sr-only" data-stage-live aria-live="polite"></span>
+              <img
+                src="/assets/thought2build-live.webp"
+                alt="The live Thought2Build public page, showing its spec-to-build workflow and workspace preview"
+                width="1280"
+                height="820"
+                fetchpriority="high"
+            /></a>
+            <figcaption>
+              Captured from the live public product page. Its workspace preview
+              uses illustrative data.
+            </figcaption>
+          </figure>
         </div>
-      </div>
-      <div class="case-body">
-        <section>
-          <h2>The problem</h2>
-          <div>
-            <p>
-              A product idea can sound clear until someone has to implement it.
-              Requirements, architecture decisions, and acceptance criteria
-              often remain implicit. That ambiguity gets passed to the
-              engineer—or the coding agent—doing the work.
+        <div class="case-body">
+          <section>
+            <h2>What I built</h2>
+            <div>
+              <p>
+                I built and deployed the workspace end to end: the FastAPI
+                backend, model-provider routing, OAuth sign-in, credit-metered
+                access, and the path from an idea to a structured build package.
+              </p>
+              <p>
+                The product moves through
+                <strong>Spec → Plan → Harness → Tasks</strong>, with a human
+                review before the next stage. The resulting tasks carry the
+                context an engineer or coding agent needs to continue.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>The problem</h2>
+            <div>
+              <p>
+                A promising idea can conceal different assumptions about users,
+                requirements, and what “done” means. Passing that ambiguity
+                straight into implementation makes the handoff harder to review.
+              </p>
+              <p>
+                The product makes those decisions visible before execution: what
+                is needed, how it could be built, how it will be checked, and
+                which tasks follow.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>A consequential decision</h2>
+            <div>
+              <p>
+                <strong
+                  >I put validation assets before implementation tasks.</strong
+                >
+                That makes checking the proposed behavior part of the build
+                package.
+              </p>
+              <p>
+                The tradeoff is an additional review step before execution. In
+                return, the next stage receives explicit acceptance criteria and
+                a way to check them.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>The system around the model</h2>
+            <div>
+              <p>
+                Requests can route across Anthropic, OpenAI, and Google. OAuth
+                handles sign-in, and users can use starter credits or bring
+                their own provider credentials.
+              </p>
+              <p>
+                I built the handoff around reviewed artifacts rather than a
+                single long response. Each task stays linked to the requirements
+                it is intended to satisfy.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>What is working</h2>
+            <div>
+              <p>
+                <strong
+                  >Thought2Build is fully working and deployed live.</strong
+                >
+                Visitors can open the product and start a workspace.
+              </p>
+              <p>
+                The capture above shows the public product page. The walkthrough
+                below is manually authored to explain the artifact
+                relationships; it is not a product export or customer workspace.
+              </p>
+            </div>
+          </section>
+        </div>
+        <div class="sample-explorer">
+          <div class="sample-intro">
+            <p class="eyebrow mono">EXPLORE THE HANDOFF</p>
+            <h3>One idea.<br />Four useful artifacts.</h3>
+            <p class="sample-brief">
+              “Build an onboarding checklist for a small SaaS.”
             </p>
-          </div>
-        </section>
-        <section>
-          <h2>The build</h2>
-          <div>
             <p>
-              Thought2Build takes an idea through four artifacts:
-              <strong>Spec, Plan, Harness, and Tasks.</strong> Each stage has a
-              human review gate before the next begins.
+              Follow one requirement from the brief to a checkable
+              implementation task.
             </p>
-            <ul>
-              <li>
-                <strong>Spec:</strong> define the problem, users, requirements,
-                and acceptance criteria.
-              </li>
-              <li>
-                <strong>Plan:</strong> make the architecture, risks, and
-                implementation path explicit.
-              </li>
-              <li>
-                <strong>Harness:</strong> produce validation assets before
-                implementation begins.
-              </li>
-              <li>
-                <strong>Tasks:</strong> break delivery into work items that
-                trace back to requirements.
-              </li>
-            </ul>
-          </div>
-        </section>
-        <section>
-          <h2>The decision</h2>
-          <div>
-            <p>
-              <strong>Put validation before code.</strong> A generated plan is
-              more useful when it describes how the result will be checked. The
-              harness becomes part of the handoff rather than work left until
-              the end.
+            <p class="sample-disclosure">
+              Manually authored teaching example. Product exports and customer
+              data are not shown.
             </p>
-            <p>
-              Review gates give the person directing the build a chance to
-              correct an assumption before it spreads into the next artifact.
-            </p>
-          </div>
-        </section>
-        <section>
-          <h2>Under the hood</h2>
-          <div>
-            <p>
-              A FastAPI workspace routes model calls across Anthropic, OpenAI,
-              and Google. OAuth handles sign-in. Users can start with a
-              credit-metered tier or bring their own provider credentials.
-            </p>
-            <p>
-              The exported package is intended for people and coding agents:
-              explicit requirements, an implementation plan, validation assets,
-              and traceable tasks.
-            </p>
-          </div>
-        </section>
-        <section>
-          <h2>See it working</h2>
-          <div>
-            <p>
-              Thought2Build is available as a live product. The illustration
-              above explains the workflow; it is not a screenshot of a customer
-              workspace.
-            </p>
-            <a class="text-link" href="https://www.thought2build.com"
-              >Open Thought2Build <span>↗</span></a
+            <a
+              class="quiet-link"
+              href="/assets/onboarding-worked-example.md"
+              download
+              >Download this example (.md) ↓</a
             >
           </div>
-        </section>
-      </div>
-      <a class="next-case" href="/work/sentineliq.html"
-        ><div>
-          <p class="eyebrow mono">NEXT PROJECT</p>
-          <h2>SentinelIQ</h2>
+          <div class="sample-output">
+            <div
+              class="sample-controls"
+              role="group"
+              aria-label="Explore the four build artifacts"
+              hidden
+            >
+              <button
+                type="button"
+                data-sample="spec"
+                aria-pressed="true"
+                aria-controls="sample-spec"
+              >
+                <span class="mono">01</span>Spec</button
+              ><button
+                type="button"
+                data-sample="plan"
+                aria-pressed="false"
+                aria-controls="sample-plan"
+              >
+                <span class="mono">02</span>Plan</button
+              ><button
+                type="button"
+                data-sample="harness"
+                aria-pressed="false"
+                aria-controls="sample-harness"
+              >
+                <span class="mono">03</span>Harness</button
+              ><button
+                type="button"
+                data-sample="tasks"
+                aria-pressed="false"
+                aria-controls="sample-tasks"
+              >
+                <span class="mono">04</span>Tasks
+              </button>
+            </div>
+            <div class="sample-panels">
+              <section
+                class="sample-panel"
+                id="sample-spec"
+                data-sample-panel="spec"
+              >
+                <div class="artifact-bar mono">
+                  <span>SPEC.md</span><span>01 / 04</span>
+                </div>
+                <h4>Make “done” explicit.</h4>
+                <pre>
+# Onboarding checklist
+
+REQ-01  A signed-in user can complete a checklist item.
+AC-01   Completion is still visible after a page refresh.
+
+Boundary: users can update only their own checklist.
+Review: confirm the checklist and acceptance criteria.</pre>
+                <p class="artifact-why">
+                  A requirement and an acceptance criterion give the build a
+                  concrete target.
+                </p>
+              </section>
+              <section
+                class="sample-panel"
+                id="sample-plan"
+                data-sample-panel="plan"
+              >
+                <div class="artifact-bar mono">
+                  <span>PLAN.md</span><span>02 / 04</span>
+                </div>
+                <h4>Choose a path before implementing.</h4>
+                <pre>
+# One implementation approach
+
+Store completion against (user_id, item_id).
+PATCH /checklist/items/{id} accepts a completed flag.
+The server verifies ownership before persisting it.
+
+Decision: saved server state is authoritative.
+Risk to check: an update must not affect another user.</pre>
+                <p class="artifact-why">
+                  The plan makes the persistence and authorization decisions
+                  explicit.
+                </p>
+              </section>
+              <section
+                class="sample-panel"
+                id="sample-harness"
+                data-sample-panel="harness"
+              >
+                <div class="artifact-bar mono">
+                  <span>ACCEPTANCE.md</span><span>03 / 04</span>
+                </div>
+                <h4>Check the promised behavior.</h4>
+                <pre>
+# Acceptance check: AC-01 → REQ-01
+
+Given: a signed-in user with an incomplete item
+When:  they complete it and refresh the page
+Then:  the same item remains complete
+
+Boundary check:
+A different user cannot update that checklist item.</pre>
+                <p class="artifact-why">
+                  The acceptance check tests both the promised behavior and its
+                  access boundary.
+                </p>
+              </section>
+              <section
+                class="sample-panel"
+                id="sample-tasks"
+                data-sample-panel="tasks"
+              >
+                <div class="artifact-bar mono">
+                  <span>TASKS.md</span><span>04 / 04</span>
+                </div>
+                <h4>Hand off traceable work.</h4>
+                <pre>
+# Delivery task T-03 → REQ-01 / AC-01
+
+Implement the checklist completion endpoint.
+- Verify checklist ownership.
+- Persist completion for the current user.
+- Add the AC-01 acceptance check.
+
+Done: completion survives refresh and the check passes.</pre>
+                <p class="artifact-why">
+                  A task points back to its requirement and check, so the next
+                  person has context.
+                </p>
+              </section>
+            </div>
+          </div>
         </div>
-        <span aria-hidden="true">↗</span></a
-      >
+        <a class="next-case" href="/work/sentineliq.html"
+          ><span class="mono">NEXT CASE STUDY</span
+          ><strong>SentinelIQ →</strong></a
+        >
+      </div>
+      <section class="contact wrap" id="contact">
+        <div>
+          <p class="eyebrow mono">LET’S TALK</p>
+          <h2>Have a role or a product<br />you’d like to discuss?</h2>
+          <p>
+            Open to AI and ML engineering roles and thoughtful collaborations.
+          </p>
+        </div>
+        <div class="contact-actions">
+          <a class="email" href="mailto:arvindsathyan@gmail.com"
+            >arvindsathyan@gmail.com <span aria-hidden="true">↗</span></a
+          >
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/97aravind-s/">LinkedIn ↗</a
+            ><a href="https://github.com/Arv-ind-s">GitHub ↗</a
+            ><button type="button" class="copy-email" hidden>Copy email</button
+            ><span class="sr-only copy-status" role="status"></span>
+          </div>
+          <a class="quiet-link" href="/assets/Aravind-S-Resume.pdf" download
+            >Download résumé (PDF) ↓</a
+          >
+        </div>
+      </section>
     </main>
     <footer class="footer wrap">
-      <span>© <span data-year>2026</span> Aravind S</span
-      ><span class="mono">Made with intent. Kochi, India.</span
+      <span>© <span data-year>2026</span> Aravind S · Kochi, India</span
       ><a href="#top">Back to top ↑</a>
     </footer>
   </body>

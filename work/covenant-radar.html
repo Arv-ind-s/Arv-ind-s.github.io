@@ -28,7 +28,7 @@
       content="https://arv-ind-s.github.io/assets/social.png"
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="icon" href="/assets/favicon.svg" />
     <link
       rel="preload"
       href="/assets/manrope-bold.ttf"
@@ -36,185 +36,194 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="stylesheet" href="/style.css?v=meaning-1" />
-    <script src="/site.js?v=meaning-1" defer></script>
+    <link rel="stylesheet" href="/style.css?v=proof-1" />
+    <script src="/site.js?v=proof-1" defer></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header wrap">
-      <a class="wordmark" href="/" aria-label="Aravind S, home"
-        >a<span class="wordmark-dot">.</span>s</a
-      ><span class="header-note mono"
-        >Independent work. <br />Production mindset.</span
-      >
-      <nav aria-label="Main navigation">
-        <a href="/#work">Work <sup>05</sup></a
-        ><a href="/#about">About</a
-        ><a href="/#contact">Contact <span aria-hidden="true">↗</span></a>
-      </nav>
+    <header class="site-header">
+      <div class="wrap nav-inner">
+        <a class="wordmark" href="/" aria-label="Aravind S, home"
+          >a<span>.</span>s</a
+        ><span class="header-note"
+          >Aravind S <span class="mono">AI ENGINEER</span></span
+        >
+        <nav aria-label="Main navigation">
+          <a href="/#work">Work</a><a href="/#about">About</a
+          ><a href="/#contact">Contact</a
+          ><a class="nav-resume" href="/assets/Aravind-S-Resume.pdf" download
+            >Résumé <span aria-hidden="true">↓</span></a
+          >
+        </nav>
+      </div>
     </header>
-    <main id="main" class="wrap">
-      <header class="case-hero" id="top">
-        <a class="breadcrumb" href="/#work">← All selected work</a>
-        <p class="eyebrow mono">TCS NATIONAL HACKATHON / FINALIST</p>
+    <main id="main" tabindex="-1">
+      <header class="case-hero wrap" id="top">
+        <a class="breadcrumb" href="/#work">← Selected work</a>
+        <p class="eyebrow mono">HACKATHON BUILD / NATIONAL FINALIST</p>
         <h1>Covenant Radar</h1>
         <p class="case-subtitle">
           An early-warning system a credit reviewer can interrogate.
         </p>
+        <div class="case-actions">
+          <a
+            class="button primary"
+            href="https://github.com/Arv-ind-s/CovenantRadar"
+            >Read the source code ↗</a
+          ><a
+            class="quiet-link"
+            href="https://github.com/Arv-ind-s/CovenantRadar#readme"
+            >Read the architecture ↗</a
+          >
+        </div>
         <dl class="case-meta">
           <div>
-            <dt>PROJECT</dt>
-            <dd>Credit-risk demonstrator</dd>
+            <dt>MY ROLE & SCOPE</dt>
+            <dd>Solo build · Demonstration lending book</dd>
           </div>
           <div>
-            <dt>ENGINEERING</dt>
+            <dt>CORE ENGINEERING</dt>
             <dd>Python · Guarded LLM · Evaluation harness</dd>
           </div>
         </dl>
       </header>
-      <div class="case-visual">
-        <div class="project-art covenant-art">
-          <div class="art-top mono">
-            <span>03 / Covenant Radar</span><span>Evidence → decision</span>
-          </div>
-          <div class="radar-sheet">
-            <div class="mono radar-label">EARLY-WARNING HORIZONS</div>
-            <div class="horizons">
-              <div><strong>30</strong><span>days</span></div>
-              <div><strong>60</strong><span>days</span></div>
-              <div><strong>90</strong><span>days</span></div>
+      <div class="case-layout wrap">
+        <div class="case-visual">
+          <figure class="case-system covenant">
+            <p class="eyebrow mono">FROM STATEMENT TO REVIEW</p>
+            <ol class="architecture-flow">
+              <li>
+                <span>01</span><strong>Normalize & test</strong>
+                <p>Source statements + period-specific thresholds</p>
+              </li>
+              <li>
+                <span>02</span><strong>Score & explain</strong>
+                <p>Separate arithmetic and risk signals</p>
+              </li>
+              <li>
+                <span>03</span><strong>Record & review</strong>
+                <p>Evidence + maker-checker approvals</p>
+              </li>
+            </ol>
+            <figcaption>
+              Architecture of the credit-risk demonstrator.
+            </figcaption>
+          </figure>
+        </div>
+        <div class="case-body">
+          <section>
+            <h2>What I built</h2>
+            <div>
+              <p>
+                I built the credit-risk workspace, REST API, nightly processing
+                pipeline, guarded LLM integration, and review workflow end to
+                end.
+              </p>
+              <p>
+                The system forecasts potential covenant breaches at
+                <strong>30, 60, and 90 days</strong>. Ingest, covenant testing,
+                risk scoring, ranking, case updates, and dispatch are separate
+                nightly steps.
+              </p>
             </div>
-            <svg
-              class="risk-path"
-              viewBox="0 0 480 100"
-              role="img"
-              aria-label="Illustration of a risk signal crossing a covenant threshold"
-            >
-              <path
-                d="M0 68H480"
-                stroke="#6c7c95"
-                stroke-dasharray="4 5"
-                fill="none"
-              />
-              <path
-                d="M0 87C80 87 80 81 150 74S240 57 300 37 400 29 480 13"
-                stroke="#304868"
-                stroke-width="2"
-                fill="none"
-              />
-              <circle cx="233" cy="57" r="5" fill="#304868" />
-              <path d="M233 57V100" stroke="#6c7c95" stroke-dasharray="3 3" />
-            </svg>
-            <div class="trace-list mono">
-              <div><span>01</span>Source statement<span>↗</span></div>
-              <div><span>02</span>Covenant calculation<span>↗</span></div>
-              <div><span>03</span>Evidence & review<span>↗</span></div>
+          </section>
+          <section>
+            <h2>The problem</h2>
+            <div>
+              <p>
+                A borrower can deteriorate between financial statements.
+                Behavioral and external signals may reveal that change, but an
+                unexplained risk score is difficult for a credit reviewer to
+                defend.
+              </p>
+              <p>
+                A useful warning needs its source data, threshold, calculation,
+                evidence, and review history.
+              </p>
             </div>
-          </div>
-          <p class="art-caption mono">
-            Architecture illustration · Every warning has a trail.
+          </section>
+          <section>
+            <h2>A consequential decision</h2>
+            <div>
+              <p>
+                <strong
+                  >I kept contractual covenant arithmetic separate from
+                  behavioral risk.</strong
+                >
+                The named ratio and the threshold in force remain inspectable;
+                risk signals add a separately identified layer.
+              </p>
+              <p>
+                The tradeoff is more explicit state and evidence handling. In
+                return, a reviewer can reconstruct why a warning appeared
+                instead of accepting an opaque score.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>The review boundary</h2>
+            <div>
+              <p>
+                A single guarded LLM call site applies input masking, provider
+                checks, token budgets, and prompt-hash versioning. Attempts and
+                refusals are recorded.
+              </p>
+              <p>
+                Eight-role access control, maker-checker approvals, a
+                hash-chained audit trail, and an evaluation harness define who
+                can act and which checks gate release.
+              </p>
+            </div>
+          </section>
+          <section>
+            <h2>What this demonstrates</h2>
+            <div>
+              <p>
+                The project was a
+                <strong>TCS National Hackathon finalist</strong>. Its source and
+                architecture are public.
+              </p>
+              <p>
+                The repository describes a demo book of 24 NSE-listed Indian
+                companies, using filed results and public-data context, plus 35
+                authored offline evaluation examples across ten categories. It
+                is a demonstrator rather than a deployed lending institution’s
+                system.
+              </p>
+            </div>
+          </section>
+        </div>
+        <a class="next-case" href="/work/thought2build.html"
+          ><span class="mono">NEXT CASE STUDY</span
+          ><strong>Thought2Build →</strong></a
+        >
+      </div>
+      <section class="contact wrap" id="contact">
+        <div>
+          <p class="eyebrow mono">LET’S TALK</p>
+          <h2>Have a role or a product<br />you’d like to discuss?</h2>
+          <p>
+            Open to AI and ML engineering roles and thoughtful collaborations.
           </p>
         </div>
-      </div>
-      <div class="case-body">
-        <section>
-          <h2>The problem</h2>
-          <div>
-            <p>
-              A borrower can deteriorate between financial reporting dates.
-              Payment behavior, account activity, and industry signals may
-              reveal the change before the next statement arrives.
-            </p>
-            <p>
-              A risk score alone is not enough for a credit decision. A reviewer
-              needs to see the calculation, the source, the threshold, and the
-              evidence.
-            </p>
+        <div class="contact-actions">
+          <a class="email" href="mailto:arvindsathyan@gmail.com"
+            >arvindsathyan@gmail.com <span aria-hidden="true">↗</span></a
+          >
+          <div class="social-links">
+            <a href="https://www.linkedin.com/in/97aravind-s/">LinkedIn ↗</a
+            ><a href="https://github.com/Arv-ind-s">GitHub ↗</a
+            ><button type="button" class="copy-email" hidden>Copy email</button
+            ><span class="sr-only copy-status" role="status"></span>
           </div>
-        </section>
-        <section>
-          <h2>The build</h2>
-          <div>
-            <p>
-              Covenant Radar forecasts potential commercial loan covenant
-              breaches at <strong>30, 60, and 90 days</strong>. A six-step
-              nightly pipeline ingests data, tests covenants, scores risk, ranks
-              warnings, updates cases, and dispatches results.
-            </p>
-            <p>
-              Financial statements are normalized into a common chart of
-              accounts. Invalid inputs enter a quarantine queue. Contractual
-              ratios are checked against the threshold in force for the relevant
-              period.
-            </p>
-          </div>
-        </section>
-        <section>
-          <h2>The decision</h2>
-          <div>
-            <p>
-              <strong
-                >Keep contractual mathematics separate from behavioral
-                risk.</strong
-              >
-              The covenant calculation stays deterministic and inspectable.
-              External and behavioral signals contribute a separately identified
-              layer.
-            </p>
-            <p>
-              Each warning can be reconstructed from stored source data,
-              threshold versions, calculations, evidence, and review history.
-            </p>
-          </div>
-        </section>
-        <section>
-          <h2>Guarded by design</h2>
-          <div>
-            <p>
-              A single guarded LLM call site applies input masking, provider
-              checks, token budgets, and prompt-hash versioning. Attempts and
-              refusals are recorded.
-            </p>
-            <p>
-              Eight-role access control, maker-checker approvals, a hash-chained
-              audit trail, and an evaluation harness define who can act and what
-              must pass before release.
-            </p>
-          </div>
-        </section>
-        <section>
-          <h2>Scope & evidence</h2>
-          <div>
-            <p>
-              The repository describes a
-              <strong>demo book of 24 NSE-listed Indian companies</strong>,
-              using their filed quarterly results, with a public-data workspace
-              for news and economic context. It is a demonstrator, not a claim
-              of deployment at a lending institution.
-            </p>
-            <p>
-              The diagram above is an explanation of the system, not measured
-              forecast performance.
-            </p>
-            <a
-              class="text-link"
-              href="https://github.com/Arv-ind-s/CovenantRadar"
-              >Explore the repository <span>↗</span></a
-            >
-          </div>
-        </section>
-      </div>
-      <a class="next-case" href="/work/thought2build.html"
-        ><div>
-          <p class="eyebrow mono">NEXT PROJECT</p>
-          <h2>Thought2Build</h2>
+          <a class="quiet-link" href="/assets/Aravind-S-Resume.pdf" download
+            >Download résumé (PDF) ↓</a
+          >
         </div>
-        <span aria-hidden="true">↗</span></a
-      >
+      </section>
     </main>
     <footer class="footer wrap">
-      <span>© <span data-year>2026</span> Aravind S</span
-      ><span class="mono">Made with intent. Kochi, India.</span
+      <span>© <span data-year>2026</span> Aravind S · Kochi, India</span
       ><a href="#top">Back to top ↑</a>
     </footer>
   </body>
