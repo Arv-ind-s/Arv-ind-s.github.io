@@ -23,3 +23,7 @@ The SentinelIQ figures refer to the repository evaluation report generated 10 Au
 ## Publishing
 
 `.github/workflows/pages.yml` stages only website files, publishes CSS/JS under content-hashed filenames, and writes `release.json` with the exact commit and asset map. One release runs at a time. `main` is the publication branch. Confirm the public release marker and browser behavior before reporting a release live.
+
+## Spatial treatment
+
+The desktop introduction previews Thought2Build as four physical artifact sheets. Selecting a sheet selects the corresponding teaching example; selecting an example updates the preview. The public product capture uses a raised frame and bounded pointer perspective. Reading text stays on a stable plane. Mobile retains shallow static depth without pointer tilt, and reduced-motion preferences disable dynamic transforms.
